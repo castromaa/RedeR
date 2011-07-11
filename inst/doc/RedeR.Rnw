@@ -307,7 +307,8 @@ This dataset integrates a case study that soon is going to appear in a new commu
 
 \begin{small}
 <<label=Pre-processing pipelines, eval=FALSE>>=
-source("casePart1.R")
+scriptFile <- system.file("script", "casePart1.R", package="RedeR")
+source(scriptFile)
 deaPipeline()
 deaFigures()
 clustPipeline(nboot=1000)
@@ -328,7 +329,8 @@ p.s.3 Snow package might need adjustments to run parallel computing!
 
 \begin{small}
 <<label=Pre-processing pipelines, eval=FALSE>>=
-source("casePart1.R")
+scriptFile <- system.file("script", "casePart2.R", package="RedeR")
+source(scriptFile)
 analysesPipeline()
 gscoPipeline4RedeR()
 ppiPipeline4RedeR()

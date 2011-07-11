@@ -1,7 +1,7 @@
 Package: RedeR
 Type: Package
 Title: RedeR: bridging the gap between network analysis and visualization.
-Version: 0.99.1
+Version: 0.99.2
 Date: 2011-06-27
 Author: Mauro Castro
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
