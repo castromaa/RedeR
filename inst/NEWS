@@ -1,0 +1,43 @@
+ NEWS/ChangeLog for RedeR
+--------------------------
+
+ 1.0.2	2011-06-27
+
+  NEW FEATURES
+    o Improved dynamic layout for containers.
+    o Improved interface, better connection between R and Java
+    o Improved uploading speed.
+    o Added a pre-processed dataset to demonstrate the package in the upcoming case studies.  
+
+  BUG FIXES
+    o Some routines are more simplified for easier maintenance.
+
+  BUG FIXES
+
+ 1.0.1	2011-04-20
+
+  NEW FEATURES
+
+    o Container status now can be set to transparence.
+    o Graphs can be printed using local PDF and PostScript printers 
+      (for better quality).
+    o Nodes can be assigned to containers 
+      (to allow subnetworks with overlapping nodes)
+    o Graphs can be added to the current session also via app.
+    o Improved I/O routines and interactivity.
+    o Improved static and dynamic layouts for containers.
+    o New method to send series of graphs to RedeR.
+    o New method to duplicate graphs and subgraphs in a network.
+    o New method to nest graphs and subgraphs in a network.
+    o "RedeR" is set as the final name for the "dyNet-RDyNet" project.
+
+  BUG FIXES
+
+    o PostScript corrected for R interface.
+    o Arrows set to large edges.
+    o Zoom of nested objects now returns to default after released.  
+    o Synchronization of dynamic layout is fixed for dense networks.
+    o Data loading/transfer via xmlrpc protocol is set for better performance.
+    o KK layout algorithm was removed due to unresolved 3rd part exceptions.
+
+ 1.0.0	2011-03-23	[1st public release]

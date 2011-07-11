@@ -1,0 +1,49 @@
+\name{mergeContainerOutEdges}
+\alias{mergeContainerOutEdges}
+\alias{mergeContainerOutEdges,RedPort-method}
+
+\title{Merge out-edges. }
+
+\description{
+Method to assign out-edges to containers in an active RedeR session. This method transfers edges from nodes to the respective containers when the assignments are not limited to the nested structure.
+}
+
+\usage{
+mergeContainerOutEdges(obj)
+}
+
+\arguments{
+  \item{obj}{Object of RedPort Class. }
+}
+
+\value{
+Add/change container attributes.
+}
+
+\author{Mauro Castro}
+
+\note{
+Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'calld').
+}
+
+\seealso{
+\code{\link[RedeR:RedPort]{RedPort}}
+}
+
+\examples{
+
+rdp <- RedPort('MyPort') 
+el<-matrix(c("n1","n2","n1","n3","n1","n4","n2","n5","n2","n6","n2","n7"), ncol=2, byrow=TRUE)
+g <- graph.edgelist(el)
+
+\dontrun{
+
+  calld(rdp)
+  addGraph( rdp, g, layout.kamada.kawai(g) )
+  nestNodes( rdp, c("n1","n2") )
+  mergeContainerOutEdges(rdp)  
+  updateGraph(rdp)
+}  
+}
+
+\keyword{graph}
