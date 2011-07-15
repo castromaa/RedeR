@@ -1,0 +1,30 @@
+load("/Users/castro02/RWork/RedeR/RedeR/data/TSS.map.RData")
+ls()
+load("/Users/castro02/RWork/RedeR/RedeR/data/ER.RedeR.RData")
+ls()
+ER.RedeR<-list()
+$
+ER.RedeR$data<-erdata
+ER.RedeR$net<-ernet
+names(ER.RedeR)
+ER.RedeR$data
+save(ER.RedeR,file="./ER.RedeR2.RData")
+load("/Users/castro02/RWork/RedeR/RedeR/data/gsca4RedeR.RData")
+ls()
+gsca4RedeR<-list()
+gsca4RedeR$gsca<-gsca
+gsca4RedeR$hits <-hits
+gsca4RedeR$pheno <-pheno
+names(gsca4RedeR)
+ls()
+dir()
+save(gsca4RedeR, file= "gsca4RedeR.RData")
+load("/Users/castro02/RWork/RedeR/RedeR/data/bionet4RedeR.RData")
+#save(gsca4RedeR, file= "gsca4RedeR.RData")
+ls()
+bionet4RedeR<-list()
+bionet4RedeR$pheno<-pheno
+bionet4RedeR$subnets <-subnets
+save(bionet4RedeR, file= "bionet4RedeR.RData")
+load("/Users/castro02/RWork/RedeR/RedeR/data/ER.ppi.RData")
+ls()

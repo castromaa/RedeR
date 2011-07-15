@@ -1,0 +1,126 @@
+exportClasses (RedPort,PluginBuilder)
+
+exportMethods (
+
+  calld,
+  ping,
+  version,
+  updateGraph,
+  dynwin,
+  getGraph,
+  addGraph,
+  addSeries,
+  duplicateGraph,
+  addSubgraph,
+  addSubgraph.list,
+
+  getNodes,
+  getNodeIDs,
+  getNodeAliases,
+  getNodeX,
+  getNodeY,
+  getNodeW,
+  getNodeH,
+  getNodeBend,
+  getNodeSize,
+  getNodeShape,
+  getNodeColor,
+  getNodeLineWidth,
+  getNodeLineColor,
+  getNodeFontName,
+  getNodeFontStyle,
+  getNodeFontSize,
+  getNodeFontColor,
+  getNodeFontX,
+  getNodeFontY,
+  getNodeWeight,
+
+  setNodeAlias,
+  setNodeXY,       
+  setNodeBend,    
+  setNodeSize,     
+  setNodeShape,    
+  setNodeColor,    
+  setNodeLineWidth, 
+  setNodeLineColor,
+  setNodeFontName, 
+  setNodeFontStyle,
+  setNodeFontSize, 
+  setNodeFontColor,
+  setNodeFontXY,   
+  setNodeWeight,  
+                  
+  addNodes,        
+  deleteNodes,     
+  nestNodes,       
+                  
+  updateContainerSize,
+  mergeOutEdges,
+  getContainerComponets,
+  mergeNodes,      
+                  
+  getEdges,        
+  getSourceEdges,  
+  getTargetEdges,  
+                  
+  getEdgeIDs,      
+  getSourceEdgeIDs,
+  getTargetEdgeIDs,
+  getArrowDirection,
+                  
+  getEdgeWidth,    
+  getEdgeColor,    
+  getEdgeType,     
+  getEdgeWeight,   
+                  
+  setArrowDirection,
+  setEdgeWidth,    
+  setEdgeColor,    
+  setEdgeType,     
+  setEdgeWeight,   
+   
+  addEdges,               
+  deleteEdges,     
+  addEdgeBetweenContainers,
+                  
+  selectEdges,      
+  selectNodes,      
+                  
+  selectAllEdges,  
+  selectAllNodes,  
+  selectGraph,     
+                  
+  deSelectEdges,   
+  deSelectNodes,   
+  deSelectGraph,   
+                  
+  deleteSelectedEdges,
+  deleteSelectedNodes,
+                  
+  isDynamicsActive,
+  submitPlugin,
+  deletePlugin,
+  updatePlugins,
+
+  exitd,
+  resetd
+
+   )
+
+export(
+
+  RedPort,
+  PluginBuilder,
+  pluginParser
+
+   )
+
+importFrom(methods, "@<-", new)
+
+importFrom(XMLRPC, xml.rpc)
+
+import(igraph)
+
+
+
+
