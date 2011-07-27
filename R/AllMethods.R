@@ -1579,7 +1579,7 @@ setMethod ('deleteNodes', 'RedPort',
 setMethod ('nestNodes', 'RedPort', 
   function (obj, nodes, nestImage ='plain', isAssign=TRUE, isAnchor=FALSE, gscale=40, gcoord=NULL, parent=NULL, 
   gatt=list(), theme=c('tm0','tm1','tm2','tm3','tm4')) { 
-  	if(ping(obj)==0)return(NULL)
+  	if(ping(obj)==0)return(invisible())
   	
 	#Further checks---------------------------------------------------- 
 	if(!is.list(gatt)){
@@ -1819,14 +1819,14 @@ setMethod ('updateContainerSize', 'RedPort',
     })
 #-------------------------------------------------------------------------------
 setMethod ('mergeOutEdges', 'RedPort', 
-  function (obj,isNorm=TRUE) { 
+  function (obj,isNorm=TRUE, lb=NULL, ub=NULL) { 
   	if(ping(obj)==0)return(invisible())
   	if(is.logical(isNorm)){
   		isNorm=ifelse(isNorm,'true','false')
   	} else {
   		isNorm='true'
   	}
-    res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', isNorm)
+    res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', isNorm, lb, ub)
     invisible( updateGraph(obj) )
     res
     })        
