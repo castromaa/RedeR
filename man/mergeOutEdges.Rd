@@ -20,7 +20,10 @@ mergeOutEdges(obj,...)
 \details{       
 Additional arguments: 
 \describe{
-   \item{setNorm}{Logical value. Whether to normalize out-edge width by the total possible links between connoted nests; if false, it will run a simple sum (default=TRUE). }}
+   \item{setNorm}{Logical value. Whether to normalize out-edge width by the total possible links between connoted nests; if false, it will run a simple sum (default=TRUE). }
+   \item{lb}{Lower bound used to set the normalized edge width (default=NULL). }
+   \item{ub}{Upper bound used to set the normalized edge width (default=NULL). }
+}
 }
 
 \value{
