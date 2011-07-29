@@ -657,7 +657,7 @@ setMethod ('addGraph', 'RedPort',
     	}
     	layout=layout.random(g)
     }
-    #Get names from edges if not available------------------------------
+    #Get names from vertex if not available------------------------------
     if(is.null(V(g)$name)){
     	V(g)$name=as.character(V(g))
     } else {
@@ -869,7 +869,7 @@ setMethod ('addGraph', 'RedPort',
       nodeFontSize   = V(g)$nodeFontSize
       nodeFontColor  = V(g)$nodeFontColor        
       #nodeAlias
-      if(!is.null(nodeAlias)){       
+      if(!is.null(nodeAlias) && length(nodeAlias)>0){       
           c1=!is.character(nodeAlias)
           if(c1){
               warning("NOTE: node 'alias' must be provided as character!")
@@ -883,7 +883,9 @@ setMethod ('addGraph', 'RedPort',
           nodeAlias=as.character(al)
        }      
        #Node coords.
-       if(!is.null(coordX) && !is.null(coordY)){
+       c1=length(coordX)>0 && length(coordY)>0
+       c2=!is.null(coordX) && !is.null(coordY)
+       if(c1 && c2){
            c1=!is.numeric(coordX)
            c2=!is.numeric(coordY)
            if(c1 && c2){
@@ -905,7 +907,7 @@ setMethod ('addGraph', 'RedPort',
            coordY=as.numeric(c(10,10))      
       }
       #nodeBend
-      if(!is.null(nodeBend)){       
+      if(!is.null(nodeBend) && length(nodeBend)>0){       
          c1=!is.numeric(nodeBend)
          if(c1){
               warning("NOTE: node 'bend' must be provided as numerics!")
@@ -926,7 +928,7 @@ setMethod ('addGraph', 'RedPort',
           nodeBend=as.numeric(c(-1,-1))
       }      
       #nodeSize
-      if(!is.null(nodeSize)){       
+      if(!is.null(nodeSize) && length(nodeSize)>0){       
           c1=!is.numeric(nodeSize)
           if(c1){
               warning("NOTE: node 'size' must be provided as numerics!")
@@ -947,7 +949,7 @@ setMethod ('addGraph', 'RedPort',
           nodeSize=as.numeric(c(-1,-1))
       }        
       #nodeShape
-      if(!is.null(nodeShape)){       
+      if(!is.null(nodeShape) && length(nodeShape)>0){       
           c1=!is.character(nodeShape)
           if(c1){
               warning("NOTE: node 'shape' must be provided as character!")
@@ -963,7 +965,7 @@ setMethod ('addGraph', 'RedPort',
           nodeShape=as.character(c('',''))
       }                      
       #nodeColor
-      if(!is.null(nodeColor)){       
+      if(!is.null(nodeColor) && length(nodeColor)>0){       
         c1=!is.character(nodeColor)
         if(c1){
           warning("NOTE: node 'color' must be provided as character (hexadecimal)!")
@@ -983,7 +985,7 @@ setMethod ('addGraph', 'RedPort',
           nodeColor=as.character(c('',''))
       }
       #nodeWeight
-      if(!is.null(nodeWeight)){       
+      if(!is.null(nodeWeight) && length(nodeWeight)>0){       
           c1=!is.numeric(nodeWeight)
           if(c1){
               warning("NOTE: node 'weight' must be provided as numerics!")
@@ -1000,7 +1002,7 @@ setMethod ('addGraph', 'RedPort',
           nodeWeight=as.numeric(c(0.0,0.0))
       }  
       #nodeLineWidth
-      if(!is.null(nodeLineWidth)){       
+      if(!is.null(nodeLineWidth) && length(nodeLineWidth)>0){       
           c1=!is.numeric(nodeLineWidth)
           if(c1){
               warning("NOTE: node 'line width' must be provided as numerics!")
@@ -1021,7 +1023,7 @@ setMethod ('addGraph', 'RedPort',
           nodeLineWidth=as.numeric(c(-1,-1))
       }
       #nodeLineColor
-      if(!is.null(nodeLineColor)){       
+      if(!is.null(nodeLineColor) && length(nodeLineColor)>0){       
         c1=!is.character(nodeLineColor)
         if(c1){
           warning("NOTE: node 'line color' must be provided as hexadecimal!")
@@ -1041,7 +1043,7 @@ setMethod ('addGraph', 'RedPort',
           nodeLineColor=as.character(c('',''))
       }    
       #nodeFontSize
-      if(!is.null(nodeFontSize)){       
+      if(!is.null(nodeFontSize) && length(nodeFontSize)>0){       
         c1=!is.integer(nodeFontSize)
         c2=!is.numeric(nodeFontSize)
         if(c1 && c2){
@@ -1063,7 +1065,7 @@ setMethod ('addGraph', 'RedPort',
           nodeFontSize=as.numeric(c(-1,-1))
       }
       #nodeFontColor
-      if(!is.null(nodeFontColor)){       
+      if(!is.null(nodeFontColor) && length(nodeFontColor)>0){       
         c1=!is.character(nodeFontColor)
         if(c1){
           warning("NOTE: node 'font color' must be provided as hexadecimal!")
@@ -1091,7 +1093,7 @@ setMethod ('addGraph', 'RedPort',
       edgeColor      = E(g)$edgeColor
       edgeType       = E(g)$edgeType
       
-      if(length(list.edge.attributes(g))>0){
+      if(length(list.edge.attributes(g))>0 && ecount(g)>0){
       		message('*** Uploading edge attributes ...')   
       }
           
@@ -1109,7 +1111,7 @@ setMethod ('addGraph', 'RedPort',
        }
            
      #arrowDirection                             
-     if(!is.null(arrowDirection)){       
+     if(!is.null(arrowDirection) && length(arrowDirection)>0){       
         c1=!is.integer(arrowDirection)
         c2=!is.numeric(arrowDirection)
         c3=(sum(arrowDirection<0)>0 || sum(arrowDirection>3)>0)
@@ -1133,7 +1135,7 @@ setMethod ('addGraph', 'RedPort',
         arrowDirection=as.numeric(c(-1,-1))
     }
     #edgeWeight
-    if(!is.null(edgeWeight)){       
+    if(!is.null(edgeWeight) && length(edgeWeight)>0 ){       
         c1=!is.numeric(edgeWeight)
         if(c1){
             warning("NOTE: edge 'weight' must be provided as numerics!")
@@ -1150,7 +1152,7 @@ setMethod ('addGraph', 'RedPort',
         edgeWeight=as.numeric(c(0.0,0.0))
     }      
     #edgeWidth
-    if(!is.null(edgeWidth)){       
+    if(!is.null(edgeWidth) && length(edgeWidth)>0){       
         c1=!is.numeric(edgeWidth)
         c2=sum(edgeWidth<0)>0
         c3=length(edgeWidth)==2 && sum(edgeWidth<0)==1        
@@ -1173,7 +1175,7 @@ setMethod ('addGraph', 'RedPort',
        edgeWidth=as.numeric(c(-1,-1))
     }              
     #edgeColor
-    if(!is.null(edgeColor)){       
+    if(!is.null(edgeColor) && length(edgeColor)>0){       
       c1=!is.character(edgeColor)
       if(c1){
           warning("NOTE: edge 'color' must be provided as hexadecimal!")
@@ -1193,7 +1195,7 @@ setMethod ('addGraph', 'RedPort',
         edgeColor=as.character(c('',''))
     }
     #edgeType
-    if(!is.null(edgeType)){       
+    if(!is.null(edgeType) && length(edgeType)>0){       
       c1=!is.character(edgeType)
       if(c1){
           warning("NOTE: edge 'type' must be provided as character!")
@@ -1215,9 +1217,9 @@ setMethod ('addGraph', 'RedPort',
         #Main call to load nodes and edges
         invisible( xml.rpc (obj@uri, 'RedHandler.updateGraphMap', edges[,1],
               edges[,2], arrowDirection, edgeWeight, edgeWidth, edgeColor, edgeType,
-              nodes,coordX,coordY,nodeBend,nodeSize,nodeShape,nodeColor,
-              nodeWeight, nodeLineWidth,nodeLineColor,nodeFontSize,
-              nodeFontColor,nodeAlias,gcoord[1], gcoord[2], update, isBrandNew) )             
+              nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
+              nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
+              nodeFontColor, nodeAlias, gcoord[1], gcoord[2], update, isBrandNew) )             
     } else {
         #Main call to load only nodes
         invisible (xml.rpc (obj@uri, 'RedHandler.updateNodeMap', 
@@ -1632,11 +1634,11 @@ setMethod ('nestNodes', 'RedPort',
   		}
   	}  	  	
 
-  	if(is.character(gatt$parent)){
+  	if(is.character(gatt$parent) && length(gatt$parent)>0){
   		parent=gatt$parent[1]
   		nodes=paste(nodes,".$", parent,sep="")
   	} else {
-   		if(is.character(parent)){
+   		if(is.character(parent) && length(parent)>0){
    			parent=parent[1]
   			nodes=paste(nodes,".$", parent,sep="")
   		}
@@ -1648,7 +1650,7 @@ setMethod ('nestNodes', 'RedPort',
 		message('*** Uploading nest attributes ...')
 	}
 	#Nest aliases
-	if(is.character(gatt$nestAliases)){
+	if(is.character(gatt$nestAliases) && length(gatt$nestAliases)>0){
 		message("** ... nest 'alias'")
 		charAtt[1]=gatt$nestAliases[1]
 	} else if(!is.null(gatt$nestAliases)){
@@ -1680,7 +1682,7 @@ setMethod ('nestNodes', 'RedPort',
 	}	
 	#Nest color
 	if(is.character(gatt$nestColor)){
-		nestColor=gatt$nestColor[1]
+		gatt$nestColor=gatt$nestColor[1]
 		if(is.na(gatt$nestColor)){
 			warning("NOTE: invalid nest 'color' declaration: 'NA' found'!")
 		} else if(nchar(gatt$nestColor)>9){
