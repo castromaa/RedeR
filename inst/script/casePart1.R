@@ -639,7 +639,7 @@ getSummary<-function(ER.pvchip,expcol=1){
 	return(ER.pvchip)
 }
 #plot figures for ChIP-on-chip mapping
-tssplot<-function(pvchipexp,distrange=1000,splitExpression=TRUE,upperplot=TRUE, plotfit=TRUE){
+tssplot<-function(pvchipexp, distrange=1000, splitExpression=TRUE, upperplot=TRUE, plotfit=TRUE){
 	library(gplots)
 	if(length(pvchipexp$clt)<=3){
 		stop("NOTE: not enough clusters to plot this figure for RedeR case study!")
@@ -665,6 +665,7 @@ tssplot<-function(pvchipexp,distrange=1000,splitExpression=TRUE,upperplot=TRUE, 
 	pvchipexp<-getSummary(pvchipexp, expcol=k)
 	#checks!!!
 	#boxplot(t(pvchipexp$bdsummary[sort.list(pvchipexp$bdsummary[,3]),]))
+	#boxplot(t(pvchipexp$logFCsummary[sort.list(pvchipexp$bdsummary[,3]),]))
 	#pvchipexp$clt[sort.list(pvchipexp$bdsummary[,3])]
 	#pvchipexp$bddata[sort.list(pvchipexp$bdsummary[,3])]
 	#
@@ -773,7 +774,7 @@ tssplot<-function(pvchipexp,distrange=1000,splitExpression=TRUE,upperplot=TRUE, 
 	# plot data
 	plot.new()
 	ylim=c(-0.15,3)
-	if(!upperplot)ylim=c(-3,0)
+	if(!upperplot)ylim=c(-3,0.15)
 	plot.window(ylim=ylim, xlim =c(-distrange, distrange))
 	axis(2,cex.axis=1.3) 
 	axis(1,cex.axis=1.3)
@@ -834,6 +835,7 @@ tssplot<-function(pvchipexp,distrange=1000,splitExpression=TRUE,upperplot=TRUE, 
 	}
 	dev.off()
 }
+
 
 ###############################################################################
 #####################igraph objects for chip-on-chip data######################

@@ -35,7 +35,7 @@ setMethod ('resetd', 'RedPort',
 setMethod ('version', 'RedPort', 
   function (obj) { 
   		if(ping(obj)==0)return(invisible())
-   	 	invisible (xml.rpc (obj@uri, 'RedHandler.version'))
+   	 	return (xml.rpc (obj@uri, 'RedHandler.version'))
     })
 #-------------------------------------------------------------------------------
 setMethod ('calld', 'RedPort',
@@ -1212,20 +1212,23 @@ setMethod ('addGraph', 'RedPort',
     }
     
     #Loading graph...      
-    isBrandNew=ifelse(isNest && isAssign,'true','false')    
+    isBrandNew=ifelse(isNest && isAssign,'true','false')
+    numsuppl=c(gcoord[1],gcoord[2])
+    charsuppl=c(update,isBrandNew)    
     if(ecount(g)>0 && loadEdges){
+    	#update, isBrandNew   	
         #Main call to load nodes and edges
         invisible( xml.rpc (obj@uri, 'RedHandler.updateGraphMap', edges[,1],
               edges[,2], arrowDirection, edgeWeight, edgeWidth, edgeColor, edgeType,
               nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
               nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
-              nodeFontColor, nodeAlias, gcoord[1], gcoord[2], update, isBrandNew) )             
+              nodeFontColor, nodeAlias, numsuppl, charsuppl) )             
     } else {
         #Main call to load only nodes
         invisible (xml.rpc (obj@uri, 'RedHandler.updateNodeMap', 
-              nodes,coordX,coordY,nodeBend,nodeSize,nodeShape,nodeColor,
-              nodeWeight, nodeLineWidth,nodeLineColor,nodeFontSize,
-              nodeFontColor,nodeAlias,gcoord[1], gcoord[2], update, isBrandNew) )
+              nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
+              nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
+              nodeFontColor, nodeAlias, numsuppl, charsuppl) )
     }
     
     #Check nesting condition
