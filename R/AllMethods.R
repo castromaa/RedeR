@@ -1234,7 +1234,7 @@ setMethod ('addGraph', 'RedPort',
     #Check nesting condition
     nestref=NULL
     if(isNest){
-        nestref=nestNodes(obj, nodes, nestImage, isAssign, isAnchor, gscale=NULL, gcoord=NULL,gatt=gatt, theme=theme)
+        nestref=nestNodes(obj, nodes, nestImage, isAssign, isAnchor, gscale=gscale, gcoord=NULL,gatt=gatt, theme=theme)
         if(!is.null(nestref))return(nestref)
     } else {
     	invisible( updateGraph(obj) )
@@ -1831,7 +1831,15 @@ setMethod ('mergeOutEdges', 'RedPort',
   	} else {
   		isNorm='true'
   	}
-    res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', isNorm, lb, ub)
+  	lb=lb[1]
+  	ub=ub[1]
+  	isNull="false"
+  	if(!is.numeric(lb) || !is.numeric(ub)){
+  		lb=0
+  		ub=0
+  		isNull="true"
+  	}
+    res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', isNorm, lb, ub, isNull)
     invisible( updateGraph(obj) )
     res
     })        
