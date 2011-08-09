@@ -21,7 +21,7 @@ nesthc(obj, hc, ...)
 \details{       
 Additional arguments: 
 \describe{
-  \item{cutlevel}{Cut level of the hclust object (default = 2) <numeric>. The distance is related to the option 'metric'. For "rootdist" and "leafdist", the cut level is related to the n steps required to get to the root's level or to the leaf's level, respectively (n>=1). For 'height', the cut is related to the corresponding dendrogram height (range: 0.0 to 1.0).}
+  \item{cutlevel}{Numeric value indicating the point where the hclust object should be cut (default = 2). The distance is related to the option 'metric'. For "rootdist" and "leafdist", the cut level is related to the n steps required to get to the root's level or to the leaf's level, respectively (n>=1). For 'height', the cut is related to the corresponding dendrogram height (range: 0.0 to 1.0) <numeric>.}
   \item{metric}{Metric used to cut the hclust object at the top level (Options: "rootdist", "leafdist" or "height"; default="rootdist") <string>.}
   \item{ncomp}{Minimum number of components of a nest (default = 3) <numeric>.}
   \item{nlev}{Maximum number of levels of a nested sequence (default=2) <numeric>.}
