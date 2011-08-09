@@ -262,7 +262,7 @@ setMethod ('addSubgraph.list', 'RedPort',
     	}
     	#Remove multiple edges and loops---
     	if(!is.simple(g)){
-    		warning("NOTE: loops and/or multiple edges were removed from your graph!")
+    		#warning("NOTE: loops and/or multiple edges were removed from your graph!")
     		g=simplify(g, remove.multiple = TRUE, remove.loops = TRUE)
     	}     
     	#Check direction
@@ -409,7 +409,7 @@ setMethod ('addSubgraph', 'RedPort',
     	}
     	#Remove multiple edges and loops---
     	if(!is.simple(g)){
-    		warning("NOTE: loops and/or multiple edges were removed from your graph!")
+    		#warning("NOTE: loops and/or multiple edges were removed from your graph!")
     		g=simplify(g, remove.multiple = TRUE, remove.loops = TRUE)
     	}     
     	#Check direction
@@ -627,7 +627,7 @@ setMethod ('addGraph', 'RedPort',
     }
     #Remove multiple edges and loops---
     if(!is.simple(g)){
-    	warning("NOTE: loops and/or multiple edges were removed from your graph!")
+    	#warning("NOTE: loops and/or multiple edges were removed from your graph!")
     	g=simplify(g, remove.multiple = TRUE, remove.loops = TRUE)
     }     
     #Check direction
@@ -1583,7 +1583,7 @@ setMethod ('deleteNodes', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('nestNodes', 'RedPort', 
   function (obj, nodes, nestImage ='plain', isAssign=TRUE, isAnchor=FALSE, gscale=40, gcoord=NULL, parent=NULL, 
-  gatt=list(), theme=c('tm0','tm1','tm2','tm3','tm4')) { 
+  gatt=list(), theme=c('tm0','tm1','tm2','tm3','tm4','tm5')) { 
   	if(ping(obj)==0)return(invisible())
   	
 	#Further checks---------------------------------------------------- 
@@ -1591,26 +1591,33 @@ setMethod ('nestNodes', 'RedPort',
 		stop("NOTE: 'gatt' must be a list of graph attributes (e.g. gatt$nestColor, gatt$gscale...)!")
 	}
 	if(theme[1]=='tm1'){
-		gatt$nestShape='ROUNDED_RECTANGLE'
-		gatt$nestLineWidth=20
+		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
+		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=15
 	}	
 	if(theme[1]=='tm2'){
-		gatt$nestShape='ROUNDED_RECTANGLE'
-		gatt$nestColor='#ffffff'
-		gatt$nestLineWidth=20
-		gatt$nestLineColor='#000000'
-		gatt$nestLineType='DOTTED'
-		gatt$isAnchor=TRUE
+		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
+		if(is.null(gatt$nestColor))gatt$nestColor='#ffffff'
+		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=15
+		if(is.null(gatt$nestLineColor))gatt$nestLineColor='#000000'
+		if(is.null(gatt$nestLineType))gatt$nestLineType='DOTTED'
+		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
 	}	
 	if(theme[1]=='tm3'){
-		gatt$nestImage='transparent'
-		gatt$isAnchor=TRUE
+		if(is.null(gatt$nestImage))gatt$nestImage='transparent'
+		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
 	}	
 	if(theme[1]=='tm4'){
-		gatt$nestImage='hide'
-		gatt$isAnchor=TRUE
+		if(is.null(gatt$nestImage))gatt$nestImage='hide'
+		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
 	}	
-		
+	if(theme[1]=='tm5'){
+		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
+		if(is.null(gatt$nestColor))gatt$nestColor='#ffffff'
+		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=5
+		if(is.null(gatt$nestLineColor))gatt$nestLineColor='#000000'
+		if(is.null(gatt$nestLineType))gatt$nestLineType='DOTTED'
+		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
+	}		
   	node=as.character(nodes) 	
   	status1='plain'
 	if(is.character(gatt$nestImage)){
@@ -2198,5 +2205,248 @@ setMethod ('submitPlugin', 'RedPort',
     invisible (xml.rpc (obj@uri, 'RedHandler.buildPlugin', pluginTitle, 
             pluginMethods, pluginAddons))
     })
+
+
+#Map hclust to RedeR app
+#-------------------------------------------------------------------------------
+setMethod ('nesthc', 'RedPort', 
+	function(obj, hc, cutlevel=2, metric=c("rootdist","leafdist","height"), ncomp=3, nlev=2, grid=c(2,3),
+		gridScale=75, gscale=c(30,75,45), gatt=list(), theme='tm5', isAssign=TRUE, isAnchor=TRUE, 
+		order=c("topdown","bottomup") ){
+				
+		if(ping(obj)==0)return(invisible())
+		
+    	#check hclust object-----------------------------------------------
+    	if(class(hc)!="hclust"){
+        	stop("Not a hclust object!")
+    	}    
+
+		#check args--------------------------------------------------------
+		if(!is.character(metric))metric="rootdist"
+		tp=switch(metric[1], rootdist=1, leafdist=2, height=3)
+		if(is.null(tp))metric="rootdist"
+		metric=metric[1]
+				
+		#this feature is not implemented yet!
+		if(!is.character(order))order="topdown"
+		tp=switch(order[1], topdown =1,bottomup=2)
+		if(is.null(order))order="topdown"
+		#further checks---------------------------------------------------- 
+		if(!is.list(gatt)){
+			stop("NOTE: 'gatt' must be a list of graph attributes (e.g. gatt$nestColor, gatt$gscale...)!")
+		}
+		if(!is.numeric(cutlevel))cutlevel=2
+		cutlevel=cutlevel[1]
+		if(!is.numeric(ncomp) || ncomp<=0)ncomp=3
+		ncomp=ncomp[1]		
+		if(!is.numeric(grid))grid=c(2,3)
+		if(length(grid)==1)grid=c(2,3)
+		gridScale=gridScale[1]
+		if(!is.numeric(gridScale))gridScale=75
+		if(gridScale<1)gridScale=1
+       	s1=!is.numeric(gscale)
+       	s2=is.null(gscale)
+       	s3=sum(is.na(gscale))>0
+       	if(s1 || s2 || s3){
+       	 	gscale = c(30,75,45)
+       	}		
+		
+		if(is.numeric(grid) && length(grid)>1){
+			gridRows=ifelse(!is.na(grid[1]),grid[1],2)
+			gridCols=ifelse(!is.na(grid[2]),grid[2],3)
+		} else {
+			gridRows=2
+			gridCols=3			
+		}
+		
+		treemap=function(hc){
+	    A=hc$merge
+	    B=list()
+	    C=list()
+	    D=list()
+	    E=list()
+	    nest=list()
+	    if(is.null(hc$labels))hc$labels=as.character(sort(hc$order))
+	    for(i in 1:nrow(A)){
+	        ai=A[i,1]      
+	        if(ai < 0){
+	          	B[[i]]= -ai
+	          	C[[i]]=1
+	        } else {
+	          	B[[i]]=B[[ai]]      
+	          	C[[i]]=C[[ai]]+1 
+	        }
+	        ai=A[i,2]
+	        if(ai < 0){
+	          	B[[i]]=sort(c(B[[i]],-ai))
+	        } else {
+	          	B[[i]]=sort(c(B[[i]],B[[ai]]))
+	          	C[[i]]=max(C[[i]],C[[ai]]+1)
+	        }
+	        p=match(i,A)
+	        D[[i]]=ifelse(p>nrow(A),p-nrow(A),p)
+	        nest[[i]]=hc$labels[B[[i]]]
+	    }
+	    D[[nrow(A)]]=nrow(A)+1
+	    for(i in 1:nrow(A)){
+			step=1
+			find=D[[i]]	
+			while(find<D[[nrow(A)]]){
+				find=D[[find]]
+				step=step+1
+			}
+			E[[i]]=step
+	    }
+	    #Re-scale hc height to [0-1]
+	    tp=sort(hc$height)[1]
+	    if(tp>0){
+	    	hc$height=hc$height-tp
+	    } else if(tp<0){
+	    	hc$height=hc$height+abs(tp)
+	    }
+	    tp=sort(hc$height)[length(hc$height)]
+	    hc$height=hc$height/tp
+	    #return results
+	    C=as.numeric(C)
+	    D=as.numeric(D)
+	    E=as.numeric(E)
+	    N=hc$merge>0
+	    N=N[,1]+N[,2]
+	    return(list(nest=nest,labels=hc$labels,parent=D,leafdist=C,rootdist=E,height=hc$height,nnest=N))
+		}
+		
+		#computa mapa e estima numero de ninhos abaixo do nivel do corte
+    	tm=treemap(hc)
+    	nn=length(tm$nest)
+  		if(metric=="rootdist"){
+  			nestcount=sum(tm[[metric]]<=cutlevel)
+  		} else {
+  			nestcount=sum(tm[[metric]]>=cutlevel)
+  		}
+    	
+    	#estima grid
+    	if(!is.numeric(gridRows)){gridRows=NULL}else{gridRows=gridRows[1]}
+    	zoom=NULL
+    	if(is.numeric(gridScale)){
+    		gridScale=gridScale[1]
+    		#set gridScale to zoom
+    		if(gridScale>100)gridScale=100
+    		if(gridScale<0)gridScale=0
+    		zoom=100-gridScale   	
+    	}
+    	#get a basic layout just for graphs' first view
+    	if(is.null(gridRows)){
+    		gbasic=graph.empty(n=nestcount,directed=FALSE)  
+        	layout=layout.norm(layout.circle(gbasic), xmin = 25, xmax=75, ymin=25, ymax=75) 
+        } else {
+        	bin=100/(gridCols+1)
+        	xgrid=c(1:gridCols)*bin
+        	bin=100/(gridRows +1)
+        	estimatedRows=as.integer(nestcount/gridCols)+1
+        	ygrid=c(1: estimatedRows)*bin
+        	layout=cbind(x=xgrid,y=ygrid[1])
+        	if(estimatedRows>1){
+        		for(i in 2: estimatedRows){
+        			lt=cbind(x=xgrid,y=ygrid[i])
+        			layout=rbind(layout, lt)
+        		}
+        	}
+        }    
+        # 'update="default"' forces to keep old node coords and not to add new containers!
+    	if(is.null(update) || !is.character(update))update=NULL
+    	# internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
+  		invisible(xml.rpc (obj@uri,'RedHandler.lockDragAndZoom'))
+  		if(!is.null(zoom))invisible( xml.rpc (obj@uri, 'RedHandler.setZoom',zoom) )
+  		checknd=getGraph(obj,attribs="minimal")
+  		checknd=V(checknd)$name
+  		
+  		#compute dist to nest root (after cut!)
+  		val=tm[[metric]]
+  		if(metric=="rootdist"){
+  			selec=as.numeric(val>=cutlevel)
+  		} else {
+  			selec=as.numeric(val<=cutlevel)
+  		}
+  		tp=tm$parent
+  		td=selec[tp]
+  		td[is.na(td)]=0
+  		distrt=td
+  		while(sum(td)>0){
+  			tp=tm$parent[tp]
+  			td=selec[tp]
+  			td[is.na(td)]=0
+  			distrt=distrt+td
+  		}
+  		distrt=distrt+selec
+  		
+    	#add tree ----------------------------------------------------------
+    	gs0=gscale[1]
+    	gs1=gscale[2]
+    	gs2=gscale[3]
+    	gc1=c(58,58)
+    	gc2=c(70,70)
+    	gc3=c(30,30)
+    	if(order[1]=="topdown"){
+    	  nid=rep(NA,nn)
+    	  k=1
+    	  for(i in nn:1){
+    	  	val=distrt[i]
+    		if(val>0 && val<=nlev){  			
+    			nodes=tm$nest[[i]]
+    			if(sum(nodes%in%checknd)>=ncomp){
+	    			idx=tm$parent[i]
+	  				if(!is.na(nid[idx]) && isAssign){
+	  					nodes=paste(nodes,".$", nid[idx],sep="")
+	  				}
+	  				if(is.na(nid[idx])){	
+	  					gs=gs0
+	  					gc=c(layout[k,1],layout[k,2])
+	  					k=k+1				
+	  				} else if(tm$nnest[idx]<2){
+	   					gs=gs1
+	  					gc=gc1  				
+	  				} else if(tm$nnest[idx]==2){
+	  					gs=gs2
+	  					gc=gc2
+	  					tm$nnest[idx]=3
+	  				} else if(tm$nnest[idx]==3) {
+	  					gs=gs2
+	  					gc=gc3  				
+	  				}
+	    			nid[i]=nestNodes(obj, nodes, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
+	    					gscale=gs, gcoord=gc, gatt=gatt, theme=theme)
+    			}
+    		}
+    	 } 
+    	} else { 
+    	  gc=gc1
+    	  gs=gs1
+    	  labs=hc$labels    		
+    	  for(i in 1:nn){
+			val=distrt[i]
+    		if(val>0 && val<=nlev){ 
+    			nodes=tm$nest[[i]]
+    			if(sum(nodes%in%checknd)>=ncomp){
+	    			nodes=labs[hc$labels%in%nodes]
+	    			nds=unique(nodes)
+	    			if(length(nds)<length(nodes)){
+	    				gs=NULL
+	    				gc=round(runif(2,min=20,max=80))
+	    			} else {
+	    				gs=gs1
+	    				gc=gc1
+	    			}
+	    			nid=nestNodes(obj, nds, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
+	    					gscale=gs, gcoord=gc, gatt=gatt, theme=theme)
+	    			labs[labs%in%tm$nest[[i]]]=nid
+    			}
+    		}
+    	  }   	 	
+      }  
+	  #Internal function (unlocks DragAndZoon interactivity after send subgraph list)
+   	  invisible(xml.rpc (obj@uri,'RedHandler.unLockDragAndZoom'))     	
+  }
+  )
+
 
 

@@ -1,5 +1,5 @@
 citEntry("Misc",
-   title        = "RedeR: bridging the gap between network analysis and visualization.",
+   title        = "RedeR: bridging the gap between hierarchical network representation and functional analysis.",
    author       = "Mauro A. A. Castro, Xin Wang, Florian Markowetz.",
    organization = "Cancer Research UK - Cambridge Research Institute, Cambridge University.",
    address      = "Li Ka Shing Centre, Robinson Way, Cambridge, CB2 0RE, UK.",
@@ -9,7 +9,7 @@ citEntry("Misc",
          
    textVersion  = 
    paste("Castro MAA, Wang X, Markowetz F.", 
-	"RDyNet: bridging the gap between network analysis and visualization.",
+	"RDyNet: bridging the gap between hierarchical network representation and functional analysis.",
 	"R package (2011), URL http://www.markowetzlab.org/software/networks.html.",
 	sep=" ")
    )

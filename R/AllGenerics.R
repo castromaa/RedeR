@@ -109,6 +109,8 @@ setGeneric ('deleteNodes',        signature='obj', function (obj, nodes)
             standardGeneric ('deleteNodes'),  package='RedeR')
 setGeneric ('nestNodes',          signature='obj', function (obj, nodes,...)      
             standardGeneric ('nestNodes'),    package='RedeR')
+setGeneric ('nesthc',          signature='obj', function (obj, hc,...)      
+            standardGeneric ('nesthc'),    package='RedeR')            
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 setGeneric ('updateContainerSize',    signature='obj', function (obj)             
