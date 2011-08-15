@@ -1,7 +1,7 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
- 0.99.11	2011-08-01
+ 0.99.12	2011-08-11
 
   NEW FEATURES
     o Improved settings for nested objects (parent, gscale, and gcoord features)
@@ -18,7 +18,8 @@
     o Improved static and dynamic layouts for containers.
     o New method to send series of graphs to RedeR.
     o New method to duplicate graphs and subgraphs in a network.
-    o New methods to nest graphs and subgraphs in a network.
+    o New method to nest graphs and subgraphs in a network.
+    o New method to nest hclust objects in a network.
     o "RedeR" is set as the final name for the "dyNet-RDyNet" project.
 
   BUG FIXES

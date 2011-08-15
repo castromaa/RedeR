@@ -2212,7 +2212,7 @@ setMethod ('submitPlugin', 'RedPort',
 setMethod ('nesthc', 'RedPort', 
 	function(obj, hc, cutlevel=2, metric=c("rootdist","leafdist","height"), ncomp=3, nlev=2, grid=c(2,3),
 		gridScale=75, gscale=c(30,75,45), gatt=list(), theme='tm5', isAssign=TRUE, isAnchor=TRUE, 
-		order=c("topdown","bottomup") ){
+		order=c("topdown","bottomup"), getcounts=FALSE ){
 				
 		if(ping(obj)==0)return(invisible())
 		
@@ -2235,6 +2235,9 @@ setMethod ('nesthc', 'RedPort',
 		if(!is.list(gatt)){
 			stop("NOTE: 'gatt' must be a list of graph attributes (e.g. gatt$nestColor, gatt$gscale...)!")
 		}
+		if(is.null(gatt$nestLineWidth) || !is.numeric(gatt$nestLineWidth))gatt$nestLineWidth=5
+		lwidth=gatt$nestLineWidth[1]
+		
 		if(!is.numeric(cutlevel))cutlevel=2
 		cutlevel=cutlevel[1]
 		if(!is.numeric(ncomp) || ncomp<=0)ncomp=3
@@ -2386,6 +2389,7 @@ setMethod ('nesthc', 'RedPort',
     	gc1=c(58,58)
     	gc2=c(70,70)
     	gc3=c(30,30)
+    	stats=data.frame()
     	if(order[1]=="topdown"){
     	  nid=rep(NA,nn)
     	  k=1
@@ -2413,8 +2417,13 @@ setMethod ('nesthc', 'RedPort',
 	  					gs=gs2
 	  					gc=gc3  				
 	  				}
+	  				#scale nest.line.width by n. levels (just to get a better image!) 
+	  				gatt$nestLineWidth=(lwidth/2)+((lwidth/2)*(1/max(1,distrt[i])))
+	  				#send nested nodes!
 	    			nid[i]=nestNodes(obj, nodes, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
 	    					gscale=gs, gcoord=gc, gatt=gatt, theme=theme)
+	    			stats=rbind(stats, data.frame(nest.id=nid[i],nest.size=length(nodes),leafdist=tm$leafdist[i],
+	    				  dendoroot.dist=tm$rootdist[i],height=tm$height[i],nestroot.dist=distrt[i]))
     			}
     		}
     	 } 
@@ -2439,12 +2448,15 @@ setMethod ('nesthc', 'RedPort',
 	    			nid=nestNodes(obj, nds, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
 	    					gscale=gs, gcoord=gc, gatt=gatt, theme=theme)
 	    			labs[labs%in%tm$nest[[i]]]=nid
+	    			stats=rbind(stats, data.frame(nest.id=nid[i],nest.size=length(nodes),leafdist=tm$leafdist[i],
+	    				  dendoroot.dist=tm$rootdist[i],height=tm$height[i],nestroot.dist=distrt[i]))
     			}
     		}
     	  }   	 	
       }  
 	  #Internal function (unlocks DragAndZoon interactivity after send subgraph list)
    	  invisible(xml.rpc (obj@uri,'RedHandler.unLockDragAndZoom'))     	
+   	  if(getcounts)return(stats)
   }
   )
 
