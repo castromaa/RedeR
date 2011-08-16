@@ -6,7 +6,7 @@ Date: 2011-08-15
 Author: Mauro Castro, Xin Wang, Florian Markowetz 
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
 Depends: R (>= 2.11.0), XMLRPC (>= 0.2.2), igraph(>= 0.5.5)  
-Imports: XMLRPC, rJava, JavaGD, methods, igraph
+Imports: XMLRPC, rJava, methods, igraph
 Suggests: XML, RCurl, graph, HTSanalyzeR
 biocViews: GraphsAndNetworks, Visualization, GUI
 Description: RedeR is an R-based package combined with a stand-alone Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, RedeR takes advantage of R to run robust statistics, while the R-to-Java interface bridges the gap between network analysis and visualization: for R Developers, it allows the development of Java plug-ins exclusively using R codes; for Java Users, it runs R methods implemented in a stand-alone application, and for R Users RedeR interactively displays R graphs using a robust Java graphic engine embedded in this package.
