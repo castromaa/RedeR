@@ -298,7 +298,7 @@ print(sessionInfo(), locale=FALSE)
 
 \section{Supplements}
 
-The R chunks below can be used to reproduce the pre-processed dataset available at "RedeR.data" object. 
+The R chunks below can be used to reproduce the pre-processed dataset available in "RedeR.data" data object. 
 This dataset integrates a case study that soon is going to appear in a new communication!
 
 \begin{itemize}
@@ -336,83 +336,6 @@ ppiPipeline4RedeR()
 p.s.1 source 'casePart2.R' is  available in the package 'script' directory.\\
 p.s.2 requirements: RedeR, BioNet, DLBCL, ALL, limma, graph, org.Hs.eg.db, KEGG.db, GO.db, AnnotationDbi, snow, biomaRt and HTSanalyzeR packages.\\
 p.s.3 Snow package might need adjustments to run parallel computing!
-\end{small}
-
-
-\item Case 1.1:
-
-\begin{small}
-
-Load pre-processed graph (should form an entangled network!)
-<<label=case 1.1: add pre-processed graph, eval=TRUE>>=
-data(ER.glist)
-addGraph(rdp, ER.glist$graph)
-@
-
-Map co-expressed gene network modules onto the graph:
-<<label=case 1.1: modules onto the graph, eval=TRUE>>=
-addSubgraph.list(rdp, ER.glist$graph, ER.glist$clust, gatt=ER.glist$clustatt)
-@
-
-Merge inter-modular edges:
-<<label=case 1.1: merge inter-modular edges, eval=TRUE>>=
-mergeOutEdges(rdp)
-@
-
-Alternatively, use 'ER.glistall' instead 'ER.glist' to reproduce a network with 42 modules.
-
-\item Case 1.2:
-
-Load pre-processed data:
-<<label=case 1.2: load pre-processed graph, eval=TRUE>>=
-data(ER.gseries)
-@
-
-Add time-series:
-<<label=case 1.2: add time-series, eval=TRUE>>=
-lt<-layout.kamada.kawai(ER.gseries$g3h)
-addGraph(rdp, ER.gseries$g3h, layout=lt, gcoord=c(50,15), gscale=30)
-addGraph(rdp, ER.gseries$g6h, layout=lt, gcoord=c(50,50), gscale=30)
-addGraph(rdp, ER.gseries$g12h, layout=lt, gcoord=c(50,85), gscale=30)
-@
-
-\item Case 2.1:
-
-Load pre-processed data:
-<<label=case 2.1: load pre-processed graph, eval=TRUE>>=
-data(ER.ppi)		
-@
-
-Add nested time-series:
-<<label=case 2.1: add nested time-series, eval=TRUE>>=
-addGraph(rdp, ER.ppi$t3, gcoord=c(15,25), gscale=25)
-id<-addGraph(rdp, ER.ppi$t6, gcoord=c(20,70), gscale=40)
-nestNodes(rdp, nodes=V(ER.ppi$t3)$name, parent=id, theme='tm2')
-id<-addGraph(rdp, ER.ppi$t12, gcoord=c(65,50), gscale=70)
-nestNodes(rdp, nodes=V(ER.ppi$t6)$name, parent=id, theme='tm2')
-@
-
-\item Case 2.2:
-
-Load pre-processed data:
-<<label=case 2.2: load pre-processed graph, eval=TRUE>>=
-data(ER.gsco)
-@
-
-Hypergeometric test:
-<<label=case 2.2: hypergeometric test, eval=TRUE>>=
-addGraph(rdp, ER.gsco$hypergeo$t3$GO_MF, gcoord=c(25,30))
-addGraph(rdp, ER.gsco$hypergeo$t6$GO_MF, gcoord=c(50,30))
-addGraph(rdp, ER.gsco$hypergeo$t12$GO_MF, gcoord=c(75,30))
-@
-
-GSEA analysis:
-<<label=case 2.2: GSEA analysis, eval=TRUE>>=
-addGraph(rdp, ER.gsco$gsea$t3$GO_MF, gcoord=c(25,70))
-addGraph(rdp, ER.gsco$gsea$t6$GO_MF, gcoord=c(50,70))
-addGraph(rdp, ER.gsco$gsea$t12$GO_MF, gcoord=c(75,70))
-@
-
 \end{small}
 
 \end{itemize}
