@@ -25,6 +25,7 @@ Additional arguments:
   \item{gatt}{A list of graph attributes. See attribute syntax in \code{\link[RedeR:addGraph]{addGraph}} } 
   \item{gscale}{Expansion factor of the graph area related to the app panel (default = 75) <numerics>. } 
   \item{gcoord}{Sets the graph x,y center. Coords between 0 and 100 are set to the visible area of the app panel (default = c(75,75)) <numeric vector>. } 
+  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5'} 
 }
 }
 

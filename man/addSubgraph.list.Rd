@@ -27,6 +27,7 @@ Additional arguments:
   \item{gscale}{Expansion factor each subgraph related to the app panel (default = 20) <numeric>. }
   \item{gatt}{Data frame with graph attributes (attribute names on cols). See attribute syntax in \code{\link[RedeR:addGraph]{addGraph}} } 
   \item{update}{Character arg, if 'all' it forces to update node/edge attributes of a graph already available in the app panel; if 'partial', only node attributes are updated (default = NULL). }
+  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5'}
 }
 }
 

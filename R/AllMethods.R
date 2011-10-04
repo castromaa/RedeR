@@ -319,7 +319,7 @@ setMethod ('addSubgraph.list', 'RedPort',
         	}
         }    
         # 'update="default"' forces to keep old node coords and not to add new containers!
-    	if(is.null(update) || !is.character(update))update=NULL
+    	if(!is.null(update) && !is.character(update))update=NULL
     	# internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
   		invisible(xml.rpc (obj@uri,'RedHandler.lockDragAndZoom'))
 		
@@ -331,12 +331,13 @@ setMethod ('addSubgraph.list', 'RedPort',
 		  if(sum(!is.na(nmat))>0){	  	
 		  		if(!is.null(gatt)){
 		  			att=as.list(gatt[i,])
+		  			if(length(gatt)==1)names(att)=names(gatt)
 		  			if(is.null(update)){
 		  				att$coordX=layout[i,1]
 		  				att$coordY=layout[i,2]
 		  				if(!is.null(zoom)){
 		  					att$zoom=zoom
-		  				} else if(is.null(att$zoom)){
+		  				} else {
 		  					att$zoom=50
 		  				}
 		  			} else {
@@ -345,7 +346,9 @@ setMethod ('addSubgraph.list', 'RedPort',
     					att$isNest=FALSE
     					att$update=update[1]
 		  			}
-		  			addSubgraph(obj,g,nodes, gscale=gscale, gatt=att, theme=theme)
+		  			if(is.null(att$isNest))att$isNest=TRUE
+		  			if(is.null(att$isAnchor))att$isAnchor=TRUE
+		  			addSubgraph(obj,g,nodes,gscale=gscale,gatt=att,theme=theme)
 		  		} else {
 		  			att=list()
 		  			if(is.null(update)){
@@ -368,7 +371,7 @@ setMethod ('addSubgraph.list', 'RedPort',
 					if(!is.null(g$isNest)){att$isNest=g$isNest}else{att$isNest=TRUE}
 					if(!is.null(g$nestImage))att$nestImage=as.character(g$nestImage)
 					if(!is.null(g$isAnchor)){att$isAnchor=g$isAnchor} else {att$isAnchor=TRUE}
-					if(!is.null(g$nestAliases))att$nestAliases=as.character(g$nestAliases)
+					if(!is.null(g$nestAlias))att$nestAlias=as.character(g$nestAlias)
 					if(!is.null(g$nestColor))att$nestColor=as.character(g$nestColor)
 					if(!is.null(g$nestLineType))att$nestLineType=as.character(g$nestLineType)
 					if(!is.null(g$nestFontSize))att$nestFontSize = g$nestFontSize
@@ -453,7 +456,7 @@ setMethod ('addSubgraph', 'RedPort',
 			loadEdges    = gatt$loadEdges
 			nestColor    = gatt$nestColor
 			bgColor      = gatt$bgColor
-			nestAliases  = gatt$nestAliases
+			nestAlias    = gatt$nestAlias
 			nestFontSize = gatt$nestFontSize
 			nestFontColor = gatt$nestFontColor
 			nestFontX    = gatt$nestFontX
@@ -475,7 +478,7 @@ setMethod ('addSubgraph', 'RedPort',
 			bgColor      = g$bgColor
 			isNest       = g$isNest
 			isAssign     = g$isAssign
-			nestAliases  = g$nestAliases
+			nestAlias    = g$nestAlias
 			nestColor    = g$nestColor
 			nestFontSize = g$nestFontSize
 			nestFontColor = g$nestFontColor
@@ -500,7 +503,7 @@ setMethod ('addSubgraph', 'RedPort',
 		if(!is.null(isNest))    sg$isNest = isNest
 		if(!is.null(nestImage))   sg$nestImage = as.character(nestImage)
 		if(!is.null(isAnchor)){sg$isAnchor = isAnchor} else {sg$isAnchor=TRUE}
-		if(!is.null(nestAliases))sg$nestAliases = as.character(nestAliases)
+		if(!is.null(nestAlias))sg$nestAlias = as.character(nestAlias)
 		if(!is.null(nestColor))  sg$nestColor = as.character(nestColor)
 		if(!is.null(nestFontSize)) sg$nestFontSize = nestFontSize
 		if(!is.null(nestFontColor))sg$nestFontColor = nestFontColor
@@ -612,12 +615,12 @@ setMethod ('addSeries', 'RedPort',
   
   })
   
-  
 #Wrap up igraph objects via RedeR methods and submit to RedeR app 
 #-------------------------------------------------------------------------------
 setMethod ('addGraph', 'RedPort', 
-  function (obj, g, layout=layout.fruchterman.reingold(g), gscale=75, gcoord=c(50,50), isNest=FALSE, nestImage='plain', 
-  			isAnchor=TRUE, isAssign=FALSE, loadEdges=TRUE, parent=NULL, minimal=FALSE, theme='tm0') {
+  function (obj, g, layout=layout.fruchterman.reingold(g), gscale=75, gcoord=c(50,50), isNest=FALSE, 
+  	nestImage='plain', isAnchor=TRUE, isAssign=FALSE, loadEdges=TRUE, parent=NULL, 
+  	minimal=FALSE, theme='tm0') {
 	
 	if(ping(obj)==0)return(invisible())
     
@@ -719,8 +722,8 @@ setMethod ('addGraph', 'RedPort',
     nestColor=NULL
     gatt<-list()           
 	if(is.character(g$nestColor))gatt$nestColor=g$nestColor[1] 
-    nestAliases=NULL
-	if(is.character(g$nestAliases))gatt$nestAliases=g$nestAliases[1]
+    nestAlias=NULL
+	if(is.character(g$nestAlias))gatt$nestAlias=g$nestAlias[1]
     nestFontSize=NULL
 	if(is.numeric(g$nestFontSize))gatt$nestFontSize=g$nestFontSize[1]  
     nestFontColor =NULL 
@@ -771,7 +774,8 @@ setMethod ('addGraph', 'RedPort',
     }
         
     #Check layout option-----------------------------------------------
-    if(!is.null(layout) && !minimal){
+    b=is.null(V(g)$coordX) || is.null(V(g)$coordY) 
+    if(!is.null(layout) && !minimal && b){
        if(!is.matrix(layout)){
            stop("Layout must be provided as matrix!")
        }     
@@ -1660,10 +1664,10 @@ setMethod ('nestNodes', 'RedPort',
 		message('*** Uploading nest attributes ...')
 	}
 	#Nest aliases
-	if(is.character(gatt$nestAliases) && length(gatt$nestAliases)>0){
+	if(is.character(gatt$nestAlias) && length(gatt$nestAlias)>0){
 		message("** ... nest 'alias'")
-		charAtt[1]=gatt$nestAliases[1]
-	} else if(!is.null(gatt$nestAliases)){
+		charAtt[1]=gatt$nestAlias[1]
+	} else if(!is.null(gatt$nestAlias)){
 		warning("NOTE: nest 'alias' must be provided as character!")
 	}
 	#Nest shape

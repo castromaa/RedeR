@@ -48,7 +48,7 @@ Submits R graphs to RedeR app.
     \item{isAnchor}{If isNest=TRUE, this logical value sets whether to anchor the container in dynamic layouts. }
     \item{isAssign}{If isNest=TRUE, this logical value sets whether to assign the container name to the nested nodes. }
     \item{nestColor}{ If isNest=TRUE, this attribute sets the 'color' of the new container <hexadecimal>. }
-    \item{nestAliases}{ If isNest=TRUE, this attribute sets the label of the new container <string>.  }
+    \item{nestAlias}{ If isNest=TRUE, this attribute sets the label of the new container <string>.  }
     \item{nestFontSize}{ If isNest=TRUE, this attribute sets the size of the container label <numerics>.}
     \item{nestFontColor}{ If isNest=TRUE, this attribute sets the 'color' of the container label <hexadecimal>. }
     \item{nestFontX}{ If isNest=TRUE, this attribute sets the x position of the label related to the container <numerics>.}
