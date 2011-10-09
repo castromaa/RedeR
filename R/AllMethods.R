@@ -708,7 +708,12 @@ setMethod ('addGraph', 'RedPort',
     	isAssign=g$isAssign[1]
     	if(isAssign){
 			temp=V(g)$name
-			if(is.null(V(g)$nodeAlias))V(g)$nodeAlias=temp
+			if(is.null(V(g)$nodeAlias)){
+				V(g)$nodeAlias=temp
+			} else {
+				idx=is.na(V(g)$nodeAlias)
+				V(g)$nodeAlias[idx]=temp[idx]
+			}
 			id="N001"
   			if(!is.null(parent))id=parent
 			V(g)$name=paste(temp,".$",id,sep="")
@@ -1791,7 +1796,7 @@ setMethod ('nestNodes', 'RedPort',
 		}
 	}	
 	#Nest gscale
-	if(!is.null(gscale)){	
+	if(!is.null(gscale) && is.null(gatt$nestSize)){	
 	  if(is.numeric(gscale)){
 		if(gscale>=1)numericAtt[6]=gscale[1]	
 	  } else if(is.numeric(gatt$gscale)){

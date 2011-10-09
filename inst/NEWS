@@ -1,11 +1,11 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
- 0.99.12	2011-08-11
+ 0.99.18	2011-10-09
 
   NEW FEATURES
-    o Improved settings for nested objects (parent, gscale, and gcoord features)
-    o Improved interface, better connection between R and Java
+    o Improved settings for nested objects (parent, gscale, and gcoord features).
+    o Improved interface, better connection between R and Java.
     o Improved uploading speed.
     o Added a pre-processed dataset to demonstrate the package in the upcoming case studies.  
     o Container status now can be set to transparence.
