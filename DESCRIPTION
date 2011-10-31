@@ -1,7 +1,7 @@
 Package: RedeR
 Type: Package
 Title: RedeR: bridging the gap between hierarchical network representation and functional analysis.
-Version: 0.99.20
+Version: 1.0.0
 Date: 2011-11-01
 Author: Mauro Castro, Xin Wang, Florian Markowetz 
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
