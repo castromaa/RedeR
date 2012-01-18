@@ -9,12 +9,13 @@ Method to select nodes in an active RedeR application. Selected objects are put 
 }
 
 \usage{
-selectNodes(obj, nodes)
+selectNodes(obj, nodes, nt=NULL)
 }
 
 \arguments{
   \item{obj}{Object of RedPort Class. }
-  \item{nodes}{Names of nodes (or containers) <array of strings>}
+  \item{nodes}{Names of nodes (or containers) <string or array of strings>}
+  \item{nt}{Optional for nested nodes: to restrict searching to a specific container <string>}
 }
 
 \value{

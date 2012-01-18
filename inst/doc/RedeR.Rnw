@@ -128,7 +128,7 @@ Another strategy is to wrap graphs into containers and then send it to the Java 
 %%%%%%
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.8\textwidth]{fig3.png}
+\includegraphics[width=0.8\textwidth]{fig3.pdf}
 \end{center}
 \label{fig3}
 \caption{Graphs nested in \emph{RedeR} by the command \emph{addGraph}.}
@@ -182,7 +182,7 @@ In Figure 5a the same graph is used to exemplify the community structure mapped 
 \begin{figure}[htbp]
   \centering
   \subfloat[Communities]{\label{fig5a: Communities}\includegraphics[width=.5\textwidth]{fig5a.pdf}}              
-  \subfloat[Graphs into containers]{\label{fig5b:Graphs into containers}\includegraphics[width=.5\textwidth]{fig5b.png}} \\
+  \subfloat[Graphs into containers]{\label{fig5b:Graphs into containers}\includegraphics[width=.5\textwidth]{fig5b.pdf}} \\
    \subfloat[Subnetworks]{\label{fig5c:Subnetworks}\includegraphics[width=.9\textwidth]{fig5c.pdf}}
   \caption{Community structure: (a) subgraphs detected based on edge betweenness; (b) nested communities into containers; (c) subnetworks in hidden containers.}
 \end{figure} 

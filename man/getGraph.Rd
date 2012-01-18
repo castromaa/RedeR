@@ -20,8 +20,8 @@ getGraph(obj, ...)
 \details{
 Additional arguments:
 \describe{
-  \item{type}{Filter options for RedeR graph objects. Valid arguments: <'node'>, <'container'> or <'all'> (default='node'). } 
   \item{status}{Filter options for RedeR graph status. Valid arguments:  <'selected'>, <'nonselected'> or <'all'> (default='all'). } 
+  \item{type}{Filter options for RedeR graph objects. Valid arguments: <'node'>, <'container'> or <'all'> (default='node'). }
   \item{attribs}{Filter options for RedeR graph attributes. Valid arguments:  <'plain'>, <'minimal'> or <'all'> (default='plain'). } 
 }
 }

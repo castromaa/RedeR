@@ -22,8 +22,8 @@ getNodes(obj, ...)
 \details{
 Additional arguments:
 \describe{
+  \item{status}{Filter options. Valid arguments:  <'selected'>, <'nonselected'> or <'all'>. Default='selected'} 
   \item{type}{Filter options. Valid arguments: <'node'>, <'container'> or <'all'>. Default='node'. } 
-  \item{status}{Filter options. Valid arguments:  <'selected'>, <'nonselected'> or <'all'>. Default='all'} 
 }
 }
 

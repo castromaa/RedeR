@@ -23,9 +23,13 @@ Additional arguments:
 \describe{
   \item{layout}{Vertex coordinates (graph layout). Accepts matrix with 2 cols (i.e. x and y coords) <matrix>. } 
   \item{gscale}{Expansion factor of the graph area related to the app panel area (default = 75) <numeric>. } 
+  \item{zoom}{ Sets the zoom scale for the app panel (range: 0.0 to 100.0; default = 100.0) <numerics>. } 
   \item{gcoord}{Sets the graph x,y center. Coords between 0 and 100 are set to the visible area of the app panel (default = c(50,50)) <numeric vector>. } 
   \item{isNest}{Logical value, whether to nest all nodes into a new container (default = FALSE). See additional args in \code{\link[RedeR:nestNodes]{nestNodes}}} 
+  \item{isAnchor}{If isNest=TRUE, this logical value sets whether to anchor the container in dynamic layouts. }
+  \item{isAssign}{If isNest=TRUE, this logical value sets whether to assign the container name to the nested nodes. }
   \item{loadEdges}{Logical value, whether to send edges to RedeR app (default = TRUE).} 
+  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5','tm6'. } 
 }
 }
 
@@ -34,12 +38,12 @@ Submits R graphs to RedeR app.
 }
 
 
-\section{Attributes}{
+\section{Attributes passed by the igraph object}{
 
 \subsection{Graph attributes}{
   \describe{	
     \item{bgColor}{ Sets the background color of the app panel <hexadecimal>. } 
-    \item{zoom}{ Sets the zoom scale of the app panel (range: 0.0 to 100.0) <numerics>. } 
+    \item{zoom}{ Sets the zoom scale for the app panel (range: 0.0 to 100.0) <numerics>. } 
     \item{gscale}{ Expansion factor of the graph area in the app panel <numerics> (PS. alternative entry to the 'gscale' argument above). }
     \item{coordX}{ Sets the graph x center; x between 0 and 100 sets to visible area <numeric> (PS. alternative entry to the 'gcoord' argument above). }
     \item{coordY}{ Sets the graph y center; y between 0 and 100 sets to visible area <numeric> (PS. alternative entry to the 'gcoord' argument above). }
@@ -95,7 +99,7 @@ Submits R graphs to RedeR app.
 \note{
 In 'igraph' package, vertex and edge attributes can be assigned as arbitrary R objects. In order 
 to pass these extensible features to RedeR the attributes must be provided in a valid syntax (see above). 
-However, only UNIQUE edges are accepted. If present, mutual/multiple edges will be collapsed to unique edges. 
+Only UNIQUE edges are accepted. If present, mutual/multiple edges will be collapsed to unique edges. 
 In this cases, source-target information is transferred to 'arrowDirection' attribute; other attributes will be related to the first edge from the edge list.
 }
 
@@ -147,7 +151,7 @@ addGraph( rdp, g2, layout.kamada.kawai(g2) )
 
 ###...to check loading speed of an interactome!
 
-data(hs.inter)t0=proc.time()addGraph(rdp, hs.inter, layout=NULL)proc.time() - t0
+data(hs.inter)system.time( addGraph(rdp, hs.inter, layout=NULL) )
 
 }
 }

@@ -6,9 +6,9 @@
 setMethod ('ping', 'RedPort', 
   function (obj) { 
       #Check if the port is not in use by the app---------------------------
-      calltest=try(xml.rpc(obj@uri,'RedHandler.ping'), TRUE) 
-      if(is.numeric(calltest) || is.integer(calltest)){
-      	if(calltest==1){
+      calltest=try(rederexpresspost(obj@uri,'RedHandler.ping'), TRUE) 
+      if(is.character(calltest) && length(calltest)==1){
+      	if(calltest=="1"){
       		return(1)
       	} else {
       		return(0)
@@ -136,7 +136,7 @@ setMethod ('calld', 'RedPort',
 setMethod ('updateGraph', 'RedPort', 
   function (obj) { 
   	if(ping(obj)==0)return(invisible())
-    	invisible (xml.rpc (obj@uri, 'RedHandler.updateGraph'))
+    	invisible (rederexpresspost (obj@uri, 'RedHandler.updateGraph'))
     })
 
 
@@ -160,12 +160,12 @@ setMethod ('dynwin', 'RedPort',
 #Get RedeR graph via RedeR methods and wrap it up into igraph objects  
 #-------------------------------------------------------------------------------
 setMethod ('getGraph', 'RedPort', 
-  function (obj, type="node", status="all", attribs="plain") {
+  function (obj, status="all", type="node", attribs="plain") {
       if(ping(obj)==0)return(graph.empty(n=0, directed=FALSE))
       
       #Get graph objects from RedeR app
-      nodes = getNodes(obj, type, status)
-      edges = getEdges(obj, type, status) 
+      nodes = getNodes(obj, status, type)
+      edges = getEdges(obj, status, type) 
 
 	  #Build igraph object
       if(length(nodes)==1 && nodes==""){
@@ -176,10 +176,10 @@ setMethod ('getGraph', 'RedPort',
       		g	      = graph.empty(n=length(nodes), directed=FALSE)
       		g         = set.vertex.attribute(g, "name", value=nodes) 
       } else {
-      		nodes	= data.frame(name=nodes)
+      		nodes	= data.frame(name=nodes, stringsAsFactors=FALSE)
        		edges 	= matrix(edges,ncol=2, byrow=TRUE)
       		colnames(edges) = c("NodeA","NodeB")
-      		edges 	= data.frame(edges) 
+      		edges 	= data.frame(edges,stringsAsFactors=FALSE) 
       		g  	  	= graph.data.frame(edges, directed=FALSE, vertices=nodes)
       }  
       
@@ -187,24 +187,24 @@ setMethod ('getGraph', 'RedPort',
       if(attribs=="minimal"){
       	  return(g) 
       } else if(attribs=="plain"){
-          nodeX     = getNodeX (obj, type, status )
-          nodeY     = getNodeY (obj, type, status )
+          nodeX     = getNodeX (obj, status, type )
+          nodeY     = getNodeY (obj, status, type )
           g         = set.vertex.attribute(g, "coordX", value=nodeX)
           g         = set.vertex.attribute(g, "coordY", value=nodeY)
           return(g)
       } else if(attribs=="all"){
-          nodeAlias      = getNodeAliases (obj, type, status ) 
-          nodeBend       = getNodeBend (obj, type, status )     
-          nodeX          = getNodeX (obj, type, status )
-          nodeY          = getNodeY (obj, type, status )
-          nodeSize       = getNodeSize (obj, type, status )
-          nodeShape      = getNodeShape (obj, type, status )
-          nodeColor      = getNodeColor (obj, type, status )
-          nodeWeight     = getNodeWeight (obj, type, status )
-          nodeLineWidth  = getNodeLineWidth (obj, type, status )
-          nodeLineColor  = getNodeLineColor (obj, type, status ) 
-          nodeFontSize   = getNodeFontSize (obj, type, status )
-          nodeFontColor  = getNodeFontColor (obj, type, status )        
+          nodeAlias      = getNodeAliases (obj, status, type ) 
+          nodeBend       = getNodeBend (obj, status, type )     
+          nodeX          = getNodeX (obj, status, type )
+          nodeY          = getNodeY (obj, status, type )
+          nodeSize       = getNodeSize (obj, status, type )
+          nodeShape      = getNodeShape (obj, status, type )
+          nodeColor      = getNodeColor (obj, status, type )
+          nodeWeight     = getNodeWeight (obj, status, type )
+          nodeLineWidth  = getNodeLineWidth (obj, status, type )
+          nodeLineColor  = getNodeLineColor (obj, status, type ) 
+          nodeFontSize   = getNodeFontSize (obj, status, type )
+          nodeFontColor  = getNodeFontColor (obj, status, type )        
           g     = set.vertex.attribute(g, "nodeAlias",  value=nodeAlias)
           g     = set.vertex.attribute(g, "nodeBend",   value=nodeBend)
           g     = set.vertex.attribute(g, "coordX",   value=nodeX)
@@ -219,11 +219,11 @@ setMethod ('getGraph', 'RedPort',
           g     = set.vertex.attribute(g, "nodeFontColor",  value=nodeFontColor) 
       	  #..get edge attrs. if present!
       	  if(!is.null(edges)){
-          	arrowDirection = getArrowDirection (obj, type, status )  
-          	edgeWeight     = getEdgeWeight(obj, type, status )
-          	edgeWidth      = getEdgeWidth (obj, type, status )
-          	edgeColor      = getEdgeColor (obj, type, status )
-          	edgeType       = getEdgeType  (obj, type, status )
+          	arrowDirection = getArrowDirection (obj, status, type )  
+          	edgeWeight     = getEdgeWeight(obj, status, type )
+          	edgeWidth      = getEdgeWidth (obj, status, type )
+          	edgeColor      = getEdgeColor (obj, status, type )
+          	edgeType       = getEdgeType  (obj, status, type )
           	g     = set.edge.attribute (g, "arrowDirection", value=arrowDirection)
           	g     = set.edge.attribute (g, "edgeWeight",     value=edgeWeight)
           	g     = set.edge.attribute (g, "edgeWidth",      value=edgeWidth)
@@ -321,7 +321,7 @@ setMethod ('addSubgraph.list', 'RedPort',
         # 'update="default"' forces to keep old node coords and not to add new containers!
     	if(!is.null(update) && !is.character(update))update=NULL
     	# internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
-  		invisible(xml.rpc (obj@uri,'RedHandler.lockDragAndZoom'))
+  		invisible(rederexpresspost (obj@uri,'RedHandler.lockDragAndZoom'))
 		
     	#send request to addSubgraph fuction
         for(i in 1:length(nodeList)){
@@ -348,7 +348,7 @@ setMethod ('addSubgraph.list', 'RedPort',
 		  			}
 		  			if(is.null(att$isNest))att$isNest=TRUE
 		  			if(is.null(att$isAnchor))att$isAnchor=TRUE
-		  			addSubgraph(obj,g,nodes,gscale=gscale,gatt=att,theme=theme)
+		  			addSubgraph(obj,g,nodes,gscale=gscale,gatt=att,theme=theme, .callchecks=FALSE)
 		  		} else {
 		  			att=list()
 		  			if(is.null(update)){
@@ -384,20 +384,22 @@ setMethod ('addSubgraph.list', 'RedPort',
 					if(!is.null(g$nestLineColor))att$nestLineColor=as.character(g$nestLineColor)
 					if(!is.null(g$isAssign))att$isAssign=g$isAssign
 					if(!is.null(g$loadEdges))att$loadEdges=g$loadEdges
-		  			addSubgraph(obj,g,nodes, gscale=gscale, gatt=att, theme=theme)
+		  			addSubgraph(obj,g,nodes, gscale=gscale, gatt=att, theme=theme, .callchecks=FALSE)
 		  		}
 		  }
 	   }  		
 	   	#Internal function (unlocks DragAndZoon interactivity after sent subgraph list)
-  		invisible(xml.rpc (obj@uri,'RedHandler.unLockDragAndZoom'))
+  		invisible(rederexpresspost (obj@uri,'RedHandler.unLockDragAndZoom'))
     })
 
 
 #Add subgraphs to RedeR app
 #-------------------------------------------------------------------------------
 setMethod ('addSubgraph', 'RedPort', 
-	function (obj, g, nodes, gscale=75, gcoord=c(75,75), gatt=NULL,theme='tm0') {
-		if(ping(obj)==0)return(invisible())
+	function (obj, g, nodes, gscale=75, gcoord=c(75,75), gatt=NULL,theme='tm0', .callchecks=TRUE) {
+		if(.callchecks){
+			if(ping(obj)==0)return(invisible())
+		}
 	
     	#Check igraph object-----------------------------------------------
     	if(!is.igraph(g)){
@@ -522,9 +524,9 @@ setMethod ('addSubgraph', 'RedPort',
 			sg$isAssign=TRUE
 		}
     	if(!is.null(update)){
-    		ref=addGraph(obj, sg)
+    		ref=addGraph(obj, sg, .callchecks=FALSE)
     	} else {		
-			ref=addGraph(obj, sg, gscale=gscale, gcoord=gcoord, theme=theme)
+			ref=addGraph(obj, sg, gscale=gscale, gcoord=gcoord, theme=theme, .callchecks=FALSE)
 			if(!is.null(ref))return(ref)
 		}
    })		  
@@ -614,20 +616,23 @@ setMethod ('addSeries', 'RedPort',
     }
   
   })
-  
+
+
 #Wrap up igraph objects via RedeR methods and submit to RedeR app 
 #-------------------------------------------------------------------------------
 setMethod ('addGraph', 'RedPort', 
-  function (obj, g, layout=layout.fruchterman.reingold(g), gscale=75, gcoord=c(50,50), isNest=FALSE, 
-  	nestImage='plain', isAnchor=TRUE, isAssign=FALSE, loadEdges=TRUE, parent=NULL, 
-  	minimal=FALSE, theme='tm0') {
-	
-	if(ping(obj)==0)return(invisible())
+  function (obj, g, layout=layout.lgl(g,maxiter=30), gscale=75, gcoord=c(50,50), 
+  	zoom=NULL, isNest=FALSE, nestImage='plain', isAnchor=TRUE, isAssign=FALSE, loadEdges=TRUE, parent=NULL, 
+  	minimal=FALSE, theme='tm0', .callchecks=TRUE) {
+	if(.callchecks){
+		if(ping(obj)==0)return(invisible())
+	}
     
     #Check igraph object-----------------------------------------------
     if(!is.igraph(g)){
         stop("Not an igraph object!")
     }
+    
     #Remove multiple edges and loops---
     if(!is.simple(g)){
     	#warning("NOTE: loops and/or multiple edges were removed from your graph!")
@@ -704,6 +709,7 @@ setMethod ('addGraph', 'RedPort',
     if(is.logical(g$isNest))isNest=g$isNest[1]
 	if(is.character(g$nestImage))nestImage=g$nestImage[1] 
     if(is.logical(g$isAnchor))isAnchor=g$isAnchor[1]
+    if(is.numeric(g$zoom))zoom=g$zoom[1]
     if(is.logical(g$isAssign) && isNest){
     	isAssign=g$isAssign[1]
     	if(isAssign){
@@ -719,9 +725,7 @@ setMethod ('addGraph', 'RedPort',
 			V(g)$name=paste(temp,".$",id,sep="")
     	}
     }
-    if(is.logical(g$loadEdges))loadEdges=g$loadEdges[1]
-    zoom=NULL
-	if(is.numeric(g$zoom))zoom=g$zoom[1]    
+    if(is.logical(g$loadEdges))loadEdges=g$loadEdges[1]   
     bgColor=NULL
 	if(is.character(g$bgColor))bgColor=g$bgColor[1]          
     nestColor=NULL
@@ -774,7 +778,7 @@ setMethod ('addGraph', 'RedPort',
             warning("NOTE: invalid graph 'zoom' declaration: 'NA' found'!")
         } else {            
              message("** ... graph 'zoom'") 
-       		 invisible( xml.rpc (obj@uri, 'RedHandler.setZoom', zoom) )
+       		 invisible( rederexpresspost (obj@uri, 'RedHandler.setZoom', zoom) )
         }
     }
         
@@ -798,7 +802,7 @@ setMethod ('addGraph', 'RedPort',
        	  	warning("NOTE: attribute 'gscale' is not set properly; must be <numeric> of length=1!")
        	  	gscale = 75
        	  }
-       	  pScale=xml.rpc(obj@uri,'RedHandler.getPanelScale')
+       	  pScale= rederexpresspost(obj@uri,'RedHandler.getPanelScale')
        	  if(is.numeric(pScale)){
        	  		pScale=pScale[1]*(gscale[1]/100)
        	  } else {
@@ -829,7 +833,7 @@ setMethod ('addGraph', 'RedPort',
         } else {            
              message("** ... graph background 'color'") 
              if(nchar(bgColor)>7) bgColor=substr(bgColor,0,7)
-       		 invisible( xml.rpc (obj@uri, 'RedHandler.setBackground', bgColor) )
+       		 invisible( rederexpresspost (obj@uri, 'RedHandler.setBackground', bgColor) )
         }      
     }  
         
@@ -837,12 +841,9 @@ setMethod ('addGraph', 'RedPort',
     if(vcount(g)>0)message("** ... nodes!") 
     if(ecount(g)>0)message("** ... edges!")
     
-	#library(RCurl)
-	#myOpts=list()
-	#myOpts[["tcp.nodelay"]]=TRUE
-	#h = getCurlHandle()
-	#(..., .opts=myOpts, .curl=h)
-	
+    #------------------------    	
+    #------------------------    	
+    	
 	 #...this option might be useful for large networks! not yet implemented!!
 	 if(minimal){	
     	addNodes(obj, nodes)
@@ -856,7 +857,7 @@ setMethod ('addGraph', 'RedPort',
             	j=j+1
         	}
         	#internal function to load igraph edges! (..bit faster for dense graphs!)
-        	invisible(xml.rpc(obj@uri,'RedHandler.addEdgesFastload',as.character(xedges)) )
+        	invisible(rederexpresspost(obj@uri,'RedHandler.addEdgesFastload',as.character(xedges) ) )
         	return("Done!")
    	 	}
 	  }
@@ -974,20 +975,16 @@ setMethod ('addGraph', 'RedPort',
           nodeShape=as.character(c('',''))
       }                      
       #nodeColor
-      if(!is.null(nodeColor) && length(nodeColor)>0){       
-        c1=!is.character(nodeColor)
-        if(c1){
-          warning("NOTE: node 'color' must be provided as character (hexadecimal)!")
-          nodeColor=as.character(c('',''))
-        }
-        else if(sum(is.na(nodeColor))>0){
+      if(!is.null(nodeColor) && length(nodeColor)>0 && is.character(nodeColor)){      
+        nodeColor=colorRampPalette(colors=nodeColor)(length(nodeColor)) 
+        if(sum(is.na(nodeColor))>0){
             warning("NOTE: invalid node 'color' declaration: 'NA' found'!")
             nodeColor=as.character(c('',''))
         } else if(sum(nchar(nodeColor)>9) ){
         	warning("NOTE: invalid node 'color' specification: not 'rgb' space! (ps. alpha not supported)")
         	nodeColor=as.character(c('',''))
         } else {            
-             message("** ... node 'color'") 
+             message("** ... node 'color'")            
              if(sum(nchar(nodeColor)>7))nodeColor=substr(nodeColor,0,7)
         }      
       } else {
@@ -1032,13 +1029,9 @@ setMethod ('addGraph', 'RedPort',
           nodeLineWidth=as.numeric(c(-1,-1))
       }
       #nodeLineColor
-      if(!is.null(nodeLineColor) && length(nodeLineColor)>0){       
-        c1=!is.character(nodeLineColor)
-        if(c1){
-          warning("NOTE: node 'line color' must be provided as hexadecimal!")
-          nodeLineColor=as.character(c('',''))
-        }
-        else if(sum(is.na(nodeLineColor))>0){
+      if(!is.null(nodeLineColor) && length(nodeLineColor)>0 && is.character(nodeLineColor)){
+        nodeLineColor=colorRampPalette(colors=nodeLineColor)(length(nodeLineColor)) 
+        if(sum(is.na(nodeLineColor))>0){
             warning("NOTE: invalid node 'line color' declaration: 'NA' found'!")
             nodeLineColor=as.character(c('',''))
         } else if(sum(nchar(nodeLineColor)>9)){
@@ -1046,7 +1039,7 @@ setMethod ('addGraph', 'RedPort',
         	nodeLineColor=as.character(c('',''))
         } else {           
              message("** ... node 'line color'")
-             if(sum(nchar(nodeLineColor)>7)) nodeLineColor=substr(nodeLineColor,0,7)
+             if(sum(nchar(nodeLineColor)>7))nodeLineColor=substr(nodeLineColor,0,7)
         }      
       } else {
           nodeLineColor=as.character(c('',''))
@@ -1074,13 +1067,9 @@ setMethod ('addGraph', 'RedPort',
           nodeFontSize=as.numeric(c(-1,-1))
       }
       #nodeFontColor
-      if(!is.null(nodeFontColor) && length(nodeFontColor)>0){       
-        c1=!is.character(nodeFontColor)
-        if(c1){
-          warning("NOTE: node 'font color' must be provided as hexadecimal!")
-          nodeFontColor=as.character(c('',''))
-        }
-        else if(sum(is.na(nodeFontColor))>0){
+      if(!is.null(nodeFontColor) && length(nodeFontColor)>0 && is.character(nodeFontColor)){ 
+      	nodeFontColor=colorRampPalette(colors=nodeFontColor)(length(nodeFontColor))
+        if(sum(is.na(nodeFontColor))>0){
             warning("NOTE: invalid node 'font color' declaration: 'NA' found'!")
             nodeFontColor=as.character(c('',''))
         } else if(sum(nchar(nodeFontColor)>9)){
@@ -1184,13 +1173,9 @@ setMethod ('addGraph', 'RedPort',
        edgeWidth=as.numeric(c(-1,-1))
     }              
     #edgeColor
-    if(!is.null(edgeColor) && length(edgeColor)>0){       
-      c1=!is.character(edgeColor)
-      if(c1){
-          warning("NOTE: edge 'color' must be provided as hexadecimal!")
-          edgeColor=as.character(c('',''))
-      }
-      else if(sum(is.na(edgeColor))>0){
+    if(!is.null(edgeColor) && length(edgeColor)>0 && is.character(edgeColor)){ 
+      edgeColor=colorRampPalette(colors=edgeColor)(length(edgeColor))
+      if(sum(is.na(edgeColor))>0){
           warning("NOTE: invalid edge 'color' declaration: 'NA' found'!")
           edgeColor=as.character(c('',''))
       } else if(sum(nchar(edgeColor)>9)){
@@ -1220,6 +1205,30 @@ setMethod ('addGraph', 'RedPort',
         edgeType=as.character(c('',''))
     }
     
+    #Check nesting condition
+    nestref=NULL
+    isnp=FALSE
+    if(isNest){
+        nestpack=nestNodes(obj, nodes, nestImage, isAssign, isAnchor, gscale=gscale, 
+        		gcoord=NULL,gatt=gatt, theme=theme, getpack=TRUE, .callchecks=FALSE)
+    	np1=nestpack$nodes
+    	np2=nestpack$status
+    	np3=nestpack$charAtt
+    	np4=nestpack$numericAtt
+    	bl1=is.character(np1) && is.character(np2) && is.character(np3) && is.numeric(np4)
+    	bl2=length(np1)>=2 && length(np2)==3 && length(np3)==6 && length(np4)==8
+    	if(bl1 && bl2)isnp=TRUE
+    }
+    if(isnp){
+    	isnp="true"  	
+    } else {
+    	np1=as.character(c('',''))
+    	np2=as.character(c('',''))
+    	np3=as.character(c('',''))
+    	np4=as.numeric(c(-1,-1)) 
+    	isnp="false"    	
+    }
+  	    
     #Loading graph...      
     isBrandNew=ifelse(isNest && isAssign,'true','false')
     numsuppl=c(gcoord[1],gcoord[2])
@@ -1227,28 +1236,25 @@ setMethod ('addGraph', 'RedPort',
     if(ecount(g)>0 && loadEdges){
     	#update, isBrandNew   	
         #Main call to load nodes and edges
-        invisible( xml.rpc (obj@uri, 'RedHandler.updateGraphMap', edges[,1],
+        nestref=rederexpresspost(obj@uri, 'RedHandler.updateGraphMap', edges[,1],
               edges[,2], arrowDirection, edgeWeight, edgeWidth, edgeColor, edgeType,
               nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
               nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
-              nodeFontColor, nodeAlias, numsuppl, charsuppl) )             
+              nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp)      
     } else {
         #Main call to load only nodes
-        invisible (xml.rpc (obj@uri, 'RedHandler.updateNodeMap', 
+        nestref=rederexpresspost(obj@uri, 'RedHandler.updateNodeMap', 
               nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
               nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
-              nodeFontColor, nodeAlias, numsuppl, charsuppl) )
-    }
+              nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp)
+	}
     
-    #Check nesting condition
-    nestref=NULL
+    invisible( updateGraph(obj) )
+    
+    #Check nesting ref
     if(isNest){
-        nestref=nestNodes(obj, nodes, nestImage, isAssign, isAnchor, gscale=gscale, gcoord=NULL,gatt=gatt, theme=theme)
         if(!is.null(nestref))return(nestref)
-    } else {
-    	invisible( updateGraph(obj) )
-    }
-    
+    }     
 
   })
         
@@ -1257,121 +1263,121 @@ setMethod ('addGraph', 'RedPort',
 
 #-------------------------------------------------------------------------------
 setMethod ('getNodes', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="selected", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodes', type, status))
     })    
 #-------------------------------------------------------------------------------
 setMethod ('getNodeIDs', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeIDs', type, status))
     }) 
 #-------------------------------------------------------------------------------
 setMethod ('getNodeAliases', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeAliases', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeX', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeX', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeY', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeY', type, status))
     })    
 #-------------------------------------------------------------------------------
 setMethod ('getNodeW', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeW', type, status))
     })    
 #-------------------------------------------------------------------------------
 setMethod ('getNodeH', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeH', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeBend', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeBend', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeSize', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeSize', type, status))
     })            
 #-------------------------------------------------------------------------------
 setMethod ('getNodeShape', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeShape', type, status))
     })            
 #-------------------------------------------------------------------------------
 setMethod ('getNodeColor', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeColor', type, status))
     })            
 #-------------------------------------------------------------------------------
 setMethod ('getNodeLineWidth', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeLineWidth', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeLineColor', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeLineColor', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeFontName', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeFontName', type, status))
     })     
 #-------------------------------------------------------------------------------
 setMethod ('getNodeFontStyle', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeFontStyle', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeFontSize', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeFontSize', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeFontColor', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeFontColor', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeFontX', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeFontX', type, status))
     })    
 #-------------------------------------------------------------------------------
 setMethod ('getNodeFontY', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeFontY', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getNodeWeight', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc (obj@uri, 'RedHandler.getNodeWeight', type, status))
     })    
@@ -1592,41 +1598,66 @@ setMethod ('deleteNodes', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('nestNodes', 'RedPort', 
   function (obj, nodes, nestImage ='plain', isAssign=TRUE, isAnchor=FALSE, gscale=40, gcoord=NULL, parent=NULL, 
-  gatt=list(), theme=c('tm0','tm1','tm2','tm3','tm4','tm5')) { 
-  	if(ping(obj)==0)return(invisible())
+  gatt=list(), theme=c('tm0','tm1','tm2','tm3','tm4','tm5','tm6'), getpack=FALSE, .callchecks=TRUE) { 
+  	if(.callchecks){
+  		if(ping(obj)==0)return(invisible())
+  	}
   	
 	#Further checks---------------------------------------------------- 
 	if(!is.list(gatt)){
 		stop("NOTE: 'gatt' must be a list of graph attributes (e.g. gatt$nestColor, gatt$gscale...)!")
 	}
-	if(theme[1]=='tm1'){
+	if(is.numeric(theme[1])){
+		theme=as.integer(theme[1])
+		theme=ifelse(theme>=0 && theme<=6, theme, 0)
+	} else if(is.character(theme[1])){
+		theme=switch(theme[1], tm1=1, tm2=2, tm3=3,tm4=4, tm5=5,tm6=6, 0)
+	} else if(is.list(theme)){
+		gatt=theme
+		theme=0
+	} else {
+		theme=0
+	}
+	if(theme==1){
 		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
-		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=15
-	}	
-	if(theme[1]=='tm2'){
+		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=10
+		if(is.null(gatt$nestColor))gatt$nestColor='#ffffff'
+		if(is.null(gatt$nestFontSize))gatt$nestFontSize=80
+		if(is.null(gatt$nestFontX))gatt$nestFontX=5
+		if(is.null(gatt$nestFontY))gatt$nestFontY=10.8
+		if(is.null(gatt$isAssign))gatt$isAssign=TRUE
+	} else if(theme==2){
 		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
 		if(is.null(gatt$nestColor))gatt$nestColor='#ffffff'
-		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=15
+		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=10
 		if(is.null(gatt$nestLineColor))gatt$nestLineColor='#000000'
 		if(is.null(gatt$nestLineType))gatt$nestLineType='DOTTED'
 		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
-	}	
-	if(theme[1]=='tm3'){
+	} else if(theme==3){
 		if(is.null(gatt$nestImage))gatt$nestImage='transparent'
 		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
-	}	
-	if(theme[1]=='tm4'){
+	} else if(theme==4){
 		if(is.null(gatt$nestImage))gatt$nestImage='hide'
 		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
-	}	
-	if(theme[1]=='tm5'){
+	} else if(theme==5){
 		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
 		if(is.null(gatt$nestColor))gatt$nestColor='#ffffff'
 		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=5
 		if(is.null(gatt$nestLineColor))gatt$nestLineColor='#000000'
 		if(is.null(gatt$nestLineType))gatt$nestLineType='DOTTED'
 		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
-	}		
+	} else if(theme==6){
+		if(is.null(gatt$nestShape))gatt$nestShape='ROUNDED_RECTANGLE'
+		if(is.null(gatt$nestColor))gatt$nestColor='#ffffff'
+		if(is.null(gatt$nestLineWidth))gatt$nestLineWidth=5
+		if(is.null(gatt$nestLineColor))gatt$nestLineColor='#000000'
+		if(is.null(gatt$nestLineType))gatt$nestLineType='DOTTED'
+		if(is.null(gatt$isAnchor))gatt$isAnchor=TRUE
+		if(is.null(gatt$nestFontSize))gatt$nestFontSize=100
+		if(is.null(gatt$nestFontX))gatt$nestFontX=5
+		if(is.null(gatt$nestFontY))gatt$nestFontY=10.8
+	}
+	
   	node=as.character(nodes) 	
   	status1='plain'
 	if(is.character(gatt$nestImage)){
@@ -1665,12 +1696,12 @@ setMethod ('nestNodes', 'RedPort',
  	 
     #Get string attributes 
     charAtt=rep("<$$>",6)
-	if(!is.null(gatt)){
+	if(!is.null(gatt) && !getpack){
 		message('*** Uploading nest attributes ...')
 	}
 	#Nest aliases
 	if(is.character(gatt$nestAlias) && length(gatt$nestAlias)>0){
-		message("** ... nest 'alias'")
+		if(!getpack)message("** ... nest 'alias'")
 		charAtt[1]=gatt$nestAlias[1]
 	} else if(!is.null(gatt$nestAlias)){
 		warning("NOTE: nest 'alias' must be provided as character!")
@@ -1681,7 +1712,7 @@ setMethod ('nestNodes', 'RedPort',
 		if(is.na(gatt$nestShape)){
 			warning("NOTE: invalid nest 'shape' declaration: 'NA' found'!")
 		} else {            
-			message("** ... nest 'shape'") 
+			if(!getpack)message("** ... nest 'shape'") 
 			charAtt[2]=gatt$nestShape
 		}      
 	} else if(!is.null(gatt$nestShape)){
@@ -1693,7 +1724,7 @@ setMethod ('nestNodes', 'RedPort',
 		if(is.na(gatt$nestLineType)){
 			warning("NOTE: invalid nest 'line type' declaration: 'NA' found'!")
 		} else {            
-			message("** ... nest 'line type'") 
+			if(!getpack)message("** ... nest 'line type'") 
 			charAtt[3]=gatt$nestLineType
 		}      
 	} else if(!is.null(gatt$nestLineType)){ 
@@ -1701,14 +1732,15 @@ setMethod ('nestNodes', 'RedPort',
 	}	
 	#Nest color
 	if(is.character(gatt$nestColor)){
-		gatt$nestColor=gatt$nestColor[1]
+		ncol=gatt$nestColor
+		gatt$nestColor=colorRampPalette(colors=c(ncol,ncol))(1)
 		if(is.na(gatt$nestColor)){
 			warning("NOTE: invalid nest 'color' declaration: 'NA' found'!")
 		} else if(nchar(gatt$nestColor)>9){
 			warning("NOTE: invalid nest 'color' specification: not 'rgb' space! (ps. alpha not supported)")
 		} else {            
 			if(nchar(gatt$nestColor)>7) gatt$nestColor=substr(gatt$nestColor,0,7)
-			message("** ... nest 'color'")
+			if(!getpack)message("** ... nest 'color'")
 			charAtt[4]=gatt$nestColor
 		}      
 	} else if(!is.null(gatt$nestColor)){ 
@@ -1716,13 +1748,14 @@ setMethod ('nestNodes', 'RedPort',
 	}
 	#Nest line color
 	if(is.character(gatt$nestLineColor)){
-		gatt$nestLineColor = gatt$nestLineColor[1]
+		ncol=gatt$nestLineColor
+		gatt$nestLineColor=colorRampPalette(colors=c(ncol, ncol))(1)
 		if(is.na(gatt$nestLineColor)){
 			warning("NOTE: invalid nest 'line color' declaration: 'NA' found'!")
 		} else if(nchar(gatt$nestLineColor)>9){
 			warning("NOTE: invalid nest 'line color' specification: not 'rgb' space! (ps. alpha not supported)")
 		} else {            
-			message("** ... nest 'line color'") 
+			if(!getpack)message("** ... nest 'line color'") 
 			if(nchar(gatt$nestLineColor)>7)gatt$nestLineColor=substr(gatt$nestLineColor,0,7)
 			charAtt[5]=gatt$nestLineColor
 		}      
@@ -1731,13 +1764,14 @@ setMethod ('nestNodes', 'RedPort',
 	}
 	#Nest font color
 	if(is.character(gatt$nestFontColor)){
-		gatt$nestFontColor = gatt$nestFontColor[1]
+		ncol=gatt$nestFontColor
+		gatt$nestFontColor = colorRampPalette(colors=c(ncol,ncol))(1)
 		if(is.na(gatt$nestFontColor)){
 			warning("NOTE: invalid nest 'font color' declaration: 'NA' found'!")
 		} else if(nchar(gatt$nestFontColor)>9){
 			warning("NOTE: invalid nest 'font color' specification: not 'rgb' space! (ps. alpha not supported)")
 		} else {            
-			message("** ... nest 'line color'") 
+			if(!getpack)message("** ... nest 'line color'") 
 			if(nchar(gatt$nestFontColor)>7) gatt$nestFontColor=substr(gatt$nestFontColor,0,7) 
 			charAtt[6]=gatt$nestFontColor
 		}      
@@ -1754,7 +1788,7 @@ setMethod ('nestNodes', 'RedPort',
 		if(is.na(gatt$nestFontX) || is.na(gatt$nestFontY) ){
                 warning("NOTE: invalid nest coords. declaration: 'NA' found'!")
 		} else {
-			message("** ... nest font 'coords'")
+			if(!getpack)message("** ... nest font 'coords'")
 			numericAtt[1]=gatt$nestFontX
 			numericAtt[2]=gatt$nestFontY
 		}      
@@ -1767,7 +1801,7 @@ setMethod ('nestNodes', 'RedPort',
 		} else if(gatt$nestFontSize<0){
         		warning("NOTE: invalid nest 'font size' declaration (options: >= 0)")
 		} else {
-			message("** ... nest font 'size'") 
+			if(!getpack)message("** ... nest font 'size'") 
 			numericAtt[3]=gatt$nestFontSize
 		}
 	}	  		
@@ -1779,7 +1813,7 @@ setMethod ('nestNodes', 'RedPort',
 		} else if(gatt$nestLineWidth<0){
 			warning("NOTE: invalid nest 'line width' declaration (options: >= 0)")
 		} else {
-			message("** ... nest 'line width'") 
+			if(!getpack)message("** ... nest 'line width'") 
 			numericAtt[4]=gatt$nestLineWidth
 		}
 	}
@@ -1791,7 +1825,7 @@ setMethod ('nestNodes', 'RedPort',
 		} else if(gatt$nestSize<0){
 			warning("NOTE: invalid nest 'size' declaration (options: >= 0)")
 		} else {
-			message("** ... nest 'size'") 
+			if(!getpack)message("** ... nest 'size'") 
 			numericAtt[5]=gatt$nestSize
 		}
 	}	
@@ -1806,7 +1840,7 @@ setMethod ('nestNodes', 'RedPort',
 		} else if(gatt$gscale <0){
 			warning("NOTE: invalid nest 'gscale' declaration (options: > 0)")
 		} else {
-			message("** ... nest 'gscale'") 
+			if(!getpack)message("** ... nest 'gscale'") 
 			numericAtt[6]=gatt$gscale
 		}
 	  } 	
@@ -1820,18 +1854,25 @@ setMethod ('nestNodes', 'RedPort',
 		if(sum(is.na(gatt$gcoord))>0 ){
 			warning("NOTE: invalid nest 'gcoord' declaration: 'NA' found'!")              
 		} else {
-			message("** ... nest 'gcoord'") 
+			if(!getpack)message("** ... nest 'gcoord'") 
 			numericAtt[7]=gatt$gcoord[1]
 			numericAtt[8]=gatt$gcoord[2]
 		}
 	  } 	
-	}	
-			   
-    ref =xml.rpc(obj@uri, 'RedHandler.nestNodes', nodes, status1, status2, status3, charAtt, numericAtt )      
-    invisible( updateGraph(obj) )
-    return(ref)  
+	}
+	if(getpack){
+		nestpack=list(nodes=nodes, status=c(status1,status2,status3), charAtt=charAtt, 
+			numericAtt=numericAtt, nestmap=length(nodes))
+		return(nestpack)
+	} else {
+    	ref=rederexpresspost(obj@uri, 'RedHandler.nestexpress', nodes, c(status1,status2,status3), 
+    		charAtt, numericAtt )      
+    	invisible( updateGraph(obj) )
+    	return(ref)		
+	}   
     
     })
+    
 #-------------------------------------------------------------------------------
 setMethod ('updateContainerSize', 'RedPort', 
   function (obj) { 
@@ -1854,6 +1895,8 @@ setMethod ('mergeOutEdges', 'RedPort',
   		lb=0
   		ub=0
   		isNull="true"
+  	} else {
+		if(lb>ub)stops("NOTE: 'lb' arg can not be >= 'ub' arg (i.e. lower and upper bounds!)")
   	}
     res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', isNorm, lb, ub, isNull)
     invisible( updateGraph(obj) )
@@ -1879,67 +1922,67 @@ setMethod ('mergeNodes', 'RedPort',
 
 #-------------------------------------------------------------------------------
 setMethod ('getEdges', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="selected", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getEdges', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getSourceEdges', 'RedPort', 
-  function (obj, type="node", status="all") {
+  function (obj, status="all", type="node") {
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getSourceEdges', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getTargetEdges', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getTargetEdges', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getEdgeIDs', 'RedPort', 
-  function (obj, type="node", status="all") {
+  function (obj, status="all", type="node") {
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getEdgeIDs', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getSourceEdgeIDs', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getSourceEdgeIDs', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getTargetEdgeIDs', 'RedPort', 
-  function (obj, type="node", status="all") {
+  function (obj, status="all", type="node") {
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getTargetEdgeIDs', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getArrowDirection', 'RedPort', 
-  function (obj, type="node", status="all") {
+  function (obj, status="all", type="node") {
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getArrowDirection', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getEdgeWidth', 'RedPort', 
-  function (obj, type="node", status="all") {
+  function (obj, status="all", type="node") {
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getEdgeWidth', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getEdgeColor', 'RedPort', 
-  function (obj, type="node", status="all") {
+  function (obj, status="all", type="node") {
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getEdgeColor', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getEdgeType', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getEdgeType', type, status))
     })
 #-------------------------------------------------------------------------------
 setMethod ('getEdgeWeight', 'RedPort', 
-  function (obj, type="node", status="all") { 
+  function (obj, status="all", type="node") { 
   	if(ping(obj)==0)return(NULL)
     return (xml.rpc(obj@uri, 'RedHandler.getEdgeWeight', type, status))
     })
@@ -2104,11 +2147,12 @@ setMethod ('selectEdges', 'RedPort',
     })
 #-------------------------------------------------------------------------------
 setMethod ('selectNodes', 'RedPort', 
-  function (obj, nodes) { 
+  function (obj, nodes, nt=NULL) { 
   		if(ping(obj)==0)return(invisible())
   		nodes=as.character(nodes)
+  		nt=ifelse(is.null(nt[1]),"",as.character(nt)[1])
   		deSelectNodes(obj)#deselect all nodes previously to the call!
-    	invisible (xml.rpc (obj@uri, 'RedHandler.selectNodes', nodes))
+    	invisible (xml.rpc (obj@uri, 'RedHandler.selectNodes', nodes, nt))
     })
 #-------------------------------------------------------------------------------
 setMethod ('selectAllEdges', 'RedPort', 
@@ -2165,7 +2209,21 @@ setMethod ('isDynamicsActive', 'RedPort',
     	return (xml.rpc (obj@uri, 'RedHandler.isDynamicsActive'))
     })
 
-
+#-------------------------------------------------------------------------------
+setMethod ('relax', 'RedPort', 
+  function (obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10) {
+  		if(ping(obj)==0)return(invisible())
+  		if(!is.numeric(p1) || length(p1)==0)p1=100;p1=p1[1]
+  		if(!is.numeric(p2) || length(p2)==0)p2=100;p2=p2[1]
+  		if(!is.numeric(p3) || length(p3)==0)p3=100;p3=p3[1] 		  		
+  		if(!is.numeric(p4) || length(p4)==0)p4=100;p4=p4[1]
+  		if(!is.numeric(p5) || length(p5)==0)p5=100;p5=p5[1]  		
+  		if(!is.numeric(p6) || length(p6)==0)p6=100;p6=p6[1]  		
+  		if(!is.numeric(p7) || length(p7)==0)p7=10;p7=p7[1]
+  		if(!is.numeric(p8) || length(p8)==0)p8=10;p8=p8[1]
+    	return (xml.rpc (obj@uri, 'RedHandler.setDynamics',p1,p2,p3,p4,p5,p6,p7,p8,1))
+    })
+    
 #Methods to build RedeR plugins
   
 #-------------------------------------------------------------------------------
@@ -2219,38 +2277,42 @@ setMethod ('submitPlugin', 'RedPort',
 #Map hclust to RedeR app
 #-------------------------------------------------------------------------------
 setMethod ('nesthc', 'RedPort', 
-	function(obj, hc, cutlevel=2, metric=c("rootdist","leafdist","height"), ncomp=3, nlev=2, grid=c(2,3),
-		gridScale=75, gscale=c(30,75,45), gatt=list(), theme='tm5', isAssign=TRUE, isAnchor=TRUE, 
-		order=c("topdown","bottomup"), getcounts=FALSE ){
-				
+	function(obj, hc, cutlevel=2, metric=c("rootdist","leafdist","height"), nmemb=2, nlev=2, grid=c(2,3),
+		gridScale=75, gscale=c(30,75,45), isAssign=FALSE, isAnchor=TRUE, theme='tm6', nlinewidth=10, nfontsz=60,
+		col=NULL, plothc=TRUE, plotbox=TRUE, cex=0.6, xlab="Nodes", ylab="Height", main="Hierarchical Network",
+		alpha = 0.95, pv = "au", type = "geq", max.only = TRUE, labels=NULL, lwd=1,...){
+
 		if(ping(obj)==0)return(invisible())
 		
     	#check hclust object-----------------------------------------------
-    	if(class(hc)!="hclust"){
+    	hctype="hclust"
+    	if(class(hc)=="pvclust"){
+    		pvedges=pvpick(x=hc, alpha=alpha, pv=pv, type=type, max.only=max.only)$edges
+    		hc=hc$hclust
+    		hctype="pvclust"
+    	} else if(class(hc)!="hclust"){
         	stop("Not a hclust object!")
-    	}    
+    	}
+    	hc$height=hc$height/max(hc$height)
 
 		#check args--------------------------------------------------------
-		if(!is.character(metric))metric="rootdist"
-		tp=switch(metric[1], rootdist=1, leafdist=2, height=3)
-		if(is.null(tp))metric="rootdist"
-		metric=metric[1]
-				
-		#this feature is not implemented yet!
-		if(!is.character(order))order="topdown"
-		tp=switch(order[1], topdown =1,bottomup=2)
-		if(is.null(order))order="topdown"
-		#further checks---------------------------------------------------- 
-		if(!is.list(gatt)){
-			stop("NOTE: 'gatt' must be a list of graph attributes (e.g. gatt$nestColor, gatt$gscale...)!")
-		}
-		if(is.null(gatt$nestLineWidth) || !is.numeric(gatt$nestLineWidth))gatt$nestLineWidth=5
-		lwidth=gatt$nestLineWidth[1]
 		
+		if(is.character(metric)){
+			tp=switch(metric[1], rootdist=1, leafdist=2, height=3, 1)
+		} else if(is.numeric(metric)){
+			tp=metric[1]
+			tp=ifelse(tp>0 && tp<=3,tp, 1)
+		} else {
+			tp=1
+		}
+		metric=c("rootdist","leafdist","height")[tp]
+		nmemb=max(2,nmemb)
+		
+		#further checks----------------------------------------------------
 		if(!is.numeric(cutlevel))cutlevel=2
 		cutlevel=cutlevel[1]
-		if(!is.numeric(ncomp) || ncomp<=0)ncomp=3
-		ncomp=ncomp[1]		
+		if(!is.numeric(nmemb))nmemb=2
+		nmemb=max(2,nmemb[1])
 		if(!is.numeric(grid))grid=c(2,3)
 		if(length(grid)==1)grid=c(2,3)
 		gridScale=gridScale[1]
@@ -2309,34 +2371,103 @@ setMethod ('nesthc', 'RedPort',
 			}
 			E[[i]]=step
 	    }
-	    #Re-scale hc height to [0-1]
-	    tp=sort(hc$height)[1]
-	    if(tp>0){
-	    	hc$height=hc$height-tp
-	    } else if(tp<0){
-	    	hc$height=hc$height+abs(tp)
-	    }
-	    tp=sort(hc$height)[length(hc$height)]
-	    hc$height=hc$height/tp
-	    #return results
+		# get dendogram xy position
+		nn=nrow(A) + 1
+		xaxis=c()
+		yaxis=hc$height
+		tp=rep(0,2)
+		mm=match(1:length(hc$order),hc$order)
+		for(i in 1:(nn-1)) {
+				ai=A[i,1]
+        		if(ai < 0){
+          			tp[1]=mm[-ai]
+        		} else {
+          			tp[1]=xaxis[ai]
+        		}
+        		ai=A[i,2]
+        		if(ai < 0){
+          			tp[2]=mm[-ai]
+        		} else {
+          			tp[2]=xaxis[ai]
+				}
+        		xaxis[i]=mean(tp)
+		}
+		xyaxis=data.frame(xaxis=xaxis,yaxis=yaxis,stringsAsFactors=FALSE)
+	    # return res
 	    C=as.numeric(C)
 	    D=as.numeric(D)
 	    E=as.numeric(E)
 	    N=hc$merge>0
 	    N=N[,1]+N[,2]
-	    return(list(nest=nest,labels=hc$labels,parent=D,leafdist=C,rootdist=E,height=hc$height,nnest=N))
+	    return(list(nest=nest,compids=B,labels=hc$labels,parent=D,leafdist=C,
+	    			rootdist=E,height=hc$height,nnest=N, xyaxis=xyaxis))
 		}
 		
-		#computa mapa e estima numero de ninhos abaixo do nivel do corte
+		# map tree
     	tm=treemap(hc)
     	nn=length(tm$nest)
-  		if(metric=="rootdist"){
-  			nestcount=sum(tm[[metric]]<=cutlevel)
+  		
+  		#compute dist to root and select nested series	
+  		if(hctype=="pvclust"){
+  			selec=rep(0, nn)
+  			selec[pvedges]=1
+			tp=tm$parent
+			td=selec[tp]
+			td[is.na(td)]=0
+			nrtdist=td
+			while(sum(td)>0){
+				tp=tm$parent[tp]
+				td=selec[tp]
+				td[is.na(td)]=0
+				nrtdist=nrtdist+td
+			}
+			selec=nrtdist+selec
+			tp=rep(0, nn)
+			tp[pvedges]=1
+			selec[tp==0]=0
+			selec[selec>nlev]=0
   		} else {
-  			nestcount=sum(tm[[metric]]>=cutlevel)
+  			val=tm[[metric]]
+  			if(metric=="rootdist"){
+  				selec=as.numeric(val>=cutlevel)
+  			} else {
+  				selec=as.numeric(val<=cutlevel)
+  			}
+			tp=tm$parent
+			td=selec[tp]
+			td[is.na(td)]=0
+			nrtdist=td
+			while(sum(td)>0){
+				tp=tm$parent[tp]
+				td=selec[tp]
+				td[is.na(td)]=0
+				nrtdist=nrtdist+td
+			}
+			selec=nrtdist+selec	
+			selec[selec>nlev]=0		
   		}
+  		tedges=c(1:length(selec))[selec!=0]
+  		# remap parents (e.g. after removing tree nodes via pvclust)
+		tp=tm$parent
+		td=tp[tedges]
+		tdd=tp[tedges]
+		idx=!td%in%tedges
+		while(sum(idx)>0){
+			td[idx]=tp[td[idx]]
+			idx=!td%in%tedges
+			idx[is.na(td)]=FALSE
+			#td[is.na(td)]=tp[tedges][is.na(td)]	
+			tdd[is.na(td)]=tp[tedges][is.na(td)]				
+		}
+		newparent=rep(0,nn)
+		newparent[tedges]=tdd
+		newnnest=rep(0,length(newparent))
+		for(i in 1:length(newnnest)){
+			newnnest[i]=sum(newparent==i)
+		}
+	  	nestcount=sum(selec!=0)
     	
-    	#estima grid
+    	#estimate grid
     	if(!is.numeric(gridRows)){gridRows=NULL}else{gridRows=gridRows[1]}
     	zoom=NULL
     	if(is.numeric(gridScale)){
@@ -2363,34 +2494,25 @@ setMethod ('nesthc', 'RedPort',
         			layout=rbind(layout, lt)
         		}
         	}
-        }    
-        # 'update="default"' forces to keep old node coords and not to add new containers!
+        }	
+        
+        # ' update="default" ' forces keeping old node coords and not to add new containers!
     	if(is.null(update) || !is.character(update))update=NULL
     	# internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
-  		invisible(xml.rpc (obj@uri,'RedHandler.lockDragAndZoom'))
-  		if(!is.null(zoom))invisible( xml.rpc (obj@uri, 'RedHandler.setZoom',zoom) )
-  		checknd=getGraph(obj,attribs="minimal")
-  		checknd=V(checknd)$name
-  		
-  		#compute dist to nest root (after cut!)
-  		val=tm[[metric]]
-  		if(metric=="rootdist"){
-  			selec=as.numeric(val>=cutlevel)
+  		invisible(rederexpresspost (obj@uri,'RedHandler.lockDragAndZoom'))
+  		if(!is.null(zoom))invisible( rederexpresspost (obj@uri, 'RedHandler.setZoom',zoom) )
+  		checknd=getGraph(obj, status="all", attribs="minimal")
+  		checknd=V(checknd)$name        
+	  	  		
+  		# set lab colors
+  		if(is.null(col)){
+  			col=c("darkred","red","orange","darkgreen","cyan","blue","darkblue")
+  			col=colorRampPalette(colors=col)(nestcount)
   		} else {
-  			selec=as.numeric(val<=cutlevel)
+  			if(length(col)<2)col=c(col,col)
+  			col=colorRampPalette(colors=col)(nestcount)
   		}
-  		tp=tm$parent
-  		td=selec[tp]
-  		td[is.na(td)]=0
-  		distrt=td
-  		while(sum(td)>0){
-  			tp=tm$parent[tp]
-  			td=selec[tp]
-  			td[is.na(td)]=0
-  			distrt=distrt+td
-  		}
-  		distrt=distrt+selec
-  		
+  				  				
     	#add tree ----------------------------------------------------------
     	gs0=gscale[1]
     	gs1=gscale[2]
@@ -2399,75 +2521,404 @@ setMethod ('nesthc', 'RedPort',
     	gc2=c(70,70)
     	gc3=c(30,30)
     	stats=data.frame()
-    	if(order[1]=="topdown"){
-    	  nid=rep(NA,nn)
-    	  k=1
-    	  for(i in nn:1){
-    	  	val=distrt[i]
-    		if(val>0 && val<=nlev){  			
+		nestpack=list()
+		nestcount=1
+		nid=rep(NA,nn)
+		k=1
+		for(i in rev(tedges)){			
     			nodes=tm$nest[[i]]
-    			if(sum(nodes%in%checknd)>=ncomp){
-	    			idx=tm$parent[i]
-	  				if(!is.na(nid[idx]) && isAssign){
-	  					nodes=paste(nodes,".$", nid[idx],sep="")
+    			if(sum(nodes%in%checknd)>=nmemb){
+	    			pt=newparent[i]
+	  				if(!is.na(nid[pt]) && isAssign){
+	  					nodes=paste(nodes,".$", nid[pt],sep="")
 	  				}
-	  				if(is.na(nid[idx])){	
+	  				if(is.na(nid[pt])){	
 	  					gs=gs0
 	  					gc=c(layout[k,1],layout[k,2])
 	  					k=k+1				
-	  				} else if(tm$nnest[idx]<2){
+	  				} else if(newnnest[pt]<2){
 	   					gs=gs1
 	  					gc=gc1  				
-	  				} else if(tm$nnest[idx]==2){
+	  				} else if(newnnest[pt]==2){
 	  					gs=gs2
 	  					gc=gc2
-	  					tm$nnest[idx]=3
-	  				} else if(tm$nnest[idx]==3) {
+	  					newnnest[pt]=3
+	  				} else if(newnnest[pt]==3) {
 	  					gs=gs2
 	  					gc=gc3  				
 	  				}
 	  				#scale nest.line.width by n. levels (just to get a better image!) 
-	  				gatt$nestLineWidth=(lwidth/2)+((lwidth/2)*(1/max(1,distrt[i])))
+	  				gatt=list()
+	  				gatt$nestLineWidth=(nlinewidth/2)+((nlinewidth/2)*(1/max(1,selec[i])))
+	  				gatt$nestFontSize=(nfontsz/2)+((nfontsz/2)*(1/max(1,selec[i])))
+	  				#gatt$nestFontColor=col[tedges==i]
+	  				gatt$nestLineColor=col[tedges==i]
+	  				gatt$nestAlias=paste("NT",nestcount,sep="")
+	  				nid[i]=gatt$nestAlias
 	  				#send nested nodes!
-	    			nid[i]=nestNodes(obj, nodes, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
+	  				if(isAssign){
+	    					nestNodes(obj, nodes, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
 	    					gscale=gs, gcoord=gc, gatt=gatt, theme=theme)
-	    			stats=rbind(stats, data.frame(nest.id=nid[i],nest.size=length(nodes),leafdist=tm$leafdist[i],
-	    				  dendoroot.dist=tm$rootdist[i],height=tm$height[i],nestroot.dist=distrt[i]))
-    			}
-    		}
-    	 } 
-    	} else { 
-    	  gc=gc1
-    	  gs=gs1
-    	  labs=hc$labels    		
-    	  for(i in 1:nn){
-			val=distrt[i]
-    		if(val>0 && val<=nlev){ 
-    			nodes=tm$nest[[i]]
-    			if(sum(nodes%in%checknd)>=ncomp){
-	    			nodes=labs[hc$labels%in%nodes]
-	    			nds=unique(nodes)
-	    			if(length(nds)<length(nodes)){
-	    				gs=NULL
-	    				gc=round(runif(2,min=20,max=80))
 	    			} else {
-	    				gs=gs1
-	    				gc=gc1
+	    				nestpack[[nestcount]]=nestNodes(obj, nodes, nestImage='plain', isAssign=isAssign, 
+	    					isAnchor=isAnchor, gscale=gs, gcoord=gc, gatt=gatt, theme=theme, 
+	    					getpack=TRUE, .callchecks=FALSE)	 
+	    				nestcount=nestcount+1
 	    			}
-	    			nid=nestNodes(obj, nds, nestImage='plain', isAssign=isAssign, isAnchor=isAnchor, 
-	    					gscale=gs, gcoord=gc, gatt=gatt, theme=theme)
-	    			labs[labs%in%tm$nest[[i]]]=nid
-	    			stats=rbind(stats, data.frame(nest.id=nid[i],nest.size=length(nodes),leafdist=tm$leafdist[i],
-	    				  dendoroot.dist=tm$rootdist[i],height=tm$height[i],nestroot.dist=distrt[i]))
+	    			stats=rbind(stats, data.frame(nid=nid[i],did=i,nest.size=length(nodes),
+	    					leafdist=tm$leafdist[i],root.dist=tm$rootdist[i],height=tm$height[i],
+	    					nestroot.dist=selec[i],stringsAsFactors=FALSE))	    			
+    			} else {
+    				selec[i]=0 #remove container due to n. members<threashold!!
     			}
-    		}
-    	  }   	 	
-      }  
-	  #Internal function (unlocks DragAndZoon interactivity after send subgraph list)
-   	  invisible(xml.rpc (obj@uri,'RedHandler.unLockDragAndZoom'))     	
-   	  if(getcounts)return(stats)
+		}
+		if(length(nestpack)>0){
+    	  	nodes=nestpack[[1]]$nodes
+    	  	status=nestpack[[1]]$status
+    	  	charAtt=nestpack[[1]]$charAtt
+    	  	numAtt=nestpack[[1]]$numericAtt
+    	  	nestmap=nestpack[[1]]$nestmap 
+    	  	if(length(nestpack)>1){ 	  	
+	    	  	for(i in 2:length(nestpack)){
+	    	  		nodes=c(nodes,nestpack[[i]]$nodes)
+	    	  		status=c(status,nestpack[[i]]$status)
+	    	  		charAtt=c(charAtt,nestpack[[i]]$charAtt)
+	    	  		numAtt=c(numAtt,nestpack[[i]]$numericAtt)
+	    	  		nestmap=c(nestmap,nestpack[[i]]$nestmap)    	  		
+	    	  	}
+    	  	}
+    	  	message('*** Uploading nest hclust...')
+    	  	rederexpresspost(obj@uri,'RedHandler.nestpackexpress', nodes, status, charAtt, numAtt, nestmap)
+    	  	invisible( updateGraph(obj) )
+		}
+    	  
+		#Internal function (unlocks DragAndZoon interactivity after send subgraph list)
+		invisible(rederexpresspost (obj@uri,'RedHandler.unLockDragAndZoom'))
+		
+		if(plothc){
+			plot(x=hc, xlab=xlab, ylab=ylab, cex=cex, sub="", main=main, labels=labels, lwd=lwd,...)
+			if(sum(selec>0)>0){
+				usr=par()$usr; wid=usr[4]-usr[3]
+				cex=cex*2
+				cex1=cex-(cex/2)
+				cex2=cex/2
+				cex=cex1+cex2*1/stats$nestroot.dist
+				text(x=tm$xyaxis[stats$did,1], y=tm$xyaxis[stats$did,2] + 0.02 * wid, 
+					labels=stats$nid, pos=4, offset=.3, col=rev(col), cex=cex, lwd=lwd,...)
+				if(plotbox){
+					comp=tm$compids
+					order=hc$order
+					xwd=usr[2]-usr[1]
+					ywd=usr[4]-usr[3]
+					cin=par()$cin	
+					for(i in rev(tedges)){
+						if(selec[i]>0){ #em funcao do corte para n.nodos
+	            			mi=comp[[i]]
+	            			ma=match(mi, order)
+	                		xl=min(ma)
+	                		xr=max(ma)
+	                		yt=hc$height[i]
+	                		yb=usr[3]
+	                		mx=xwd / length(comp) / 3
+	                		my=ywd / 200
+	                		nd=stats[stats$did==i,"nestroot.dist"]
+	                		rect(xleft=xl - mx, ybottom=yb + my, xright=xr + mx, ytop=yt + my, 
+	                			border=col[tedges==i], shade=NULL, lwd=lwd*2*(1/nd),...)
+	                	}
+					}
+				}
+			}
+		}
   }
   )
 
+#-------------------------------------------------------------------------------
+setMethod ('addLegend.color', 'RedPort', 
+  function (obj, colvec, type="node", labvec=NULL, position=NULL, dxborder=NULL, dyborder=NULL, vertical=NULL, 
+  			ftsize=NULL, title=NULL, dxtitle=NULL, size=NULL, bend=NULL) {
+	
+	if(ping(obj)==0)return(invisible())
+  	
+	# checks---------------------------------------------------- 
 
+	# color vec
+	colvec=colorRampPalette(colors=colvec)(length(colvec))
+	if(!is.null(colvec) && length(colvec)>1){       
+		c1=!is.character(colvec)
+        if(c1){
+			stop("NOTE: 'color' must be provided as a vector (hexadecimal or valid R colors)!")
+        } else {
+        	colvec=colorRampPalette(colors=colvec)(length(colvec))
+        }
+        if(sum(is.na(colvec))>0){
+            stop("NOTE: invalid node 'color' declaration: 'NA' found'!")
+        } else if(sum(nchar(colvec)>9) ){
+        	stop("NOTE: invalid node 'color' specification: not 'rgb' space! (alpha not supported)")
+        } else {            
+             if(sum(nchar(colvec)>7))colvec=substr(colvec,0,7)
+        }
+	} else {
+		stop("NOTE: 'color' must be provided as a vector (hexadecimal or valid R colors)!")
+	}
+	# label vec
+	if(is.null(labvec))labvec=letters[c(1:length(colvec))]
+	if(length(labvec)!=length(colvec)){
+		stop("NOTE: 'labvec' and 'colvec' must have the same length!")
+	}
+	labvec=as.character(labvec)
+	# further args
+	if(!is.null(position) && !is.character(position))position=NULL
+	position=position[1]
+	if(!is.null(dxborder) && !is.numeric(dxborder))dxborder=NULL
+	dxborder=dxborder[1]
+	if(!is.null(dyborder) && !is.numeric(dyborder))dyborder=NULL
+	dyborder=dyborder[1]
+	if(!is.null(vertical) && !is.logical(vertical))vertical=NULL
+	vertical=vertical[1]
+	if(!is.null(ftsize) && !is.numeric(ftsize))ftsize=NULL
+	ftsize=ftsize[1]
+	if(!is.null(title) && !is.character(title))title=NULL
+	title=title[1]	
+	if(!is.null(dxtitle) && !is.numeric(dxtitle))dxtitle=NULL
+	dxtitle=dxtitle[1]
+	if(!is.null(size) && !is.numeric(size))size=NULL
+	size=size[1]	
+	if(!is.null(bend) && !is.numeric(bend))bend=NULL
+	bend=bend[1]	
+		
+	if(!is.character(type))type="nodecolor"
+	type=switch(type, node="nodecolor", edge="edgecolor", "nodecolor")
+	
+	if(!is.null(position)){
+		position=switch(position, bottomright="bottomRight", 
+			bottomleft="bottomLeft", topright="topRight", topleft="topLeft", NULL)
+	}	
+	
+	# default settings
+	if(type=="nodecolor"){
+		if(is.null(position))position="topRight"
+		if(is.null(dxborder))dxborder=5
+		if(is.null(dyborder))dyborder=5
+		if(is.null(vertical))vertical=FALSE
+		if(is.null(ftsize))ftsize=8
+		if(is.null(title))title="nodecolorscale"
+		if(is.null(dxtitle))dxtitle=40
+		if(is.null(size))size=20
+		if(is.null(bend))bend=0.85	
+	} else {
+		if(is.null(position))position="topRight"
+		if(is.null(dxborder))dxborder=5
+		if(is.null(dyborder))dyborder=85
+		if(is.null(vertical))vertical=FALSE
+		if(is.null(ftsize))ftsize=8
+		if(is.null(title))title="edgecolorscale"
+		if(is.null(dxtitle))dxtitle=40
+		if(is.null(size))size=20
+		if(is.null(bend))bend=0.85
+	}
+	bend=as.integer(bend*100)
+	bend=min(max(bend,0),100)
+	
+	# set logical
+	vertical=ifelse(vertical,"true","false")
+	
+	invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendColor', colvec, labvec, size, 
+					bend, ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type ) )
+    
+    })	
+
+#-------------------------------------------------------------------------------
+setMethod ('addLegend.size', 'RedPort', 
+  function (obj, sizevec, type="node", labvec=NULL, position=NULL, dxborder=NULL, dyborder=NULL, vertical=NULL, 
+  			ftsize=NULL, title=NULL, dxtitle=NULL, col=NULL, intersp=NULL) {
+	
+	if(ping(obj)==0)return(invisible())
+  	
+	# checks---------------------------------------------------- 
+
+	#size vec
+	if(!is.null(sizevec) && length(sizevec)>1){       
+		c1=!is.numeric(sizevec)
+		if(c1){
+			stop("NOTE: 'size' must be provided as numerics!")
+		} else if(sum(is.na(sizevec))>0){
+			stop("NOTE: invalid 'size' declaration: 'NA' found'!")
+		} else if(sum(sizevec<0)>0){
+			stop("NOTE: invalid node 'size' input (options: >= 0)")
+		} else {            
+			sizevec=as.numeric(sizevec)
+		}
+	} else {
+		stop("NOTE: 'size' must be provided as a vector (numeric)!")
+	} 
+	# label vec
+	if(is.null(labvec))labvec=as.character(sizevec)	
+	if(length(labvec)!=length(sizevec)){
+		stop("NOTE: 'labvec' and 'sizevec' must have the same length!")
+	}
+	labvec=as.character(labvec)
+	# further args
+	if(!is.null(position) && !is.character(position))position=NULL
+	position=position[1]
+	if(!is.null(dxborder) && !is.numeric(dxborder))dxborder=NULL
+	dxborder=dxborder[1]
+	if(!is.null(dyborder) && !is.numeric(dyborder))dyborder=NULL
+	dyborder=dyborder[1]
+	if(!is.null(vertical) && !is.logical(vertical))vertical=NULL
+	vertical=vertical[1]
+	if(!is.null(ftsize) && !is.numeric(ftsize))ftsize=NULL
+	ftsize=ftsize[1]
+	if(!is.null(title) && !is.character(title))title=NULL
+	title=title[1]	
+	if(!is.null(dxtitle) && !is.numeric(dxtitle))dxtitle=NULL
+	dxtitle=dxtitle[1]
+	if(!is.null(col) && !is.character(col))col=NULL
+	col=col[1]
+	if(sum(nchar(col)>7))col=substr(col,0,7)
+	if(!is.null(intersp) && !is.numeric(intersp)) intersp=NULL
+	intersp=intersp[1]
+	
+	if(!is.character(type))type="nodesize"
+	type=switch(type, node="nodesize", edge="edgewidth", "nodesize")
+	
+	if(!is.null(position)){
+		position=switch(position, bottomright="bottomRight", 
+			bottomleft="bottomLeft", topright="topRight", topleft="topLeft", NULL)
+	}
+	
+	# default settings
+	if(type=="nodesize"){
+		if(is.null(position))position="bottomLeft"
+		if(is.null(dxborder))dxborder=10
+		if(is.null(dyborder))dyborder=10
+		if(is.null(vertical))vertical=FALSE
+		if(is.null(ftsize))ftsize=8
+		if(is.null(title))title="nodesize"
+		if(is.null(dxtitle))dxtitle=40
+		if(is.null(col))col="#000000"
+		if(is.null(intersp))intersp=10	
+	} else {
+		if(is.null(position))position="bottomLeft"
+		if(is.null(dxborder))dxborder=10
+		if(is.null(dyborder))dyborder=120
+		if(is.null(vertical))vertical=TRUE
+		if(is.null(ftsize))ftsize=8
+		if(is.null(title))title="edgewidth"
+		if(is.null(dxtitle))dxtitle=40
+		if(is.null(col))col="#000000"
+		if(is.null(intersp))intersp=10
+	}
+	
+	# final col setting
+	col=colorRampPalette(colors=c(col,col))(1)	
+	# final logical setting
+	vertical=ifelse(vertical,"true","false")
+
+	invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendSize', sizevec, labvec, col, intersp, 
+				ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type ) )
+    
+    })
+
+#-------------------------------------------------------------------------------
+setMethod ('addLegend.shape', 'RedPort', 
+  function (obj, shapevec, type="node", labvec=NULL, position=NULL, dxborder=NULL, dyborder=NULL, vertical=NULL, 
+  			ftsize=NULL, title=NULL, dxtitle=NULL, col=NULL, size=NULL, intersp=NULL) {
+	
+	if(ping(obj)==0)return(invisible())
+  	
+	# checks---------------------------------------------------- 
+
+	if(!is.character(type))type="nodeshape"
+	type=switch(type, node="nodeshape", edge="edgeshape", "nodeshape")
+	
+	#shapes
+	defaultv=c('ELLIPSE', 'RECTANGLE', 'ROUNDED_RECTANGLE', 'TRIANGLE', 'DIAMOND')
+	defaulte=c('LONG_DASH','SOLID','DOTTED','DOTTED_SHORT')
+	if(type=='nodeshape'){
+		defaultshapes=defaultv
+	} else {
+		defaultshapes= defaulte
+	}
+	if(!is.null(shapevec) && length(shapevec)>1){       
+		c1=!is.character(shapevec)
+		if(c1){
+			stop("NOTE: 'shape' must be provided as character!")
+		} else if(sum(is.na(shapevec))>0){
+			stop("NOTE: invalid 'shape' declaration: 'NA' found'!")
+		} else if(sum(!shapevec%in%defaultshapes)>0){
+			stop(paste("NOTE: invalid 'shape' input. Options:", paste(defaultshapes, collapse="  ")))
+		} else {            
+			shapevec=as.character(shapevec)
+		}
+	} else {
+		stop("NOTE: 'shape' must be provided as a vector (character)!")
+	} 
+	# label vec
+	if(is.null(labvec))labvec=letters[c(1:length(shapevec))]
+	if(length(labvec)!=length(shapevec)){
+		stop("NOTE: 'labvec' and 'shapevec' must have same length!")
+	}
+	labvec=as.character(labvec)
+	# further args
+	if(!is.null(position) && !is.character(position))position=NULL
+	position=position[1]
+	if(!is.null(dxborder) && !is.numeric(dxborder))dxborder=NULL
+	dxborder=dxborder[1]
+	if(!is.null(dyborder) && !is.numeric(dyborder))dyborder=NULL
+	dyborder=dyborder[1]
+	if(!is.null(vertical) && !is.logical(vertical))vertical=NULL
+	vertical=vertical[1]
+	if(!is.null(ftsize) && !is.numeric(ftsize))ftsize=NULL
+	ftsize=ftsize[1]
+	if(!is.null(title) && !is.character(title))title=NULL
+	title=title[1]	
+	if(!is.null(dxtitle) && !is.numeric(dxtitle))dxtitle=NULL
+	dxtitle=dxtitle[1]
+	if(!is.null(col) && !is.character(col))col=NULL
+	col=col[1]
+	if(sum(nchar(col)>7))col=substr(col,0,7)
+	if(!is.null(size) && !is.numeric(size))size=NULL
+	size=size[1]	
+	if(!is.null(intersp) && !is.numeric(intersp)) intersp=NULL
+	intersp=intersp[1]
+	
+	if(!is.null(position)){
+		position=switch(position, bottomright="bottomRight", 
+			bottomleft="bottomLeft", topright="topRight", topleft="topLeft", NULL)
+	}
+	
+	# default settings
+	if(type=="nodeshape"){
+		if(is.null(position))position="topRight"
+		if(is.null(dxborder))dxborder=5
+		if(is.null(dyborder))dyborder=165
+		if(is.null(vertical))vertical=TRUE
+		if(is.null(ftsize))ftsize=8
+		if(is.null(title))title="nodeshape"
+		if(is.null(dxtitle))dxtitle=40
+		if(is.null(col))col="#000000"
+		if(is.null(size))size=15
+		if(is.null(intersp))intersp=5	
+	} else {
+		if(is.null(position))position="topRight"
+		if(is.null(dxborder))dxborder=100
+		if(is.null(dyborder))dyborder=165
+		if(is.null(vertical))vertical=TRUE
+		if(is.null(ftsize))ftsize=8
+		if(is.null(title))title="edgeshape"
+		if(is.null(dxtitle))dxtitle=40
+		if(is.null(col))col="#000000"
+		if(is.null(size))size=1.2
+		if(is.null(intersp))intersp=10
+	}
+	
+	# final col setting
+	col=colorRampPalette(colors=c(col,col))(1)	
+	# final logical setting
+	vertical=ifelse(vertical,"true","false")
+	
+	invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendShape', shapevec, labvec, col, size, 
+				intersp, ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type) )
+	    
+    })
 

@@ -13,6 +13,10 @@ exportMethods (
   duplicateGraph,
   addSubgraph,
   addSubgraph.list,
+  addLegend.color,
+  addLegend.size,
+  addLegend.shape,
+  relax,
 
   getNodes,
   getNodeIDs,
@@ -113,13 +117,25 @@ export(
   RedPort,
   PluginBuilder,
   pluginParser,
-  gtoy.rm
+  gtoy.rm,
+  rederpost,
+  rederexpresspost,
+  att.setv,
+  att.sete,
+  att.mapv,
+  att.mape,
+  subg,
+  cea
 
    )
 
 importFrom(methods, "@<-", new)
 
 importFrom(XMLRPC, xml.rpc)
+
+importFrom(XML, newXMLNode, saveXML)
+
+importFrom(RCurl, postForm)
 
 import(igraph)
 

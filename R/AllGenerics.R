@@ -28,7 +28,13 @@ setGeneric ('addSubgraph.list',   signature='obj', function (obj, g, nodeList, .
 setGeneric ('exitd',            signature='obj', function (obj)                 
             standardGeneric ('exitd'),         package='RedeR') 
 setGeneric ('resetd',           signature='obj', function (obj)                 
-            standardGeneric ('resetd'),        package='RedeR')                                                                                     
+            standardGeneric ('resetd'),        package='RedeR') 
+setGeneric ('addLegend.color',   signature='obj', function (obj, colvec, ...)            
+            standardGeneric ('addLegend.color'), package='RedeR')
+setGeneric ('addLegend.size',   signature='obj', function (obj, sizevec, ...)            
+            standardGeneric ('addLegend.size'), package='RedeR')            
+setGeneric ('addLegend.shape',   signature='obj', function (obj, shapevec, ...)            
+            standardGeneric ('addLegend.shape'), package='RedeR')                                                                                            
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 setGeneric ('getNodes',           signature='obj', function (obj, ...) 
@@ -173,7 +179,7 @@ setGeneric ('addEdgeBetweenContainers', signature='obj', function (obj,container
 #-----------------------------------------------------------------------------------------
 setGeneric ('selectEdges',        signature='obj', function (obj, nodeA, nodeB)    
             standardGeneric ('selectEdges'), package='RedeR')
-setGeneric ('selectNodes',        signature='obj', function (obj, nodes)           
+setGeneric ('selectNodes',        signature='obj', function (obj, nodes, nt=NULL)           
             standardGeneric ('selectNodes'), package='RedeR')
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -201,6 +207,9 @@ setGeneric ('deleteSelectedNodes',  signature='obj', function (obj)
 #-------------------------------------------------------------------------------
 setGeneric ('isDynamicsActive',     signature='obj', function (obj)   
             standardGeneric ('isDynamicsActive'), package='RedeR')
+setGeneric ('relax',     signature='obj', function (obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10)   
+            standardGeneric ('relax'), package='RedeR')    
+            
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 setGeneric ('submitPlugin', signature='obj', function (obj, plugin)     
