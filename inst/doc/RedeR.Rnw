@@ -157,7 +157,8 @@ The next chunk generates a scale-free graph according to the Barabasi-Albert mod
 \begin{small}
 <<label= Build scale-free graph and send to the app, eval= TRUE>>=
    g6 <- barabasi.game(500)
-   addGraph(rdp, g6)
+   addGraph(rdp, g6, zoom=20)
+   relax(rdp,100,400)
 @
 \end{small}
 
@@ -237,7 +238,7 @@ Now the method \emph{mt1} is added to the \emph{PluginBuilder}, and is ready to 
 
 The submission is straightforward: in the Java side, the plugin will be displayed in the main menu provided that the interface is properly set to find \emph{R}.
 \begin{small}
-<<label= Submit the plugin to RedeR app, eval= TRUE>>=
+<<label= Submit plugin to the app (p.s. JavaGD will be required: see footnotes!), eval= TRUE>>=
   submitPlugin(rdp, plugin)
   updatePlugins(rdp)
   exitd(rdp)
@@ -298,45 +299,161 @@ print(sessionInfo(), locale=FALSE)
 
 \section{Supplements}
 
-The R chunks below can be used to reproduce the pre-processed dataset available in "RedeR.data" data object. 
-This dataset integrates a case study that soon is going to appear in a new communication!
+The R chunks below can be used to illustrate possible usages for RedeR. The full description integrates a case study that soon is going to appear in a new communication!
 
 \begin{itemize}
 
-\item Pre-processing pipelines for differential expression, clustering and co-expression analysis:
+\item Sample workflow 1: nested networks.
 
-\begin{small}
-<<label=Pre-processing pipelines, eval=FALSE>>=
-source("casePart1.R")
-deaPipeline()
-deaFigures()
-clustPipeline(nboot=1000)
-clustFigures()
-correl<-ceaPipeline()
-ceaFigures(correl)
-pvchip<-pvchipPipeline()
-pvchipFigures(pvchip)
-dataPipeline4RedeR(correl,pvchip)
-graphPipeline4RedeR()
+\begin{scriptsize}
+
+1 - start the app:
+<<label=start the app, eval=FALSE>>=
+rdp <- RedPort() 
+calld(rdp)
 @
-p.s.1 source 'casePart1.R' is  available in the package 'script' directory.\\
-p.s.2 requirements: RedeR, limma, snow, pvclust and gplots packages.\\
-p.s.3 Snow package might need adjustments to run parallel computing!
-\end{small}
 
-\item Pre-processing pipelines for enrichment analyses and subnetwork identification
-
-\begin{small}
-<<label=Pre-processing pipelines, eval=FALSE>>=
-source("casePart2.R")
-analysesPipeline()
-gscoPipeline4RedeR()
-ppiPipeline4RedeR()
+2 - get a dataframe and an interactome:
+<<label=get a dataframe and an interactome, eval=TRUE>>=
+data(ER.limma)
+data(hs.inter)
+dt <- ER.limma
+gi <- hs.inter
 @
-p.s.1 source 'casePart2.R' is  available in the package 'script' directory.\\
-p.s.2 requirements: RedeR, BioNet, DLBCL, ALL, limma, graph, org.Hs.eg.db, KEGG.db, GO.db, AnnotationDbi, snow, biomaRt and HTSanalyzeR packages.\\
-p.s.3 Snow package might need adjustments to run parallel computing!
-\end{small}
+
+3 - extract a subgraph and set attributes to RedeR (i.e. logFC from t3-t0 contrast):
+<<label=extract a subgraph and set attributes to RedeR, eval=TRUE>>=
+gt3  <- subg(g=gi, dat=dt[dt$degenes.t3!=0,], refcol=1)
+gt3  <- att.setv(g=gt3, from="Symbol", to="nodeAlias")
+gt3  <- att.setv(g=gt3, from="logFC.t3...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+@
+
+4 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t6-t0 contrast):
+<<label=extract another subgraph and set attributes to RedeR, eval=TRUE>>=
+gt6  <- subg(g=gi, dat=dt[dt$degenes.t6!=0,], refcol=1)
+gt6  <- att.setv(g=gt6, from="Symbol", to="nodeAlias")
+gt6  <- att.setv(g=gt6, from="logFC.t6...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+@
+
+5 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t12-t0 contrast):
+<<label=extract another subgraph and set attributes to RedeR, eval=TRUE>>=
+gt12 <- subg(g=gi, dat=dt[dt$degenes.t12!=0,], refcol=1)
+gt12 <- att.setv(g=gt12, from="Symbol", to="nodeAlias")
+gt12 <- att.setv(g=gt12, from="logFC.t12...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+@
+
+6 - add subgraphs to the app:
+<<label=add subgraphs to the app, eval=FALSE>>=
+n0 <- addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
+n1 <- addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
+n2 <- addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
+@
+
+7 - nest subgraphs (i.e. overlap time-series):
+<<label=nest subgraphs, eval=FALSE>>=
+nestNodes(rdp, nodes=V(gt3)$name, parent=n1, theme='tm2')
+nestNodes(rdp, nodes=V(gt6)$name, parent=n2, theme='tm2')
+@
+
+8 - assign edges to containers
+<<label=assign edges to containers, eval=FALSE>>=
+mergeOutEdges(rdp)
+@
+
+9 - relax the network
+<<label=relax the network, eval=FALSE>>=
+relax(rdp,50,400)
+@
+
+10 - add a color legend (other types are available):
+<<label=add a color legend (other types are available), eval=FALSE>>=
+scl <- gt3$legNodeColor$scale
+leg <- gt3$legNodeColor$legend 
+addLegend.color(rdp, colvec=scl, labvec=leg, title="node color (logFC)")
+@
+
+11 -  select a gene:
+<<label=select a gene, eval=FALSE>>=
+selectNodes(rdp,"RET")
+@
+
+12 - reset graph:
+<<label=reset graph, eval=FALSE>>=
+resetd(rdp)
+@
+
+\end{scriptsize}
+
+
+\item Sample workflow 2: clustering.
+
+
+\begin{scriptsize}
+
+1 - get a dataframe and an igraph object:
+<<label=get a dataframe and an igraph object, eval=TRUE>>=
+data(ER.deg)
+dt <- ER.deg$dat
+sg <- ER.deg$ceg
+@
+
+2 - map the dataframe to the graph:
+<<label=map the dataframe to the graph, eval=TRUE>>=
+sg <- att.mapv(sg, dat=dt, refcol=1)
+@
+
+3 - set attributes to RedeR (i.e. gene symbols and two available numeric data):
+<<label=set attributes to RedeR , eval=TRUE>>=
+sg <- att.setv(sg, from="Symbol", to="nodeAlias")
+sg <- att.setv(sg, from="logFC.t3...t0", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)	
+sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
+@
+
+4 - add graph to the app:
+<<label= add graph to the app, eval=FALSE>>=
+addGraph(rdp,sg)
+@
+
+5 - compute a hierarchical clustering using standard R functions:
+<<label=compute a hierarchical clustering using standard R functions, eval=TRUE>>=
+hc <- hclust(dist(get.adjacency(sg, attr="weight")))
+@
+
+6 - map the hclust object onto the network (pvclust objects are also compatible!):
+<<label=map the hclust object onto the network, eval=FALSE>>=
+nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
+@
+
+7 - assign edges to containers:
+<<label=assign edges to containers, eval=FALSE>>=
+mergeOutEdges(rdp)
+@
+
+8 - relax the network:
+<<label=relax the network, eval=FALSE>>=
+relax(rdp)
+@
+
+9 - add color legend:
+<<label=add color legend, eval=FALSE>>=
+scl <- sg$legNodeColor$scale
+leg <- sg$legNodeColor$legend
+addLegend.color(rdp, colvec=scl, labvec=leg, title="diff. gene expression (logFC)")
+@
+
+10 - add node size legend:
+<<label=, eval=FALSE>>=
+scl <- sg$legNodeSize$scale
+leg <- sg$legNodeSize$legend
+addLegend.size(rdp, sizevec=scl, labvec=leg, title="bd site distance (kb)")
+@
+
+11 - reset graph:
+<<label=reset graph, eval=FALSE>>=
+resetd(rdp)
+@
+
+\end{scriptsize}
 
 \end{itemize}
 
