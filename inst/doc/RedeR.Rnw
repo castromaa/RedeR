@@ -155,10 +155,10 @@ In this case, the subgraphs can be handled apart from each other. For example, t
 
 The next chunk generates a scale-free graph according to the Barabasi-Albert model\cite{igraph} and sends the graph to RedeR without any layout information.
 \begin{small}
-<<label= Build scale-free graph and send to the app, eval= TRUE>>=
+<<label= Build scale-free graph and send to the app, eval=TRUE>>=
    g6 <- barabasi.game(500)
    addGraph(rdp, g6, zoom=20)
-   relax(rdp,100,400)
+   relax(rdp,p2=400,p5=30,ps=T)
 @
 \end{small}
 
@@ -343,42 +343,42 @@ gt12 <- att.setv(g=gt12, from="logFC.t12...t0", to="nodeColor", breaks=seq(-2,2,
 @
 
 6 - add subgraphs to the app:
-<<label=add subgraphs to the app, eval=FALSE>>=
+<<label=add subgraphs to the app, eval=TRUE>>=
 n0 <- addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
 n1 <- addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
 n2 <- addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
 @
 
 7 - nest subgraphs (i.e. overlap time-series):
-<<label=nest subgraphs, eval=FALSE>>=
+<<label=nest subgraphs, eval=TRUE>>=
 nestNodes(rdp, nodes=V(gt3)$name, parent=n1, theme='tm2')
 nestNodes(rdp, nodes=V(gt6)$name, parent=n2, theme='tm2')
 @
 
 8 - assign edges to containers
-<<label=assign edges to containers, eval=FALSE>>=
+<<label=assign edges to containers, eval=TRUE>>=
 mergeOutEdges(rdp)
 @
 
 9 - relax the network
-<<label=relax the network, eval=FALSE>>=
+<<label=relax the network, eval=TRUE>>=
 relax(rdp,50,400)
 @
 
 10 - add a color legend (other types are available):
-<<label=add a color legend (other types are available), eval=FALSE>>=
+<<label=add a color legend (other types are available), eval=TRUE>>=
 scl <- gt3$legNodeColor$scale
 leg <- gt3$legNodeColor$legend 
 addLegend.color(rdp, colvec=scl, labvec=leg, title="node color (logFC)")
 @
 
 11 -  select a gene:
-<<label=select a gene, eval=FALSE>>=
+<<label=select a gene, eval=TRUE>>=
 selectNodes(rdp,"RET")
 @
 
 12 - reset graph:
-<<label=reset graph, eval=FALSE>>=
+<<label=reset graph, eval=TRUE>>=
 resetd(rdp)
 @
 
@@ -410,7 +410,7 @@ sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(
 @
 
 4 - add graph to the app:
-<<label= add graph to the app, eval=FALSE>>=
+<<label= add graph to the app, eval=TRUE>>=
 addGraph(rdp,sg)
 @
 
@@ -420,36 +420,36 @@ hc <- hclust(dist(get.adjacency(sg, attr="weight")))
 @
 
 6 - map the hclust object onto the network (pvclust objects are also compatible!):
-<<label=map the hclust object onto the network, eval=FALSE>>=
+<<label=map the hclust object onto the network, eval=TRUE>>=
 nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
 @
 
 7 - assign edges to containers:
-<<label=assign edges to containers, eval=FALSE>>=
+<<label=assign edges to containers, eval=TRUE>>=
 mergeOutEdges(rdp)
 @
 
 8 - relax the network:
-<<label=relax the network, eval=FALSE>>=
+<<label=relax the network, eval=TRUE>>=
 relax(rdp)
 @
 
 9 - add color legend:
-<<label=add color legend, eval=FALSE>>=
+<<label=add color legend, eval=TRUE>>=
 scl <- sg$legNodeColor$scale
 leg <- sg$legNodeColor$legend
 addLegend.color(rdp, colvec=scl, labvec=leg, title="diff. gene expression (logFC)")
 @
 
 10 - add node size legend:
-<<label=, eval=FALSE>>=
+<<label=, eval=TRUE>>=
 scl <- sg$legNodeSize$scale
 leg <- sg$legNodeSize$legend
 addLegend.size(rdp, sizevec=scl, labvec=leg, title="bd site distance (kb)")
 @
 
 11 - reset graph:
-<<label=reset graph, eval=FALSE>>=
+<<label=reset graph, eval=TRUE>>=
 resetd(rdp)
 @
 

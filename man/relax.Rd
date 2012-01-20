@@ -9,7 +9,7 @@ This function starts the dynamic layout and sets the force-directed options avai
 }
 
 \usage{
-relax(obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10)
+relax(obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10,ps=FALSE)
 }
 
 \arguments{
@@ -22,6 +22,7 @@ relax(obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10)
   \item{p6}{Nest-nest edge target length, i.e., edge target between linked containers (in pixels; >= 1 ) <numeric>. }
   \item{p7}{Nest-node repel factor, i.e., repulsion among containers and out-nodes (arbitrary unities; >= 1 ) <numeric>.  }
   \item{p8}{Repulsion radius, i.e., this parameter limits the repel factor range (given in p1 unites; >= 1 ) <numeric>.  }
+  \item{ps}{Panel settings: logical value, whether to start interactive panel. }
 }
 
 \details{

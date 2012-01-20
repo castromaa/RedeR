@@ -2211,7 +2211,7 @@ setMethod ('isDynamicsActive', 'RedPort',
 
 #-------------------------------------------------------------------------------
 setMethod ('relax', 'RedPort', 
-  function (obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10) {
+  function (obj,p1=100,p2=100,p3=100,p4=100,p5=100,p6=100,p7=10,p8=10,ps=FALSE) {
   		if(ping(obj)==0)return(invisible())
   		if(!is.numeric(p1) || length(p1)==0)p1=100;p1=p1[1]
   		if(!is.numeric(p2) || length(p2)==0)p2=100;p2=p2[1]
@@ -2221,7 +2221,9 @@ setMethod ('relax', 'RedPort',
   		if(!is.numeric(p6) || length(p6)==0)p6=100;p6=p6[1]  		
   		if(!is.numeric(p7) || length(p7)==0)p7=10;p7=p7[1]
   		if(!is.numeric(p8) || length(p8)==0)p8=10;p8=p8[1]
-    	return (xml.rpc (obj@uri, 'RedHandler.setDynamics',p1,p2,p3,p4,p5,p6,p7,p8,1))
+  		if(!is.logical(ps))ps=FALSE
+  		ps=ifelse(ps[1],1,0)
+    	return (xml.rpc (obj@uri, 'RedHandler.setDynamics',p1,p2,p3,p4,p5,p6,p7,p8,ps))
     })
     
 #Methods to build RedeR plugins
