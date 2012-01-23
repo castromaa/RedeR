@@ -93,7 +93,7 @@ Within an active interface, then the method 'addGraph' can easily send R graphs 
 %%%%%%
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.4\textwidth]{fig2.pdf}
+\includegraphics[width=0.35\textwidth]{fig2.pdf}
 \end{center}
 \label{fig2}
 \caption{A toy example added to \emph{RedeR} by the \emph{addGraph} function.}
@@ -108,7 +108,7 @@ Conversely, RedeR graphs can be transferred to R and wrapped in \emph{igraph} ob
 @
 \end{small}
 The interface accepts additional graph attributes, as for example edge direction, edge width, edge weight, node shape, node size, node color etc. In \emph{igraph} objects, vertex and edge attributes can be assigned as arbitrary R objects. In order to pass these extensible features to \emph{RedeR} the attributes must be provided in a valid syntax.
-\footnote[1]{See \emph{getGraph} and \emph{addGraph} specification for additional details.}
+\footnote{See \emph{getGraph} and \emph{addGraph} specification for additional details.}
 
 
 Another strategy is to wrap graphs into containers and then send it to the Java app. Next, the subgraphs g3 and g4 are assigned to different nested structures (Fig.3).
@@ -151,18 +151,22 @@ In this case, the subgraphs can be handled apart from each other. For example, t
 \newpage
 
 
-\subsection{Working interactively}
+\subsection{Interactive work}
 
 The next chunk generates a scale-free graph according to the Barabasi-Albert model\cite{igraph} and sends the graph to RedeR without any layout information.
 \begin{small}
 <<label= Build scale-free graph and send to the app, eval=TRUE>>=
    g6 <- barabasi.game(500)
    addGraph(rdp, g6, zoom=20)
-   relax(rdp,p2=400,p5=30,ps=T)
 @
 \end{small}
 
-Then using the dynamic function available in the app you can layout the graph as presented in Figure 4.
+Then using the "relax" options available in the app you can tune the graph layout as presented in Figure 4.
+\begin{small}
+<<label= Start relax , eval=TRUE>>=
+   relax(rdp,p2=400,p5=30,ps=T)
+@
+\end{small}
 
 %%%%%%
 %Fig4%
@@ -175,7 +179,7 @@ Then using the dynamic function available in the app you can layout the graph as
 \caption{Scale-free graph according to the Barabasi-Albert model\cite{igraph}.}
 \end{figure}
 
-In Figure 5a the same graph is used to exemplify the community structure mapped by the edge-betweenness function available in RedeR. In Figure 5b these communities are nested to containers, which are objects of the same class of the nodes but with additional behaviors: it can be hidden and anchored to the main panel (Fig.5c). You can build these containers either using \emph{R} or \emph{Java} functions (see options available in the \emph{clustering} main menu and in the shortcuts of nested objects).
+In Figure 5a the same graph is used to exemplify the community structure mapped by the edge-betweenness function available in RedeR. In Figure 5b these communities are nested to containers, which are objects of the same class of the nodes but with additional behaviors: it can be hidden and anchored to the main panel (Fig.5c). You can build these containers either using \emph{R} or \emph{Java} functions (see options available in the \emph{clustering} main menu and in the shortcuts of nested objects, i.e., right-click a container!).
 
 %%%%%%
 %Fig5%
@@ -194,12 +198,189 @@ For the next example you will need to reproduce in \emph{RedeR} app the graph fr
 <<label= Map clic communities, eval= TRUE>>=
    g <- getGraph(rdp, status= "selected")
    if(vcount(g)>0)plot(degree.distribution(g), xlab = "k", ylab = "P(k)", pch=19)
+   resetd(rdp)
 @
 \end{small}
 
+
+\newpage 
+
+
+\section{Workflow samples}
+
+This section provides a sequence of steps that illustrate how users might integrate its own pre-processed data with a given network in order to visualize subgraphs and nested networks. The full description soon will be available in a new communication!
+
+\subsection{Subgraphs}
+
+\begin{itemize}
+
+\begin{scriptsize}
+
+\item 1 - start the app (i.e. 'calld' method).
+
+\item 2 - get a dataframe and an interactome:
+<<label=get a dataframe and an interactome, eval=TRUE>>=
+data(ER.limma)
+data(hs.inter)
+dt <- ER.limma
+gi <- hs.inter
+@
+
+\item 3 - extract a subgraph and set attributes to RedeR (i.e. logFC from t3-t0 contrast):
+<<label=extract a subgraph and set attributes to RedeR, eval=TRUE>>=
+gt3  <- subg(g=gi, dat=dt[dt$degenes.t3!=0,], refcol=1)
+gt3  <- att.setv(g=gt3, from="Symbol", to="nodeAlias")
+gt3  <- att.setv(g=gt3, from="logFC.t3...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+@
+\emph{ps. some genes will not be found in the interactome!}
+
+\item 4 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t6-t0 contrast):
+<<label=extract another subgraph and set attributes to RedeR, eval=TRUE>>=
+gt6  <- subg(g=gi, dat=dt[dt$degenes.t6!=0,], refcol=1)
+gt6  <- att.setv(g=gt6, from="Symbol", to="nodeAlias")
+gt6  <- att.setv(g=gt6, from="logFC.t6...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+@
+
+\item 5 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t12-t0 contrast):
+<<label=extract another subgraph and set attributes to RedeR, eval=TRUE>>=
+gt12 <- subg(g=gi, dat=dt[dt$degenes.t12!=0,], refcol=1)
+gt12 <- att.setv(g=gt12, from="Symbol", to="nodeAlias")
+gt12 <- att.setv(g=gt12, from="logFC.t12...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+@
+
+\item 6 - add subgraphs to the app:
+<<label=add subgraphs to the app, eval=TRUE>>=
+n0 <- addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
+n1 <- addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
+n2 <- addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
+@
+
+\item 7 - nest subgraphs (i.e. overlap time-series):
+<<label=nest subgraphs, eval=TRUE>>=
+nestNodes(rdp, nodes=V(gt3)$name, parent=n1, theme='tm2')
+nestNodes(rdp, nodes=V(gt6)$name, parent=n2, theme='tm2')
+@
+
+\item 8 - assign edges to containers
+<<label=assign edges to containers, eval=TRUE>>=
+mergeOutEdges(rdp)
+@
+
+\item 9 - relax the network
+<<label=relax the network, eval=TRUE>>=
+relax(rdp,50,400)
+@
+
+\item 10 - add a color legend (other types are available):
+\footnote{Legends are add/set only via command line in the current version.}
+
+<<label=add a color legend (other types are available), eval=TRUE>>=
+scl <- gt3$legNodeColor$scale
+leg <- gt3$legNodeColor$legend 
+addLegend.color(rdp, colvec=scl, labvec=leg, title="node color (logFC)")
+@
+
 \newpage
 
-\subsection{Plugin builder}
+\item 11 -  select a gene:
+<<label=select a gene, eval=TRUE>>=
+selectNodes(rdp,"RET")
+@
+
+\item 12 - reset graph:
+<<label=reset graph, eval=TRUE>>=
+resetd(rdp)
+@
+
+\end{scriptsize}
+
+\end{itemize}
+
+
+\subsection{Nested networks and clustering}
+
+
+\begin{itemize}
+
+\begin{scriptsize}
+
+\item 1 - get a dataframe and an igraph object:
+<<label=get a dataframe and an igraph object, eval=TRUE>>=
+data(ER.deg)
+dt <- ER.deg$dat
+sg <- ER.deg$ceg
+@
+
+\item 2 - map the dataframe to the graph:
+<<label=map the dataframe to the graph, eval=TRUE>>=
+sg <- att.mapv(sg, dat=dt, refcol=1)
+@
+
+\item 3 - set attributes to RedeR (i.e. gene symbols and two available numeric data):
+<<label=set attributes to RedeR , eval=TRUE>>=
+sg <- att.setv(sg, from="Symbol", to="nodeAlias")
+sg <- att.setv(sg, from="logFC.t3...t0", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)	
+sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
+@
+
+\item 4 - add graph to the app:
+<<label= add graph to the app, eval=TRUE>>=
+addGraph(rdp,sg)
+@
+
+\item 5 - compute a hierarchical clustering using standard R functions:
+<<label=compute a hierarchical clustering using standard R functions, eval=TRUE>>=
+hc <- hclust(dist(get.adjacency(sg, attr="weight")))
+@
+
+\item 6 - map the hclust object onto the network (pvclust objects are also compatible!):
+<<label=map the hclust object onto the network, eval=TRUE>>=
+nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
+@
+
+\emph{...at this point nested objects from the network should also be mapped to a dendrogram!  different levels of the nested structure can be set by the nesthc method. Additionally, significant clusters can be computed by the pvclust package, which is already compatible with RedeR interface.}
+
+\item 7 - assign edges to containers:
+<<label=assign edges to containers, eval=TRUE>>=
+mergeOutEdges(rdp)
+@
+
+\item 8 - relax the network:
+<<label=relax the network, eval=TRUE>>=
+relax(rdp)
+@
+
+\item 9 - add color legend: 
+\footnotemark[\value{footnote}]
+
+<<label=add color legend, eval=TRUE>>=
+scl <- sg$legNodeColor$scale
+leg <- sg$legNodeColor$legend
+addLegend.color(rdp, colvec=scl, labvec=leg, title="diff. gene expression (logFC)")
+@
+
+\item 10 - add node size legend: 
+\footnotemark[\value{footnote}]
+
+
+<<label=, eval=TRUE>>=
+scl <- sg$legNodeSize$scale
+leg <- sg$legNodeSize$legend
+addLegend.size(rdp, sizevec=scl, labvec=leg, title="bd site distance (kb)")
+@
+
+\item 11 - reset graph:
+<<label=reset graph, eval=TRUE>>=
+resetd(rdp)
+@
+
+\end{scriptsize}
+
+\end{itemize}
+
+\newpage
+
+\section{Plugin builder}
 
 RedeR plug-ins have two main sections: methods and add-ons. The 'methods' section can be regarded as the plug-in trigger. 
 When installed in the Java app, this trigger is used to start a given analysis by unfolding the R expressions wrapped in the methods. 
@@ -212,7 +393,9 @@ Prior to the main call, all functions are automatically loaded in R, making the 
 
 \item Wrap methods in functions
 
-Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes.
+Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R.
+\footnote{Due to build/check errors, this package was not available at the occasion of Bioconductor release; therefore, it had to be removed from RedeR dependencies. It should be installed by command line, as indicate in \emph{Installation} section.}
+
 \begin{small}
 <<label= Set a simple method, eval= TRUE>>=
       mt1 <- function() 
@@ -249,6 +432,8 @@ The submission is straightforward: in the Java side, the plugin will be displaye
 
 \emph{As a suggestion, try the heatmap plugin in RedeR. This is the first default plugin of the software; hopefully others will be available soon! }
 
+
+
 %%%%%%
 %Fig6%
 %%%%%%
@@ -265,196 +450,37 @@ The submission is straightforward: in the Java side, the plugin will be displaye
 
 \section{Installation}
 
-\subsection{The RedeR package}
-The RedeR package is freely available from Bioconductor at \url{http://www.bioconductor.org}.
-In addition, you might need to install other dependencies (e.g. RCurl and XML; section 3.3 shows a typical R session).
+\subsubsection*{Release version}
+The RedeR package is freely available from Bioconductor at \url{http://bioconductor.org/packages/release/bioc/html/RedeR.html}.
 
-\subsection{The RedeR application}
-The RedeR jar file is already included in the R package and, as usual, to run Java applications your system must have a copy of the JRE (Java Runtime Environment, version>= 5). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task:
-\begin{itemize}
-\item Using RedeR embedded in R: it is automatic ..but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. 
-The function \emph{calld} accepts additional arguments for these cases. 
-\item Using RedeR as stand-alone application: follow the settings in the main menu and add R paths if required. A script file is generated to do all the job.
-\end{itemize}
+\subsubsection*{Developing version}
+As usual with any new package, the developing process tends to be faster than the release schedule of R/Bioconductor. So, at this stage of the project we suggest using RedeR devel version available at \url{http://bioconductor.org/packages/devel/bioc/html/RedeR.html}: please download the \emph{Package Source} (the .tar.gz file!!) and install all dependences by the following sequence of commands in R:
 
-If you find any difficulty, please contact us.
+\begin{scriptsize}
+<<label= Devel version, eval= FALSE>>=
+install.packages(c("RCurl", "XML", "rJava", "igraph", "JavaGD"), repos = "http://cran.r-project.org")
+install.packages("XMLRPC", repos = "http://www.omegahat.org/R", type = "source")
+install.packages('/devel.tar.gz', type='source')  ## i.e. the path to the downloaded .tar.gz file!
+@
+\end{scriptsize}
+
+\subsubsection*{The JAVA application}
+The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>= 5). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task, but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. If you find any difficulty, please contact us.
+
 
 \newpage
 
+\section{Session information}
 
-\subsection{Session information}
-
+\begin{scriptsize}
 <<label=Session information, eval=TRUE,echo=FALSE>>=
 print(sessionInfo(), locale=FALSE)
 @
+\end{scriptsize}
+
 
 \newpage 
 
 \bibliography{bib}
-
-
-\newpage 
-
-\newpage 
-
-\section{Supplements}
-
-The R chunks below can be used to illustrate possible usages for RedeR. The full description integrates a case study that soon is going to appear in a new communication!
-
-\begin{itemize}
-
-\item Sample workflow 1: nested networks.
-
-\begin{scriptsize}
-
-1 - start the app:
-<<label=start the app, eval=FALSE>>=
-rdp <- RedPort() 
-calld(rdp)
-@
-
-2 - get a dataframe and an interactome:
-<<label=get a dataframe and an interactome, eval=TRUE>>=
-data(ER.limma)
-data(hs.inter)
-dt <- ER.limma
-gi <- hs.inter
-@
-
-3 - extract a subgraph and set attributes to RedeR (i.e. logFC from t3-t0 contrast):
-<<label=extract a subgraph and set attributes to RedeR, eval=TRUE>>=
-gt3  <- subg(g=gi, dat=dt[dt$degenes.t3!=0,], refcol=1)
-gt3  <- att.setv(g=gt3, from="Symbol", to="nodeAlias")
-gt3  <- att.setv(g=gt3, from="logFC.t3...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
-@
-
-4 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t6-t0 contrast):
-<<label=extract another subgraph and set attributes to RedeR, eval=TRUE>>=
-gt6  <- subg(g=gi, dat=dt[dt$degenes.t6!=0,], refcol=1)
-gt6  <- att.setv(g=gt6, from="Symbol", to="nodeAlias")
-gt6  <- att.setv(g=gt6, from="logFC.t6...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
-@
-
-5 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t12-t0 contrast):
-<<label=extract another subgraph and set attributes to RedeR, eval=TRUE>>=
-gt12 <- subg(g=gi, dat=dt[dt$degenes.t12!=0,], refcol=1)
-gt12 <- att.setv(g=gt12, from="Symbol", to="nodeAlias")
-gt12 <- att.setv(g=gt12, from="logFC.t12...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
-@
-
-6 - add subgraphs to the app:
-<<label=add subgraphs to the app, eval=TRUE>>=
-n0 <- addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
-n1 <- addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
-n2 <- addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
-@
-
-7 - nest subgraphs (i.e. overlap time-series):
-<<label=nest subgraphs, eval=TRUE>>=
-nestNodes(rdp, nodes=V(gt3)$name, parent=n1, theme='tm2')
-nestNodes(rdp, nodes=V(gt6)$name, parent=n2, theme='tm2')
-@
-
-8 - assign edges to containers
-<<label=assign edges to containers, eval=TRUE>>=
-mergeOutEdges(rdp)
-@
-
-9 - relax the network
-<<label=relax the network, eval=TRUE>>=
-relax(rdp,50,400)
-@
-
-10 - add a color legend (other types are available):
-<<label=add a color legend (other types are available), eval=TRUE>>=
-scl <- gt3$legNodeColor$scale
-leg <- gt3$legNodeColor$legend 
-addLegend.color(rdp, colvec=scl, labvec=leg, title="node color (logFC)")
-@
-
-11 -  select a gene:
-<<label=select a gene, eval=TRUE>>=
-selectNodes(rdp,"RET")
-@
-
-12 - reset graph:
-<<label=reset graph, eval=TRUE>>=
-resetd(rdp)
-@
-
-\end{scriptsize}
-
-
-\item Sample workflow 2: clustering.
-
-
-\begin{scriptsize}
-
-1 - get a dataframe and an igraph object:
-<<label=get a dataframe and an igraph object, eval=TRUE>>=
-data(ER.deg)
-dt <- ER.deg$dat
-sg <- ER.deg$ceg
-@
-
-2 - map the dataframe to the graph:
-<<label=map the dataframe to the graph, eval=TRUE>>=
-sg <- att.mapv(sg, dat=dt, refcol=1)
-@
-
-3 - set attributes to RedeR (i.e. gene symbols and two available numeric data):
-<<label=set attributes to RedeR , eval=TRUE>>=
-sg <- att.setv(sg, from="Symbol", to="nodeAlias")
-sg <- att.setv(sg, from="logFC.t3...t0", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)	
-sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
-@
-
-4 - add graph to the app:
-<<label= add graph to the app, eval=TRUE>>=
-addGraph(rdp,sg)
-@
-
-5 - compute a hierarchical clustering using standard R functions:
-<<label=compute a hierarchical clustering using standard R functions, eval=TRUE>>=
-hc <- hclust(dist(get.adjacency(sg, attr="weight")))
-@
-
-6 - map the hclust object onto the network (pvclust objects are also compatible!):
-<<label=map the hclust object onto the network, eval=TRUE>>=
-nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
-@
-
-7 - assign edges to containers:
-<<label=assign edges to containers, eval=TRUE>>=
-mergeOutEdges(rdp)
-@
-
-8 - relax the network:
-<<label=relax the network, eval=TRUE>>=
-relax(rdp)
-@
-
-9 - add color legend:
-<<label=add color legend, eval=TRUE>>=
-scl <- sg$legNodeColor$scale
-leg <- sg$legNodeColor$legend
-addLegend.color(rdp, colvec=scl, labvec=leg, title="diff. gene expression (logFC)")
-@
-
-10 - add node size legend:
-<<label=, eval=TRUE>>=
-scl <- sg$legNodeSize$scale
-leg <- sg$legNodeSize$legend
-addLegend.size(rdp, sizevec=scl, labvec=leg, title="bd site distance (kb)")
-@
-
-11 - reset graph:
-<<label=reset graph, eval=TRUE>>=
-resetd(rdp)
-@
-
-\end{scriptsize}
-
-\end{itemize}
 
 \end{document}
