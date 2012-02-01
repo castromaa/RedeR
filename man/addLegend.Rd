@@ -20,14 +20,16 @@ addLegend.shape(obj, shapevec, ...)
 
 \arguments{
   \item{obj}{ Object of RedPort Class. }
-  \item{colvec}{ Vector with legend colors, either hexadecimal or valid R color names. }
+  \item{colvec}{ Vector with legend colors, either hexadecimal or valid R color names.}
   \item{sizevec}{ Vector with legend node size, options: > 0 <numeric>. }
   \item{shapevec}{ Vector with valid shape names: 'ELLIPSE', 'RECTANGLE', 'ROUNDED_RECTANGLE', 'TRIANGLE', 'DIAMOND'. }
   \item{...}{ Additional arguments passed to RedeR application. }    
 }
 
 
-\details{       
+\details{     
+Alternatively, colvec, sizevec and shapevec can be igraph objects with legend information previously set by the functions \code{\link[RedeR:att.setv]{att.setv}} and \code{\link[RedeR:att.sete]{att.sete}}.
+ 
 Additional arguments: 
 \describe{
   \item{type}{ Legend type. Options: "node" or "edge" (default: "node") <character>. }
@@ -55,6 +57,8 @@ Send legend objects to RedeR app.
 
 \seealso{
 \code{\link[RedeR:addGraph]{addGraph}}
+\code{\link[RedeR:att.setv]{att.setv}}
+\code{\link[RedeR:att.sete]{att.sete}}
 }
 
 

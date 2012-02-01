@@ -1,7 +1,7 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
- 1.1.6		2012-02-01
+ 1.1.7		2012-02-01
 
   BUG FIXES
     o Improved graph loading time via xml serialization, data packing and post formats for RedeR.
