@@ -2641,8 +2641,30 @@ setMethod ('addLegend.color', 'RedPort',
 	
 	if(ping(obj)==0)return(invisible())
   	
-	# checks---------------------------------------------------- 
+	# checks--------------------------------------------------------- 
 
+	if(!is.character(type))type="nodecolor"
+	type=switch(type, node="nodecolor", edge="edgecolor", "nodecolor")
+	
+	#Check if igraph object------------------------------------------
+	if(is.igraph(colvec)){
+    	if(type=="nodecolor"){
+			if(!is.null(colvec$legNodeColor$scale)){
+	       		if(!is.null(colvec$legNodeColor$legend))labvec=colvec$legNodeColor$legend
+	       		colvec=colvec$legNodeColor$scale
+			} else {
+				stop("NOTE: there is no valid 'legNodeColor' legend information for this igraph object!!")
+			}
+		} else {
+			if(!is.null(colvec$legEdgeColor$scale)){
+	       		if(!is.null(colvec$legEdgeColor$legend))labvec=colvec$legEdgeColor$legend
+	       		colvec=colvec$legEdgeColor$scale
+			} else {
+				stop("NOTE: there is no valid 'legEdgeColor' legend information for this igraph object!!")
+			}			
+		}
+	}
+  
 	# color vec
 	colvec=colorRampPalette(colors=colvec)(length(colvec))
 	if(!is.null(colvec) && length(colvec)>1){       
@@ -2687,10 +2709,7 @@ setMethod ('addLegend.color', 'RedPort',
 	size=size[1]	
 	if(!is.null(bend) && !is.numeric(bend))bend=NULL
 	bend=bend[1]	
-		
-	if(!is.character(type))type="nodecolor"
-	type=switch(type, node="nodecolor", edge="edgecolor", "nodecolor")
-	
+
 	if(!is.null(position)){
 		position=switch(position, bottomright="bottomRight", 
 			bottomleft="bottomLeft", topright="topRight", topleft="topLeft", NULL)
@@ -2737,7 +2756,28 @@ setMethod ('addLegend.size', 'RedPort',
 	if(ping(obj)==0)return(invisible())
   	
 	# checks---------------------------------------------------- 
+	if(!is.character(type))type="nodesize"
+	type=switch(type, node="nodesize", edge="edgewidth", "nodesize")
 
+	#Check if igraph object------------------------------------------
+	if(is.igraph(sizevec)){
+    	if(type=="nodesize"){
+			if(!is.null(sizevec$legNodeSize$scale)){
+	       		if(!is.null(sizevec$legNodeSize$legend))labvec=sizevec$legNodeSize$legend
+	       		sizevec=sizevec$legNodeSize$scale
+			} else {
+				stop("NOTE: there is no valid 'legNodeSize' legend information for this igraph object!!")
+			}
+		} else {
+			if(!is.null(sizevec$legEdgeWidth$scale)){
+	       		if(!is.null(sizevec$legEdgeWidth$legend))labvec=sizevec$legEdgeWidth$legend
+	       		sizevec=sizevec$legEdgeWidth$scale
+			} else {
+				stop("NOTE: there is no valid 'legEdgeWidth' legend information for this igraph object!!")
+			}			
+		}
+	}
+	
 	#size vec
 	if(!is.null(sizevec) && length(sizevec)>1){       
 		c1=!is.numeric(sizevec)
@@ -2779,9 +2819,6 @@ setMethod ('addLegend.size', 'RedPort',
 	if(sum(nchar(col)>7))col=substr(col,0,7)
 	if(!is.null(intersp) && !is.numeric(intersp)) intersp=NULL
 	intersp=intersp[1]
-	
-	if(!is.character(type))type="nodesize"
-	type=switch(type, node="nodesize", edge="edgewidth", "nodesize")
 	
 	if(!is.null(position)){
 		position=switch(position, bottomright="bottomRight", 
@@ -2832,6 +2869,25 @@ setMethod ('addLegend.shape', 'RedPort',
 
 	if(!is.character(type))type="nodeshape"
 	type=switch(type, node="nodeshape", edge="edgeshape", "nodeshape")
+	
+	#Check if igraph object------------------------------------------
+	if(is.igraph(shapevec)){
+    	if(type=="nodeshape"){
+			if(!is.null(shapevec$legNodeShape$scale)){
+	       		if(!is.null(shapevec$legNodeShape$legend))labvec=shapevec$legNodeShape$legend
+	       		shapevec=shapevec$legNodeShape$scale
+			} else {
+				stop("NOTE: there is no valid 'legNodeShape' legend information for this igraph object!!")
+			}
+		} else {
+			if(!is.null(shapevec$legEdgeType$scale)){
+	       		if(!is.null(shapevec$legEdgeType$legend))labvec=shapevec$legEdgeType$legend
+	       		shapevec=shapevec$legEdgeType$scale
+			} else {
+				stop("NOTE: there is no valid 'legEdgeType' legend information for this igraph object!!")
+			}			
+		}
+	}
 	
 	#shapes
 	defaultv=c('ELLIPSE', 'RECTANGLE', 'ROUNDED_RECTANGLE', 'TRIANGLE', 'DIAMOND')
