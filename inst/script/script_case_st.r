@@ -4,7 +4,7 @@
 ##
 ## Source code to reproduce the preprocessed data included in RedeR software.
 ##
-## This program is free software: you can redistribute it and/or modify
+## RedeR is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 2 of the License, or
 ## (at your option) any later version.
@@ -56,7 +56,7 @@ ER.limma <- data.frame(
 
 
 #####################################################
-# Chunk 2 ER binding sites mapping
+# Chunk 2: Map ER binding sites to transcript start sites
 #####################################################
 
 #---get ER binding sites from  Carroll2006 datase
@@ -95,14 +95,14 @@ resaveRdaFiles('./ER.limma.RData')
 				
 							
 #####################################################
-# Chunk 3: get summary from limma results
+# Chunk 3: summary from diff. expression analysis
 #####################################################
 
-#---extract results for DE genes
+#---extract results for diff. expressed genes
 idx <- rowSums(ER.limma[,c(9,10,11)]!=0)
 dat <- ER.limma[idx>0,]
 			
-#---extract gene expression matrix for DE genes
+#---extract gene expression matrix for diff. expressed genes
 exp <- Carroll2006$exp[is.element(rownames(Carroll2006$exp), dat$ENTREZ),]
 
 
@@ -110,7 +110,7 @@ exp <- Carroll2006$exp[is.element(rownames(Carroll2006$exp), dat$ENTREZ),]
 # Chunk 4: co-expression gene network analysis
 #####################################################
 
-#---compute a co-expression gene network sample (using early ER-responsive genes)
+#---compute a co-expression gene network sample (using 3h early responsive genes)
 degt3 <- dat[dat$degenes.t3!=0, "ENTREZ"]
 res <- cea(exp[degt3,], sig=1e-4, nper=1000, plotcea=FALSE, ptype=4)
 ceg <- graph.adjacency(res, diag=FALSE, mode="undirected", weighted=TRUE)
@@ -118,14 +118,13 @@ ceg <- subg(g=ceg, dat=dat, transdat=FALSE)
 
 
 #####################################################
-# Chunk 5: save summary data for RedeR
+# Chunk 5: save summary
 #####################################################
 
 #---save the same RData object included in the package!
 ER.deg <- list(dat=dat, exp=exp, ceg=ceg)
 save(ER.deg, file="ER.deg.RData")
 resaveRdaFiles('./ER.deg.RData')	
-
 
 
 
