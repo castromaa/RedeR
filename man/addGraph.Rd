@@ -29,7 +29,7 @@ Additional arguments:
   \item{isAnchor}{If isNest=TRUE, this logical value sets whether to anchor the container in dynamic layouts. }
   \item{isAssign}{If isNest=TRUE, this logical value sets whether to assign the container name to the nested nodes. }
   \item{loadEdges}{Logical value, whether to send edges to RedeR app (default = TRUE).} 
-  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5','tm6'. } 
+  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5','tm6' <string>. Alternatively, it can be a list with customized attributes. }
 }
 }
 

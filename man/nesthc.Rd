@@ -30,7 +30,7 @@ Additional arguments:
   \item{gscale}{Expansion factor to set the nest area related to the parents -- or related to the app panel. Provided as a vector with three numbers, c(n1,n2,n3):  n1 is related to nests at the first level of the hierarchy (i.e. nests rooted to the panel); n2 is related to nests from single branches, and n3 nests from double branches (default = c(30,75,45)) <numeric>.}
   \item{isAnchor}{Logical value; it sets whether to anchor containers in dynamic layouts. }
   \item{isAssign}{Logical value; it sets whether to assign container names to nested nodes. }
-  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5', 'tm6' (default: 'tm6'). }
+  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5', 'tm6' (default: 'tm6') <string>. Alternatively, it can be a list with customized attributes.}
   \item{nlinewidth}{Line width of a nested series containers.}
   \item{nfontsz}{Label font size a nested series containers.}
   \item{plothc}{Logical value; whether to plot the corresponding hclust object (i.e. dendrogram). }

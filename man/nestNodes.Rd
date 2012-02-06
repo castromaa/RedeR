@@ -28,7 +28,7 @@ Additional arguments:
   \item{gcoord}{Sets the nest c(x,y) center related to the parent center. Coords between 0 and 100 are set to the inner area (default = NULL) <numeric vector>. } 
   \item{parent}{Nest ID of a parent nest. Must be used with 'isAssign=TRUE' (default = NULL). } 
   \item{gatt}{A list with graph attributes. See nest attribute syntax in \code{\link[RedeR:addGraph]{addGraph}} }
-  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5' } 
+  \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5', 'tm6' <string>. Alternatively, it can be a list with customized attributes. } 
 }
 }
 

@@ -53,7 +53,7 @@ gtoy.rm=function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
 }
 
 #-------------------------------------------------------------
-#Improved remote procedure calls for RedeR!
+# simplified remote calls for RedeR!
 rederpost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){
 	aXML=function(method, gdata){
 		a=newXMLNode("methodCall", newXMLNode("methodName", method))

@@ -21,8 +21,9 @@ mergeOutEdges(obj,...)
 Additional arguments: 
 \describe{
    \item{setNorm}{Logical value. Whether to rescale the out-edge width to fit container size limits; if false, it will run a simple sum (default=TRUE). }
-   \item{lb}{Lower bound used to rescale edge width between containers (default=NULL). }
-   \item{ub}{Upper bound used to rescale edge width between containers (default=NULL). }
+   \item{lb}{Lower bound used to rescale edge width between containers (default=NULL) <numerics>. }
+   \item{ub}{Upper bound used to rescale edge width between containers (default=NULL) <numerics>. }
+   \item{nlev}{Number of levels to be merged (default=1) <integer>. }
 }
 }
 
