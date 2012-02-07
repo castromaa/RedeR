@@ -1964,27 +1964,25 @@ setMethod ('updateContainerSize', 'RedPort',
     })
 #-------------------------------------------------------------------------------
 setMethod ('mergeOutEdges', 'RedPort', 
-  function (obj,isNorm=TRUE, lb=NULL, ub=NULL,nlev=1) { 
+  function (obj,rescale=TRUE, lb=NULL, ub=NULL, nlev=1) { 
   	if(ping(obj)==0)return(invisible())
   	if(!is.numeric(nlev) && !is.integer(nlev))nlev=1
   	if(is.nan(nlev))nlev=1
-  	if(is.logical(isNorm)){
-  		isNorm=ifelse(isNorm,'true','false')
+  	if(is.logical(rescale)){
+  		rescale=ifelse(rescale,'true','false')
   	} else {
-  		isNorm='true'
+  		rescale='true'
   	}
   	lb=lb[1]
   	ub=ub[1]
-  	isNull="false"
   	if(!is.numeric(lb) || !is.numeric(ub)){
   		lb=0
   		ub=0
-  		isNull="true"
   	} else {
-		if(lb>ub)stops("NOTE: 'lb' arg can not be >= 'ub' arg (i.e. lower and upper bounds!)")
+  		lb=max(lb,0)
+  		ub=max(ub,0)
   	}
-  	for(i in 1:nlev)res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', isNorm, lb, ub, isNull)
-    invisible( updateGraph(obj) )
+  	for(i in 1:nlev)res=xml.rpc(obj@uri, 'RedHandler.mergeContainerOutEdges', rescale, lb, ub)
     res
     })        
 #-------------------------------------------------------------------------------
