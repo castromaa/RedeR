@@ -49,11 +49,13 @@ Matrix with significant correlation values.
 \examples{
 
 data(ER.deg)
+#--- a gene expression matrix
 exp <- ER.deg$exp
-idx <- sample(1:nrow(exp))[1:100]
+#--- a sample from gx!! 
+idx <- sample(1:nrow(exp))[1:100] 
 exp <- exp[idx,]
 
-res <- cea(x=exp, nper=100) #ps set 'nper' for at least 1000
+res <- cea(x=exp, nper=100, plot=FALSE, ptype=4) #ps set 'nper' for at least 1000
 
 }
 
