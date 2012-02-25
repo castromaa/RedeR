@@ -26,8 +26,8 @@ Additional arguments:
   \item{zoom}{ Sets the zoom scale for the app panel (range: 0.0 to 100.0; default = 100.0) <numerics>. } 
   \item{gcoord}{Sets the graph x,y center. Coords between 0 and 100 are set to the visible area of the app panel (default = c(50,50)) <numeric vector>. } 
   \item{isNest}{Logical value, whether to nest all nodes into a new container (default = FALSE). See additional args in \code{\link[RedeR:nestNodes]{nestNodes}}} 
-  \item{isAnchor}{If isNest=TRUE, this logical value sets whether to anchor the container in dynamic layouts. }
-  \item{isAssign}{If isNest=TRUE, this logical value sets whether to assign the container name to the nested nodes. }
+  \item{isAnchor}{If isNest=TRUE, this logical value sets whether to anchor the container in dynamic layouts (default = TRUE). }
+  \item{isAssign}{If isNest=TRUE, this logical value sets whether to assign the container name to the nested nodes (default = FALSE). }
   \item{loadEdges}{Logical value, whether to send edges to RedeR app (default = TRUE).} 
   \item{theme}{Some pre-defined nest attributes. Options: 'tm0','tm1','tm2','tm3','tm4','tm5','tm6' <string>. Alternatively, it can be a list with customized attributes. }
   \item{ntransform}{Logical value, whether to transform nodes in containers (default = FALSE).}
