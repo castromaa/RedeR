@@ -36,6 +36,7 @@ Systems call to open RedeR application and XML-RPC server.
 
 \seealso{
 \code{\link[RedeR:RedPort]{RedPort}}
+\code{\link[RedeR:addGraph]{addGraph}}
 }
 
 \examples{

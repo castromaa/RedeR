@@ -225,6 +225,8 @@ setMethod ('getGraph', 'RedPort',
           	edgeColor      = getEdgeColor (obj, status, type )
           	edgeType       = getEdgeType  (obj, status, type )
           	g     = set.edge.attribute (g, "arrowDirection", value=arrowDirection)
+          	#g     = set.edge.attribute (g, "arrowLength",    value= arrowLength)
+          	#g     = set.edge.attribute (g, "arrowAngle",     value= arrowAngle)
           	g     = set.edge.attribute (g, "edgeWeight",     value=edgeWeight)
           	g     = set.edge.attribute (g, "edgeWidth",      value=edgeWidth)
           	g     = set.edge.attribute (g, "edgeColor",      value=edgeColor)
@@ -597,6 +599,8 @@ setMethod ('addSeries', 'RedPort',
     if(!setedges){
     	isToCopyEdges="yes"
     	g <- remove.edge.attribute(g,"arrowDirection")
+    	g <- remove.edge.attribute(g,"arrowLength")
+    	g <- remove.edge.attribute(g,"arrowAngle")    	
     	g <- remove.edge.attribute(g,"edgeWeight")
     	g <- remove.edge.attribute(g,"weight")
     	g <- remove.edge.attribute(g,"edgeWidth")
@@ -624,7 +628,7 @@ setMethod ('addSeries', 'RedPort',
 setMethod ('addGraph', 'RedPort', 
   function (obj, g, layout=layout.lgl(g,maxiter=30), gscale=75, gcoord=c(50,50), 
   	zoom=NULL, isNest=FALSE, nestImage='plain', isAnchor=TRUE, isAssign=FALSE, loadEdges=TRUE, parent=NULL, 
-  	minimal=FALSE, theme='tm0', igraphatt=TRUE, .callchecks=TRUE) {
+  	minimal=FALSE, theme='tm0', igraphatt=TRUE, ntransform=FALSE, .callchecks=TRUE) {
 	if(.callchecks){
 		if(ping(obj)==0)return(invisible())
 	}
@@ -741,24 +745,28 @@ setMethod ('addGraph', 'RedPort',
 	if(is.numeric(g$coordX))gcoord[1]=g$coordX[1] 
 	if(is.numeric(g$coordY))gcoord[2]=g$coordY[1]     
     if(is.logical(g$isNest))isNest=g$isNest[1]
+    if(is.logical(g$isAssign))isAssign=g$isAssign[1]
 	if(is.character(g$nestImage))nestImage=g$nestImage[1] 
     if(is.logical(g$isAnchor))isAnchor=g$isAnchor[1]
     if(is.numeric(g$zoom))zoom=g$zoom[1]
-    if(is.logical(g$isAssign) && isNest){
-    	isAssign=g$isAssign[1]
-    	if(isAssign){
-			temp=V(g)$name
-			if(is.null(V(g)$nodeAlias)){
-				V(g)$nodeAlias=temp
-			} else {
-				idx=is.na(V(g)$nodeAlias)
-				V(g)$nodeAlias[idx]=temp[idx]
-			}
-			id="N001"
-  			if(!is.null(parent))id=parent
-			V(g)$name=paste(temp,".$",id,sep="")
-    	}
-    }
+    
+    #..nested assigments are not straightforward for R-J!!
+   	if(isAssign && isNest){
+		temp=V(g)$name
+		if(is.null(V(g)$nodeAlias)){
+			V(g)$nodeAlias=temp
+		} else {
+			idx=is.na(V(g)$nodeAlias)
+			V(g)$nodeAlias[idx]=temp[idx]
+		}
+		id="N001"
+  		if(is.character(parent))id=parent
+		V(g)$name=paste(temp,".$",id,sep="")
+    } 
+    #else if(isNest){
+    #	parent=NULL
+    #}
+    
     if(is.logical(g$loadEdges))loadEdges=g$loadEdges[1]   
     bgColor=NULL
 	if(is.character(g$bgColor))bgColor=g$bgColor[1]          
@@ -959,12 +967,12 @@ setMethod ('addGraph', 'RedPort',
            if(c1 && c2){
                 warning("NOTE: node coords. must be provided as numerics!")
                 coordX=as.numeric(c(10,10))
-                coordY=as.numeric(c(10,10))
+                coordY=as.numeric(c(10,10,10))
            }
            else if(sum(is.na(coordX))>0 || sum(is.na(coordY))>0 ){
                 warning("NOTE: invalid node coords. declaration: 'NA' found'!")
                 coordX=as.numeric(c(10,10))
-                coordY=as.numeric(c(10,10))
+                coordY=as.numeric(c(10,10,10))
            } else {
                 message("** ... node 'coords'") 
                 coordX=as.numeric(coordX) 
@@ -972,7 +980,7 @@ setMethod ('addGraph', 'RedPort',
            }      
       } else {
            coordX=as.numeric(c(10,10))
-           coordY=as.numeric(c(10,10))      
+           coordY=as.numeric(c(10,10,10))      
       }
       #nodeBend
       if(!is.null(nodeBend) && length(nodeBend)>0){       
@@ -1143,6 +1151,8 @@ setMethod ('addGraph', 'RedPort',
     
       #Get/set edges attributes (if available)------------------------
       arrowDirection = E(g)$arrowDirection
+      arrowLength    = E(g)$arrowLength
+      arrowAngle     = E(g)$arrowAngle
       edgeWeight     = E(g)$edgeWeight
       igraphWeight   = E(g)$weight
       edgeWidth      = E(g)$edgeWidth
@@ -1159,6 +1169,8 @@ setMethod ('addGraph', 'RedPort',
       if(nrow(edges)==1){
          edges=rbind(edges,edges)
          if(!is.null(arrowDirection)) arrowDirection=c(arrowDirection,-1)
+         if(!is.null(arrowLength))arrowLength=c(arrowLength,-1)
+         if(!is.null(arrowAngle))arrowAngle=c(arrowAngle,-1)
          if(!is.null(edgeWidth)) edgeWidth=c(edgeWidth,-1)
          if(!is.null(edgeColor)) edgeColor=c(edgeColor,'')
          if(!is.null(edgeType)) edgeType=c(edgeType,'')
@@ -1189,6 +1201,40 @@ setMethod ('addGraph', 'RedPort',
         }
     } else {
         arrowDirection=as.numeric(c(-1,-1))
+    }
+    #arrowLength
+    if(!is.null(arrowLength) && length(arrowLength)>0){       
+        c1=!is.numeric(arrowLength)
+        if(c1){
+            warning("NOTE: arrow 'length' must be provided as numerics!")
+            arrowLength =as.numeric(c(-1,-1))
+        }
+        else if(sum(is.na(arrowLength))>0){
+            warning("NOTE: invalid arrow 'length' declaration: 'NA' found'!")
+            arrowLength=as.numeric(c(-1,-1))
+        } else {            
+            message("** ... arrow 'length'") 
+            arrowLength=as.numeric(arrowLength)
+        }
+    } else {
+        arrowLength=as.numeric(c(-1,-1))
+    }   
+    #arrowAngle
+    if(!is.null(arrowAngle) && length(arrowAngle)>0){       
+        c1=!is.numeric(arrowAngle)
+        if(c1){
+            warning("NOTE: arrow 'angle' must be provided as numerics!")
+            arrowAngle=as.numeric(c(-1,-1))
+        }
+        else if(sum(is.na(arrowAngle))>0){
+            warning("NOTE: invalid arrow 'angle' declaration: 'NA' found'!")
+            arrowAngle=as.numeric(c(-1,-1))
+        } else {            
+            message("** ... arrow 'angle'") 
+            arrowAngle=as.numeric(arrowAngle)
+        }
+    } else {
+        arrowAngle=as.numeric(c(-1,-1))
     }
     #edgeWeight
     if(!is.null(edgeWeight) && length(edgeWeight)>0 ){       
@@ -1284,27 +1330,37 @@ setMethod ('addGraph', 'RedPort',
     	np2=as.character(c('',''))
     	np3=as.character(c('',''))
     	np4=as.numeric(c(-1,-1)) 
-    	isnp="false"    	
+    	isnp="false"
+    	#usa "canal" np2 para passar cc status a eventuais nodos transformados!
+    	if(ntransform){
+    		np2=c(as.character(nestImage), ifelse(isAnchor,'anchor',''), ifelse(isAssign,'assign',''))
+    	}
     }
-  	    
+    
     #Loading graph...      
     isBrandNew=ifelse(isNest && isAssign,'true','false')
+    ntransform=ifelse(ntransform,'true','false')
+    parent=ifelse(is.null(parent),'.$NULL', parent)
+    parent=as.character(parent)
     numsuppl=c(gcoord[1],gcoord[2])
-    charsuppl=c(update,isBrandNew)    
+    charsuppl=c(update,isBrandNew) 
+       
     if(ecount(g)>0 && loadEdges){
     	#update, isBrandNew   	
         #Main call to load nodes and edges
         nestref=rederexpresspost(obj@uri, 'RedHandler.updateGraphMap', edges[,1],
               edges[,2], arrowDirection, edgeWeight, edgeWidth, edgeColor, edgeType,
-              nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
-              nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
-              nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp)      
+              arrowLength, arrowAngle, nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, 
+              nodeColor, nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
+              nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp, 
+              parent, ntransform)      
     } else {
         #Main call to load only nodes
         nestref=rederexpresspost(obj@uri, 'RedHandler.updateNodeMap', 
               nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
               nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
-              nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp)
+              nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp, 
+              parent, ntransform)
 	}
     
     invisible( updateGraph(obj) )
@@ -2733,14 +2789,14 @@ setMethod ('addLegend.color', 'RedPort',
 	if(is.igraph(colvec)){
     	if(type=="nodecolor"){
 			if(!is.null(colvec$legNodeColor$scale)){
-	       		if(!is.null(colvec$legNodeColor$legend))labvec=colvec$legNodeColor$legend
+	       		if(!is.null(colvec$legNodeColor$legend) && is.null(labvec))labvec=colvec$legNodeColor$legend
 	       		colvec=colvec$legNodeColor$scale
 			} else {
 				stop("NOTE: there is no valid 'legNodeColor' legend information for this igraph object!!")
 			}
 		} else {
 			if(!is.null(colvec$legEdgeColor$scale)){
-	       		if(!is.null(colvec$legEdgeColor$legend))labvec=colvec$legEdgeColor$legend
+	       		if(!is.null(colvec$legEdgeColor$legend) && is.null(labvec))labvec=colvec$legEdgeColor$legend
 	       		colvec=colvec$legEdgeColor$scale
 			} else {
 				stop("NOTE: there is no valid 'legEdgeColor' legend information for this igraph object!!")
@@ -2846,14 +2902,14 @@ setMethod ('addLegend.size', 'RedPort',
 	if(is.igraph(sizevec)){
     	if(type=="nodesize"){
 			if(!is.null(sizevec$legNodeSize$scale)){
-	       		if(!is.null(sizevec$legNodeSize$legend))labvec=sizevec$legNodeSize$legend
+	       		if(!is.null(sizevec$legNodeSize$legend) && is.null(labvec))labvec=sizevec$legNodeSize$legend
 	       		sizevec=sizevec$legNodeSize$scale
 			} else {
 				stop("NOTE: there is no valid 'legNodeSize' legend information for this igraph object!!")
 			}
 		} else {
 			if(!is.null(sizevec$legEdgeWidth$scale)){
-	       		if(!is.null(sizevec$legEdgeWidth$legend))labvec=sizevec$legEdgeWidth$legend
+	       		if(!is.null(sizevec$legEdgeWidth$legend) && is.null(labvec))labvec=sizevec$legEdgeWidth$legend
 	       		sizevec=sizevec$legEdgeWidth$scale
 			} else {
 				stop("NOTE: there is no valid 'legEdgeWidth' legend information for this igraph object!!")
@@ -2956,16 +3012,16 @@ setMethod ('addLegend.shape', 'RedPort',
 	#Check if igraph object------------------------------------------
 	if(is.igraph(shapevec)){
     	if(type=="nodeshape"){
-			if(!is.null(shapevec$legNodeShape$scale)){
-	       		if(!is.null(shapevec$legNodeShape$legend))labvec=shapevec$legNodeShape$legend
-	       		shapevec=shapevec$legNodeShape$scale
+			if(!is.null(shapevec$legNodeShape$shape)){
+	       		if(!is.null(shapevec$legNodeShape$legend) && is.null(labvec))labvec=shapevec$legNodeShape$legend
+	       		shapevec=shapevec$legNodeShape$shape
 			} else {
 				stop("NOTE: there is no valid 'legNodeShape' legend information for this igraph object!!")
 			}
 		} else {
-			if(!is.null(shapevec$legEdgeType$scale)){
-	       		if(!is.null(shapevec$legEdgeType$legend))labvec=shapevec$legEdgeType$legend
-	       		shapevec=shapevec$legEdgeType$scale
+			if(!is.null(shapevec$legEdgeType$shape)){
+	       		if(!is.null(shapevec$legEdgeType$legend) && is.null(labvec))labvec=shapevec$legEdgeType$legend
+	       		shapevec=shapevec$legEdgeType$shape
 			} else {
 				stop("NOTE: there is no valid 'legEdgeType' legend information for this igraph object!!")
 			}			

@@ -205,7 +205,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		x.col=cols[x]
 		x.col[is.na(x.col)]=colorRampPalette(colors=c(na.col,na.col))(1)
 		# get scale (for any legend) and return results
-		leg=list(color_levels=cols,legend=levels(x))
+		leg=list(scale=cols,legend=levels(x))
 		res=list(res=x.col,leg=leg)
 		return(res)
 	}	
@@ -331,7 +331,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		x.sz=szlevs[x]
 		x.sz[is.na(x.sz)]=na.sz
 		# get scale (for any legend) and return results
-		leg=list(levels=szlevs,legend=levels(x))
+		leg=list(scale=szlevs,legend=levels(x))
 		res=list(res=x.sz,leg=leg)
 		return(res)		
 	}
@@ -412,8 +412,9 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 			x=factor(x,levels=categvec)
 		}
 		att=shapes[x]
+		shapes=shapes[1:nlevels(x)]
 		# get shapes (for any legend) and return results
-		leg=list(shapes=shapes,legend=levels(x))
+		leg=list(shape=shapes,legend=levels(x))
 		res=list(res=att,leg=leg)
 		return(res)
 	}	
@@ -561,7 +562,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		x.col=cols[x]
 		x.col[is.na(x.col)]=colorRampPalette(colors=c(na.col,na.col))(1)
 		# get scale (for any legend) and return results
-		leg=list(color_levels=cols,legend=levels(x))
+		leg=list(scale=cols,legend=levels(x))
 		res=list(res=x.col,leg=leg)
 		return(res)
 	}	
@@ -687,7 +688,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		x.sz=szlevs[x]
 		x.sz[is.na(x.sz)]=na.sz
 		# get scale (for any legend) and return results
-		leg=list(levels=szlevs,legend=levels(x))
+		leg=list(scale=szlevs,legend=levels(x))
 		res=list(res=x.sz,leg=leg)
 		return(res)		
 	}
@@ -769,7 +770,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		}
 		att=shapes[x]
 		# get shapes (for any legend) and return results
-		leg=list(shapes=shapes,legend=levels(x))
+		leg=list(shape=shapes,legend=levels(x))
 		res=list(res=att,leg=leg)
 		return(res)
 	}	
