@@ -3,16 +3,16 @@
 
  1.1.12		2012-02-24
 
-  IMPROVEMENTS
-    o Improved graph loading time via xml serialization, data packing and post formats for RedeR.
-    o Improved stability in server/client connections.
-    o Improved control over the app main features.
-    o Improved node-container assignment options.
+  IMPROVED FEATURES
+    o Loading performance, xml serialization, data packing and post formats.
+    o Server/client connection.
+    o Control over the app main features.
+    o Node-container assignment options.
 
   BUG FIXES
     o Correction/fine-tune of dynamic layout function under zoom-in/zoom-out requests.
     o Merge out-edge function is fixed to rescale with node size.
-    o Legend function is fixed to load shape attributes.
+    o Legend function is fixed for node/edge shape attributes.
 
  1.00		2011-11-01	[1st public release in Bioconductor]
 
