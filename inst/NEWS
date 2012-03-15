@@ -1,7 +1,7 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
- 1.1.13		2012-03-01
+ 1.1.14		2012-03-15
 
   IMPROVED FEATURES
     o Loading performance, xml serialization, data packing and post formats.
@@ -13,6 +13,7 @@
     o Correction/fine-tune of dynamic layout function under zoom-in/zoom-out requests.
     o Merge out-edge function is fixed to rescale with node size.
     o Legend function is fixed for node/edge shape attributes.
+    o Legend color is fixed for two-palette option.
 
  1.00		2011-11-01	[1st public release in Bioconductor]
 

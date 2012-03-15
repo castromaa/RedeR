@@ -119,6 +119,7 @@ rederexpresspost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()
 
 #------------------------------------------------------------------------------
 # set RedeR att. to vertices in igraph objects
+#TODO: patela 2 somente aceita vetor de cores de numero par!!!
 att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=grey(0.7), 
 	xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=2){
 	# set att---------------------------------------------------------
@@ -214,33 +215,32 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant+1),na.rm=TRUE,names=FALSE)
+			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
 		}
 		if(is.null(cols))cols=c("darkblue","blue","orange","cyan","red","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}	
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
-		if(length(breaks)<2)stop("NOTE: require at least two breaks!")
+		if(length(breaks)<3)stop("NOTE: require at least three breaks!")
 		if(isrev)cols=rev(cols)
 		# adjust breaks and get palette
-		if(is.null(nquant))breaks=c(-Inf,breaks,+Inf)
-		cols=colorRampPalette(colors=cols)(length(breaks)-1)
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2
+		bkcenter=c(-Inf,bkcenter,+Inf)
+		cols=colorRampPalette(colors=cols)(length(bkcenter)-1)
 		# set colors to x
 		x.col=rep(NA,length(x))
-		cuts=cut(x[!is.na(x)],breaks=breaks,include.lowest=TRUE)
+		cuts=cut(x[!is.na(x)], breaks=bkcenter,include.lowest=TRUE)
 		x.col[!is.na(x)]=cols[as.integer(cuts)]
 		x.col[is.na(x.col)]=colorRampPalette(colors=c(na.col,na.col))(1)
-		# get scale (for any legend) and return results
-		lbks=rep(NA,length(breaks)-1)
-		for(i in 1:length(lbks)){lbks[i]=mean(breaks[i:(i+1)])}
-		if(lbks[1]==-Inf)lbks[1]=breaks[2]
-		if(lbks[length(lbks)]==Inf)lbks[length(lbks)]=breaks[length(breaks)-1]
-		lbks=format(lbks, digits=roundleg, nsmall=roundleg)	
+		# get intervals
 		if(is.null(nquant)){
-			lbks[1]=paste("<",lbks[1],sep="")
-			lbks[length(lbks)]=paste(">",lbks[length(lbks)],sep="")
+			interv=levels(cuts)
+		} else {
+			interv=seq(0,1,length.out=nquant+1)[-1]
+			interv=paste(interv*100,"%",sep="")
 		}		
-		leg=list(scale=cols,legend=lbks, interval=levels(cuts))
+		breaks=format(breaks, digits=roundleg, nsmall=roundleg)	
+		leg=list(scale=cols,legend=breaks, interval=interv)
 		res=list(res=x.col,leg=leg)	
 		return(res)
 	}
@@ -249,45 +249,41 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		# check args
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant+1),na.rm=TRUE,names=FALSE)
-		}
+			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+		}	
 		if(is.null(cols))cols=c("darkblue","white","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
-		if(length(breaks)<2)stop("NOTE: require at least two breaks!")
+		if(length(breaks)<3)stop("NOTE: require at least three breaks!")
 		if(isrev)cols=rev(cols)
-		# check color vec
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2		
+		# check color vec		
 		lt=length(cols)
-		if(lt/2==as.integer(lt/2)){	
-			lt=lt+1
-			cols=colorRampPalette(colors=cols)(lt)
-			lfrt=as.integer(lt/2)+1				
-		} else {
-			cols=colorRampPalette(colors=cols)(lt)
-			lfrt=as.integer(lt/2)+1
-		}	
+		if(lt/2==as.integer(lt/2))lt=lt+1	
+		cols=colorRampPalette(colors=cols)(lt)
+		lfrt=as.integer(lt/2)+1
 		# get neg/pos colors
 		negCols=cols[1:lfrt]
 		posCols=cols[lfrt:lt]
 		ct.col=cols[lfrt]
 		# check and adjust breaks
-		lt=length(breaks)
+		lt=length(bkcenter)
 		if(lt/2==as.integer(lt/2)){
 			lf=lt/2
 			rt=(lt/2)+1
-			center=(breaks[lf]+breaks[rt])/2
-			negBreaks=c(if(is.null(nquant))-Inf,breaks[1:lf],center)
-			posBreaks=c(center,breaks[rt:lt],if(is.null(nquant))+Inf)
+			center=(bkcenter[lf]+bkcenter[rt])/2
+			negBreaks=c(-Inf,bkcenter[1:lf],center)
+			posBreaks=c(center,bkcenter[rt:lt],+Inf)
 		} else {
 			lfrt=as.integer(lt/2)+1
-			center=breaks[lfrt]
-			negBreaks=c(if(is.null(nquant))-Inf,breaks[1:lfrt])
-			posBreaks=c(breaks[lfrt:lt],if(is.null(nquant))+Inf)
+			center=bkcenter[lfrt]
+			negBreaks=c(-Inf,bkcenter[1:lfrt])
+			posBreaks=c(bkcenter[lfrt:lt],+Inf)
 		}
 		# set main palettes	
-		negCols=colorRampPalette(colors=negCols)(length(negBreaks)-1)
-		posCols=colorRampPalette(colors=posCols)(length(posBreaks)-1)
+		negCols=colorRampPalette(colors=negCols)(length(negBreaks))[-length(negBreaks)]
+		posCols=colorRampPalette(colors=posCols)(length(posBreaks))[-1]
 		# set minor palettesscale
 		na.col=colorRampPalette(colors=c(na.col,na.col))(1)
 		ct.col=colorRampPalette(colors=c(ct.col,ct.col))(1)		
@@ -301,18 +297,20 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		x.col[idx]=posCols[as.integer(poscuts)]
 		x.col[x==center]=ct.col
 		x.col[is.na(x.col)]=na.col
-		# get scale (for any legend) and return results
-		breaks=c(negBreaks,posBreaks[-1])		
-		lbks=rep(NA,length(breaks)-1)
-		for(i in 1:length(lbks)){lbks[i]=mean(breaks[i:(i+1)])}
-		if(lbks[1]==-Inf)lbks[1]=breaks[2]
-		if(lbks[length(lbks)]==Inf)lbks[length(lbks)]=breaks[length(breaks)-1]
-		lbks=format(lbks, digits=roundleg, nsmall=roundleg)	
+		# get intervals
 		if(is.null(nquant)){
-			lbks[1]=paste("<",lbks[1],sep="")
-			lbks[length(lbks)]=paste(">",lbks[length(lbks)],sep="")
+			interv=c(levels(negcuts),levels(poscuts))
+		} else {
+			interv=seq(0,1,length.out=nquant+1)[-1]
+			interv=paste(interv*100,"%",sep="")
 		}
-		leg=list(scale=c(negCols,posCols),legend=lbks, interval=c(levels(negcuts),levels(poscuts)))
+		testlen=length(breaks)/2
+		if(as.integer(testlen)<testlen){
+			idx=as.integer(testlen)+1
+			breaks=breaks[c(1:idx,idx:length(breaks))]
+		}
+		breaks=format(breaks, digits=roundleg, nsmall=roundleg)
+		leg=list(scale=c(negCols,posCols),legend=breaks, interval=interv)
 		res=list(res=x.col,leg=leg)
 		return(res)
 	}
@@ -340,31 +338,32 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant+1),na.rm=TRUE,names=FALSE)
+			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
 		}	
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
+		if(length(breaks)<3)stop("NOTE: require at least three breaks!")
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2
 		# adjust breaks
-		if(is.null(nquant))breaks=c(-Inf,breaks,+Inf)
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2
+		bkcenter=c(-Inf,bkcenter,+Inf)
 		# get sz levels
-		szlevs=seq(szmin,szmax,length.out=length(breaks)-1)
+		szlevs=seq(szmin,szmax,length.out=length(bkcenter)-1)
 		if(isrev)szlevs=rev(szlevs)		
 		# set sz to x
 		x.sz=rep(NA,length(x))
-		cuts=cut(x[!is.na(x)],breaks=breaks,include.lowest=TRUE)
+		cuts=cut(x[!is.na(x)],breaks=bkcenter,include.lowest=TRUE)
 		x.sz[!is.na(x)]=szlevs[as.integer(cuts)]
 		x.sz[is.na(x.sz)]=na.sz
-		# get scale (for any legend) and return results
-		lbks=rep(NA,length(breaks)-1)
-		for(i in 1:length(lbks)){lbks[i]=mean(breaks[i:(i+1)])}
-		if(lbks[1]==-Inf)lbks[1]=breaks[2]
-		if(lbks[length(lbks)]==Inf)lbks[length(lbks)]=breaks[length(breaks)-1]
-		lbks=format(lbks, digits=roundleg, nsmall=roundleg)
+		# get interval
 		if(is.null(nquant)){
-			lbks[1]=paste("<",lbks[1],sep="")
-			lbks[length(lbks)]=paste(">",lbks[length(lbks)],sep="")
+			interv=levels(cuts)
+		} else {
+			interv=seq(0,1,length.out=nquant+1)[-1]
+			interv=paste(interv*100,"%",sep="")
 		}		
-		leg=list(scale=szlevs,legend=lbks,interval=levels(cuts))
+		breaks=format(breaks, digits=roundleg, nsmall=roundleg)
+		leg=list(scale=szlevs,legend=breaks,interval=interv)
 		res=list(res=x.sz,leg=leg)
 		return(res)
 	}
@@ -571,33 +570,32 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant+1),na.rm=TRUE,names=FALSE)
+			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
 		}
 		if(is.null(cols))cols=c("darkblue","blue","orange","cyan","red","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}	
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
-		if(length(breaks)<2)stop("NOTE: require at least two breaks!")
+		if(length(breaks)<3)stop("NOTE: require at least three breaks!")
 		if(isrev)cols=rev(cols)
 		# adjust breaks and get palette
-		if(is.null(nquant))breaks=c(-Inf,breaks,+Inf)
-		cols=colorRampPalette(colors=cols)(length(breaks)-1)
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2
+		bkcenter=c(-Inf,bkcenter,+Inf)
+		cols=colorRampPalette(colors=cols)(length(bkcenter)-1)
 		# set colors to x
 		x.col=rep(NA,length(x))
-		cuts=cut(x[!is.na(x)],breaks=breaks,include.lowest=TRUE)
+		cuts=cut(x[!is.na(x)],breaks=bkcenter,include.lowest=TRUE)
 		x.col[!is.na(x)]=cols[as.integer(cuts)]
 		x.col[is.na(x.col)]=colorRampPalette(colors=c(na.col,na.col))(1)
 		# get scale (for any legend) and return results
-		lbks=rep(NA,length(breaks)-1)
-		for(i in 1:length(lbks)){lbks[i]=mean(breaks[i:(i+1)])}
-		if(lbks[1]==-Inf)lbks[1]=breaks[2]
-		if(lbks[length(lbks)]==Inf)lbks[length(lbks)]=breaks[length(breaks)-1]
-		lbks=format(lbks, digits=roundleg, nsmall=roundleg)	
 		if(is.null(nquant)){
-			lbks[1]=paste("<",lbks[1],sep="")
-			lbks[length(lbks)]=paste(">",lbks[length(lbks)],sep="")
-		}		
-		leg=list(scale=cols,legend=lbks, interval=levels(cuts))
+			interv=levels(cuts)
+		} else {
+			interv=seq(0,1,length.out=nquant+1)[-1]
+			interv=paste(interv*100,"%",sep="")
+		}
+		breaks=format(breaks, digits=roundleg, nsmall=roundleg)
+		leg=list(scale=cols,legend=breaks, interval=interv)
 		res=list(res=x.col,leg=leg)	
 		return(res)
 	}
@@ -606,46 +604,42 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		# check args
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant+1),na.rm=TRUE,names=FALSE)
-		}
+			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+		}	
 		if(is.null(cols))cols=c("darkblue","white","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
-		if(length(breaks)<2)stop("NOTE: require at least two breaks!")
+		if(length(breaks)<3)stop("NOTE: require at least three breaks!")
 		if(isrev)cols=rev(cols)
-		# check color vec
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2		
+		# check color vec		
 		lt=length(cols)
-		if(lt/2==as.integer(lt/2)){	
-			lt=lt+1
-			cols=colorRampPalette(colors=cols)(lt)
-			lfrt=as.integer(lt/2)+1				
-		} else {
-			cols=colorRampPalette(colors=cols)(lt)
-			lfrt=as.integer(lt/2)+1
-		}	
+		if(lt/2==as.integer(lt/2))lt=lt+1	
+		cols=colorRampPalette(colors=cols)(lt)
+		lfrt=as.integer(lt/2)+1
 		# get neg/pos colors
 		negCols=cols[1:lfrt]
 		posCols=cols[lfrt:lt]
 		ct.col=cols[lfrt]
 		# check and adjust breaks
-		lt=length(breaks)
+		lt=length(bkcenter)
 		if(lt/2==as.integer(lt/2)){
 			lf=lt/2
 			rt=(lt/2)+1
-			center=(breaks[lf]+breaks[rt])/2
-			negBreaks=c(if(is.null(nquant))-Inf,breaks[1:lf],center)
-			posBreaks=c(center,breaks[rt:lt],if(is.null(nquant))+Inf)
+			center=(bkcenter[lf]+bkcenter[rt])/2
+			negBreaks=c(-Inf,bkcenter[1:lf],center)
+			posBreaks=c(center,bkcenter[rt:lt],+Inf)
 		} else {
 			lfrt=as.integer(lt/2)+1
-			center=breaks[lfrt]
-			negBreaks=c(if(is.null(nquant))-Inf,breaks[1:lfrt])
-			posBreaks=c(breaks[lfrt:lt],if(is.null(nquant))+Inf)
+			center=bkcenter[lfrt]
+			negBreaks=c(-Inf,bkcenter[1:lfrt])
+			posBreaks=c(bkcenter[lfrt:lt],+Inf)
 		}
 		# set main palettes	
-		negCols=colorRampPalette(colors=negCols)(length(negBreaks)-1)
-		posCols=colorRampPalette(colors=posCols)(length(posBreaks)-1)
-		# set minor palettes
+		negCols=colorRampPalette(colors=negCols)(length(negBreaks))[-length(negBreaks)]
+		posCols=colorRampPalette(colors=posCols)(length(posBreaks))[-1]
+		# set minor palettesscale
 		na.col=colorRampPalette(colors=c(na.col,na.col))(1)
 		ct.col=colorRampPalette(colors=c(ct.col,ct.col))(1)		
 		# set colors to x
@@ -658,18 +652,20 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		x.col[idx]=posCols[as.integer(poscuts)]
 		x.col[x==center]=ct.col
 		x.col[is.na(x.col)]=na.col
-		# get scale (for any legend) and return results
-		breaks=c(negBreaks[-length(negBreaks)],posBreaks[-1])		
-		lbks=rep(NA,length(breaks)-1)
-		for(i in 1:length(lbks)){lbks[i]=mean(breaks[i:(i+1)])}
-		if(lbks[1]==-Inf)lbks[1]=breaks[2]
-		if(lbks[length(lbks)]==Inf)lbks[length(lbks)]=breaks[length(breaks)-1]
-		lbks=format(lbks, digits=roundleg, nsmall=roundleg)
+		# get intervals
 		if(is.null(nquant)){
-			lbks[1]=paste("<",lbks[1],sep="")
-			lbks[length(lbks)]=paste(">",lbks[length(lbks)],sep="")
-		}			
-		leg=list(scale=c(negCols,posCols),legend=lbks, interval=c(levels(negcuts),levels(poscuts)))
+			interv=c(levels(negcuts),levels(poscuts))
+		} else {
+			interv=seq(0,1,length.out=nquant+1)[-1]
+			interv=paste(interv*100,"%",sep="")
+		}
+		testlen=length(breaks)/2
+		if(as.integer(testlen)<testlen){
+			idx=as.integer(testlen)+1
+			breaks=breaks[c(1:idx,idx:length(breaks))]
+		}
+		breaks=format(breaks, digits=roundleg, nsmall=roundleg)
+		leg=list(scale=c(negCols,posCols),legend=breaks, interval=interv)
 		res=list(res=x.col,leg=leg)
 		return(res)
 	}
@@ -697,31 +693,31 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant+1),na.rm=TRUE,names=FALSE)
+			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
 		}	
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
+		if(length(breaks)<3)stop("NOTE: require at least three breaks!")
 		# adjust breaks
-		if(is.null(nquant))breaks=c(-Inf,breaks,+Inf)
+		bkcenter=(breaks[-length(breaks)]+breaks[-1])/2
+		bkcenter=c(-Inf,bkcenter,+Inf)
 		# get sz levels
-		szlevs=seq(szmin,szmax,length.out=length(breaks)-1)
+		szlevs=seq(szmin,szmax,length.out=length(bkcenter)-1)
 		if(isrev)szlevs=rev(szlevs)		
 		# set sz to x
 		x.sz=rep(NA,length(x))
-		cuts=cut(x[!is.na(x)],breaks=breaks,include.lowest=TRUE)
+		cuts=cut(x[!is.na(x)],breaks=bkcenter,include.lowest=TRUE)
 		x.sz[!is.na(x)]=szlevs[as.integer(cuts)]
 		x.sz[is.na(x.sz)]=na.sz
 		# get scale (for any legend) and return results
-		lbks=rep(NA,length(breaks)-1)
-		for(i in 1:length(lbks)){lbks[i]=mean(breaks[i:(i+1)])}
-		if(lbks[1]==-Inf)lbks[1]=breaks[2]
-		if(lbks[length(lbks)]==Inf)lbks[length(lbks)]=breaks[length(breaks)-1]
-		lbks=format(lbks, digits=roundleg, nsmall=roundleg)
 		if(is.null(nquant)){
-			lbks[1]=paste("<",lbks[1],sep="")
-			lbks[length(lbks)]=paste(">",lbks[length(lbks)],sep="")
-		}		
-		leg=list(scale=szlevs,legend=lbks,interval=levels(cuts))
+			interv=levels(cuts)
+		} else {
+			interv=seq(0,1,length.out=nquant+1)[-1]
+			interv=paste(interv*100,"%",sep="")
+		}	
+		breaks=format(breaks, digits=roundleg, nsmall=roundleg)
+		leg=list(scale=szlevs,legend=breaks,interval=interv)
 		res=list(res=x.sz,leg=leg)
 		return(res)
 	}

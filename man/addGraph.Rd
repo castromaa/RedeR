@@ -95,6 +95,7 @@ Submits R graphs to RedeR app.
     \item{edgeType}{ Edge attribute 'color', options: 'SOLID', 'DOTTED, 'DOTTED_SHORT', 'LONG_DASH' (Default='SOLID'). } 
     \item{arrowLength}{ Edge arrow attribute 'length', options: > 0 (Default=10) <numeric>. } 
     \item{arrowAngle}{ Edge arrow attribute 'angle', options: 0-90 (Default=45) <numeric>. } 
+    \item{linkType}{ Set assignment type either between nodes and containers or containers and containers.  Options: 'nested' and 'notnested' (Default='nested') <string>. } 
   }
 }
 

@@ -600,7 +600,8 @@ setMethod ('addSeries', 'RedPort',
     	isToCopyEdges="yes"
     	g <- remove.edge.attribute(g,"arrowDirection")
     	g <- remove.edge.attribute(g,"arrowLength")
-    	g <- remove.edge.attribute(g,"arrowAngle")    	
+    	g <- remove.edge.attribute(g,"arrowAngle") 
+    	g <- remove.edge.attribute(g,"linkType")     	
     	g <- remove.edge.attribute(g,"edgeWeight")
     	g <- remove.edge.attribute(g,"weight")
     	g <- remove.edge.attribute(g,"edgeWidth")
@@ -1153,6 +1154,7 @@ setMethod ('addGraph', 'RedPort',
       arrowDirection = E(g)$arrowDirection
       arrowLength    = E(g)$arrowLength
       arrowAngle     = E(g)$arrowAngle
+      linkType       = E(g)$linkType
       edgeWeight     = E(g)$edgeWeight
       igraphWeight   = E(g)$weight
       edgeWidth      = E(g)$edgeWidth
@@ -1171,6 +1173,7 @@ setMethod ('addGraph', 'RedPort',
          if(!is.null(arrowDirection)) arrowDirection=c(arrowDirection,-1)
          if(!is.null(arrowLength))arrowLength=c(arrowLength,-1)
          if(!is.null(arrowAngle))arrowAngle=c(arrowAngle,-1)
+         if(!is.null(linkType))linkType=c(linkType,'')
          if(!is.null(edgeWidth)) edgeWidth=c(edgeWidth,-1)
          if(!is.null(edgeColor)) edgeColor=c(edgeColor,'')
          if(!is.null(edgeType)) edgeType=c(edgeType,'')
@@ -1235,7 +1238,7 @@ setMethod ('addGraph', 'RedPort',
         }
     } else {
         arrowAngle=as.numeric(c(-1,-1))
-    }
+    }   
     #edgeWeight
     if(!is.null(edgeWeight) && length(edgeWeight)>0 ){       
         c1=!is.numeric(edgeWeight)
@@ -1308,7 +1311,22 @@ setMethod ('addGraph', 'RedPort',
     } else {
         edgeType=as.character(c('',''))
     }
-    
+    #linkType
+    if(!is.null(linkType) && length(linkType)>0){       
+      c1=!is.character(linkType)
+      if(c1){
+          warning("NOTE: 'linkType' must be provided as character!")
+          linkType=as.character(c('',''))
+      }
+      else if(sum(is.na(linkType))>0){
+          warning("NOTE: invalid 'linkType' declaration: 'NA' found'!")
+          linkType=as.character(c('',''))
+      } else {            
+          message("** ... edge 'link type'") 
+      }      
+    } else {
+        linkType=as.character(c('',''))
+    }    
     #Check nesting condition
     nestref=NULL
     isnp=FALSE
@@ -1350,7 +1368,7 @@ setMethod ('addGraph', 'RedPort',
         #Main call to load nodes and edges
         nestref=rederexpresspost(obj@uri, 'RedHandler.updateGraphMap', edges[,1],
               edges[,2], arrowDirection, edgeWeight, edgeWidth, edgeColor, edgeType,
-              arrowLength, arrowAngle, nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, 
+              arrowLength, arrowAngle, linkType, nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, 
               nodeColor, nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
               nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp, 
               parent, ntransform)      
@@ -2862,17 +2880,17 @@ setMethod ('addLegend.color', 'RedPort',
 		if(is.null(vertical))vertical=FALSE
 		if(is.null(ftsize))ftsize=8
 		if(is.null(title))title="nodecolorscale"
-		if(is.null(dxtitle))dxtitle=40
+		if(is.null(dxtitle))dxtitle=35
 		if(is.null(size))size=20
 		if(is.null(bend))bend=0.85	
 	} else {
 		if(is.null(position))position="topRight"
 		if(is.null(dxborder))dxborder=5
-		if(is.null(dyborder))dyborder=85
+		if(is.null(dyborder))dyborder=100
 		if(is.null(vertical))vertical=FALSE
 		if(is.null(ftsize))ftsize=8
 		if(is.null(title))title="edgecolorscale"
-		if(is.null(dxtitle))dxtitle=40
+		if(is.null(dxtitle))dxtitle=35
 		if(is.null(size))size=20
 		if(is.null(bend))bend=0.85
 	}
@@ -2890,7 +2908,7 @@ setMethod ('addLegend.color', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('addLegend.size', 'RedPort', 
   function (obj, sizevec, type="node", labvec=NULL, position=NULL, dxborder=NULL, dyborder=NULL, vertical=NULL, 
-  			ftsize=NULL, title=NULL, dxtitle=NULL, col=NULL, intersp=NULL) {
+  			ftsize=NULL, title=NULL, dxtitle=NULL, col=NULL, intersp=NULL, edgelen=NULL) {
 	
 	if(ping(obj)==0)return(invisible())
   	
@@ -2953,6 +2971,8 @@ setMethod ('addLegend.size', 'RedPort',
 	title=title[1]	
 	if(!is.null(dxtitle) && !is.numeric(dxtitle))dxtitle=NULL
 	dxtitle=dxtitle[1]
+	if(!is.null(edgelen) && !is.numeric(edgelen))edgelen=NULL
+	edgelen=edgelen[1]
 	if(!is.null(col) && !is.character(col))col=NULL
 	col=col[1]
 	if(sum(nchar(col)>7))col=substr(col,0,7)
@@ -2975,6 +2995,7 @@ setMethod ('addLegend.size', 'RedPort',
 		if(is.null(dxtitle))dxtitle=40
 		if(is.null(col))col="#000000"
 		if(is.null(intersp))intersp=10	
+		if(is.null(edgelen))edgelen=0 #not used for nodes!
 	} else {
 		if(is.null(position))position="bottomLeft"
 		if(is.null(dxborder))dxborder=10
@@ -2985,6 +3006,7 @@ setMethod ('addLegend.size', 'RedPort',
 		if(is.null(dxtitle))dxtitle=40
 		if(is.null(col))col="#000000"
 		if(is.null(intersp))intersp=10
+		if(is.null(edgelen))edgelen=50
 	}
 	
 	# final col setting
@@ -2993,7 +3015,7 @@ setMethod ('addLegend.size', 'RedPort',
 	vertical=ifelse(vertical,"true","false")
 
 	invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendSize', sizevec, labvec, col, intersp, 
-				ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type ) )
+				ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type, edgelen ) )
     
     })
 
@@ -3088,7 +3110,7 @@ setMethod ('addLegend.shape', 'RedPort',
 	if(type=="nodeshape"){
 		if(is.null(position))position="topRight"
 		if(is.null(dxborder))dxborder=5
-		if(is.null(dyborder))dyborder=165
+		if(is.null(dyborder))dyborder=200
 		if(is.null(vertical))vertical=TRUE
 		if(is.null(ftsize))ftsize=8
 		if(is.null(title))title="nodeshape"
@@ -3099,7 +3121,7 @@ setMethod ('addLegend.shape', 'RedPort',
 	} else {
 		if(is.null(position))position="topRight"
 		if(is.null(dxborder))dxborder=100
-		if(is.null(dyborder))dyborder=165
+		if(is.null(dyborder))dyborder=200
 		if(is.null(vertical))vertical=TRUE
 		if(is.null(ftsize))ftsize=8
 		if(is.null(title))title="edgeshape"
