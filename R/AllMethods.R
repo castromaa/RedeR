@@ -684,7 +684,7 @@ setMethod ('addGraph', 'RedPort',
         E(gtemp)$arrowDirection=1
         E(gtemp)$arrowDirection[is.mutual(gtemp)]=3
         # collapse mutual edges to unique edges and check edge attributes
-        gtemp=as.undirected(gtemp, mode="each")
+        #gtemp=as.undirected(gtemp, mode="each") //essa funcao nao retorno ordem correta!!! controlado agora em J!
         gtemp=simplify(gtemp)
         c1=length(list.edge.attributes(g))>0
         c2=ecount(g)>ecount(gtemp)
