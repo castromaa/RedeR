@@ -1,14 +1,14 @@
 Package: RedeR
 Type: Package
 Title: Bridging the gap between hierarchical network representation and functional analysis.
-Version: 1.3.0
-Date: 2012-03-27
+Version: 1.3.1
+Date: 2012-04-27
 Author: Mauro Castro, Xin Wang, Florian Markowetz
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
 Depends: R (>= 2.12.0), igraph(>= 0.5.5), RCurl(>= 1.6-0), XML (>= 3.4-0), XMLRPC (>= 0.2.2)
 Imports: rJava, methods
 Suggests: PANR, HTSanalyzeR, pvclust, graph
-biocViews: GraphsAndNetworks, Visualization, GUI
+biocViews: GraphsAndNetworks, NetworkVisualization, GUI, ConnectTools
 Description: RedeR is an R-based package combined with a stand-alone Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, RedeR takes advantage of R to run robust statistics, while the R-to-Java interface bridges the gap between network analysis and visualization: for R Developers, it allows the development of Java plug-ins exclusively using R codes; for Java Users, it runs R methods implemented in a stand-alone application, and for R Users RedeR interactively displays R graphs using a robust Java graphic engine embedded in this package.
 License: GPL (>= 2)
 URL: http://www.markowetzlab.org/software/networks.html
