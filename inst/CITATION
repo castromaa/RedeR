@@ -1,17 +1,17 @@
-citEntry("Misc",
-   title        = "RedeR: bridging the gap between hierarchical network representation and functional analysis.",
-   author       = "Mauro A. A. Castro, Xin Wang, Florian Markowetz.",
-   organization = "Cancer Research UK - Cambridge Research Institute, Cambridge University.",
-   address      = "Li Ka Shing Centre, Robinson Way, Cambridge, CB2 0RE, UK.",
-   year         = "2011",
-   type 	= "R package",
-   url          = "http://www.markowetzlab.org/software/networks.html",
-         
-   textVersion  = 
-   paste("Castro MAA, Wang X, Markowetz F.", 
-	"RDyNet: bridging the gap between hierarchical network representation and functional analysis.",
-	"R package (2011), URL http://www.markowetzlab.org/software/networks.html.",
+citEntry(entry = "Article",
+  author = "Mauro AA Castro, Xin Wang, Michael NC Fletcher, Kerstin B Meyer and Florian Markowetz",
+  title = "RedeR: R/Bioconductor package for representing modular structures, nested networks and multiple levels of hierarchical associations.",
+  journal = "Genome Biology",
+  year = "2012",
+  volume = "13",
+  pages = "R29",
+  number = "4",
+  textVersion  = 
+  paste("Castro MAA, Wang X, Fletcher MNC, Meyer KB, Markowetz F.", 
+	"RedeR: R/Bioconductor package for representing modular structures,",
+	"nested networks and multiple levels of hierarchical associations.",
+	"Genome Biology 13:R29, 2012.",
 	sep=" ")
-   )
+)
 
 

@@ -1,7 +1,7 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
- 1.1.16		2012-03-25
+ 1.2.0		2012-03-25
 
   IMPROVED FEATURES
     o Loading performance, xml serialization, data packing and post formats.

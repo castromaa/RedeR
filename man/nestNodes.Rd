@@ -50,7 +50,7 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 
 rdp <- RedPort('MyPort') 
 el<-matrix(c('n1','n2','n3','n4'), ncol=2, byrow=TRUE)
-g <- graph.edgelist(el)
+#g <- graph.edgelist(el)
 
 \dontrun{
 

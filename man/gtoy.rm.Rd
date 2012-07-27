@@ -28,7 +28,7 @@ Returns a igraph object.
 
 \examples{
 
-g<-gtoy.rm()
+#g<-gtoy.rm()
 
 }
 

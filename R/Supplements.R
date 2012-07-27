@@ -953,7 +953,7 @@ subg=function(g, dat, refcol=1, maincomp=TRUE, connected=TRUE, transdat=TRUE){
 		cids <- which.max(comp$csize) - 1
 		sg <- subgraph(sg, V(sg)[comp$membership == cids])
 	} else if(connected){
-		dg=igraph::degree(sg)>0
+		dg=igraph0::degree(sg)>0
 		nodes=V(sg)$name[dg] 
 		sg=subgraph(graph=sg,v=nodes)
 	}

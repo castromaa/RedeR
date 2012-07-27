@@ -29,7 +29,7 @@ Returns a igraph object.
 \examples{
 data(hs.inter)
 data(ER.deg)
-subnet <- subg(g=hs.inter, dat=ER.deg$dat, refcol=1)
+#subnet <- subg(g=hs.inter, dat=ER.deg$dat, refcol=1)
 
 }
 

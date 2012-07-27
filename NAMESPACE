@@ -137,7 +137,7 @@ importFrom(XML, newXMLNode, saveXML)
 
 importFrom(RCurl, postForm)
 
-import(igraph)
+import(igraph0)
 
 
 

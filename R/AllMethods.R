@@ -2823,8 +2823,8 @@ setMethod ('addLegend.color', 'RedPort',
 	}
   
 	# color vec
-	colvec=colorRampPalette(colors=colvec)(length(colvec))
-	if(!is.null(colvec) && length(colvec)>1){       
+	if(!is.null(colvec) && length(colvec)>1){    
+		colvec=colorRampPalette(colors=colvec)(length(colvec))   
 		c1=!is.character(colvec)
         if(c1){
 			stop("NOTE: 'color' must be provided as a vector (hexadecimal or valid R colors)!")
@@ -2838,9 +2838,14 @@ setMethod ('addLegend.color', 'RedPort',
         } else {            
              if(sum(nchar(colvec)>7))colvec=substr(colvec,0,7)
         }
+	} else if(is.null(colvec)){
+		type="null"
+		colvec=c("null","null")
+		labvec=NULL	
 	} else {
 		stop("NOTE: 'color' must be provided as a vector (hexadecimal or valid R colors)!")
 	}
+	
 	# label vec
 	if(is.null(labvec))labvec=letters[c(1:length(colvec))]
 	if(length(labvec)!=length(colvec)){
@@ -2947,9 +2952,13 @@ setMethod ('addLegend.size', 'RedPort',
 		} else {            
 			sizevec=as.numeric(sizevec)
 		}
+	} else if(is.null(sizevec)){
+		type="null"
+		sizevec=c(0,0)	
+		labvec=NULL	
 	} else {
 		stop("NOTE: 'size' must be provided as a vector (numeric)!")
-	} 
+	}
 	# label vec
 	if(is.null(labvec))labvec=as.character(sizevec)	
 	if(length(labvec)!=length(sizevec)){
@@ -3069,9 +3078,13 @@ setMethod ('addLegend.shape', 'RedPort',
 		} else {            
 			shapevec=as.character(shapevec)
 		}
+	} else if(is.null(shapevec)){
+		type="null"
+		shapevec=c("null","null")	
+		labvec=NULL	
 	} else {
 		stop("NOTE: 'shape' must be provided as a vector (character)!")
-	} 
+	}
 	# label vec
 	if(is.null(labvec))labvec=letters[c(1:length(shapevec))]
 	if(length(labvec)!=length(shapevec)){

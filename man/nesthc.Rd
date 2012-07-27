@@ -59,11 +59,11 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 
 \examples{
 
-g <- gtoy.rm()
-hc<-hclust(dist(get.adjacency(g)))
+#g <- gtoy.rm()
+#hc<-hclust(dist(get.adjacency(g)))
 #plot(hc)
 
-rdp <- RedPort('MyPort') 
+#rdp <- RedPort('MyPort') 
 
 \dontrun{
 
