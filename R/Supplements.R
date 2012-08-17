@@ -976,15 +976,7 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 	x=t(x)
 	corrMt=cor(x, method = cor.method)
 	diag(corrMt)=0	
-	uniqueVec=unique(sort(corrMt))	
-	# function to find intervals
-	getprobs=function(A,B){
-		nx=length(A)
-		index<-integer(nx)
-		.C("find_interv_vec", xt=as.double(B), n=length(B), x=as.double(A), 
-		   nx=nx, FALSE, FALSE, index, DUP=FALSE, NAOK=TRUE, PACKAGE="base")
-		return(as.numeric(index))
-	}
+	uniqueVec=unique(sort(corrMt))
 	cat("Step 2 ...computing null distribution",fill=TRUE)
 	# builds the null distribution via permutation
 	ctsum=numeric(length(uniqueVec))
@@ -995,7 +987,8 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 		permt=cor(permt,method=cor.method)
 		diag(permt)=NA
 		permt=sort(permt)
-		ct=getprobs(uniqueVec,permt)
+        #find intervals
+		ct=findInterval(uniqueVec,permt)
 		ctsum=ctsum+ct
 		nl=density(permt)
 		nulldist$x=cbind(nulldist$x,nl$x)
