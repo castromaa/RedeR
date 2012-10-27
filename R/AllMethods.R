@@ -40,14 +40,15 @@ setMethod ('version', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('calld', 'RedPort',
 
-   function (obj, filepath='default', ADDPATH='', checks='lock') {
+   function (obj, filepath='default', ADDPATH='', checks='lock', maxlag=300) {
 
       #Check if the port is not in use by the app---------------------------
       if(ping(obj)==1){
           tx=paste("R interface is already in use! Port: ", obj@port, sep='') 
           return(tx)
       }
-         
+      if(!is.numeric(maxlag))maxlag=300
+      
       #Set local paths and call RedeR app:----------------------------------
       
       #(1)Check rJava package, get path to JRI if present!------------------
@@ -111,11 +112,12 @@ setMethod ('calld', 'RedPort',
       #(7) Wait response from the app (implement a short-delay)-------------
       status="OFF"
       tdelta=0
-      t0=proc.time()[2] #...used to start time delay!  
+      t0=proc.time()[2] #...used to start time delay! 
+      maxlag=maxlag/100
       while(status=="OFF"){        
           #timer
           tdelta = proc.time()[2] - t0
-          if(tdelta>0.30){
+          if(tdelta>maxlag){
             status="OFFON"
           }
           #

@@ -1,1 +1,8 @@
-inst/doc/.*[.]pdf$
+inst/doc/fig1.pdf
+inst/doc/fig2.pdf
+inst/doc/fig3.pdf
+inst/doc/fig4.pdf
+inst/doc/fig5a.pdf
+inst/doc/fig5b.pdf
+inst/doc/fig5c.pdf
+inst/doc/fig6.pdf

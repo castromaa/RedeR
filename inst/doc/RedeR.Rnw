@@ -17,6 +17,7 @@ Mauro A. A. Castro, Xin Wang, Florian Markowetz
 }
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \maketitle
 
