@@ -4,20 +4,28 @@
 
 \documentclass[11pt]{article}
 \usepackage{Sweave,fullpage}
+\usepackage{float}
+\SweaveOpts{keep.source=TRUE,eps=FALSE,width=4,height=4.5}
+\usepackage{color}
 \usepackage{hyperref}
+\definecolor{linkcolor}{rgb}{0.0,0.0,0.75}
+\hypersetup{colorlinks=true, linkcolor=linkcolor, urlcolor=cyan}
 \bibliographystyle{unsrt}
 \usepackage{subfig}
 
-\title{RedeR: bridging the gap between hierarchical network representation and functional analysis.}
+\title{
+Vignette for \emph{RedeR}: bridging the gap between hierarchical network \\ 
+representation and functional analysis.
+}
 \author{
-Mauro A. A. Castro, Xin Wang, Florian Markowetz 
+Mauro AA Castro, Xin Wang, Michael NC Fletcher, \\ 
+Kerstin B Meyer and Florian Markowetz 
 \thanks{Cancer Research UK - Cambridge Research Institute, Robinson Way Cambridge, CB2 0RE, UK.} \\
 \texttt{\small http://www.markowetzlab.org/software/networks.html} \\
 \texttt{\small florian.markowetz@cancer.org.uk} \\
 }
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 
 \maketitle
 
@@ -31,22 +39,16 @@ Mauro A. A. Castro, Xin Wang, Florian Markowetz
 
 \section{Overview}
 
-\emph{RedeR} is an R-based package combined with a Java application for dynamic network visualization and manipulation. It
-implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, \emph{RedeR} takes advantage of 
-\emph{\textbf{R}} to run robust statistics, while the R-to-Java interface bridge the gap between network analysis and visualization: for \textbf{R Developers}, it allows 
-the development of Java plug-ins exclusively using R codes; for \textbf{Java Users}, it runs R methods implemented in a stand-alone application,  
-and for \textbf{R Users} \emph{RedeR} interactively displays R graphs using a robust Java graphic engine embedded in \emph{R}.  \\
+\emph{RedeR} is an R-based package combined with a Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, \emph{RedeR} takes advantage of \emph{\textbf{R}} to run robust statistics, while the R-to-Java interface bridge the gap between network analysis and visualization: for \textbf{R Developers}, it allows the development of Java plug-ins exclusively using R codes; for \textbf{Java Users}, it runs R methods implemented in a stand-alone application, and for \textbf{R Users} \emph{RedeR} interactively displays R graphs using a robust Java graphic engine embedded in \emph{R}.\\
 
 \emph{RedeR} use different strategies to link R to Java: 
 
 \begin{itemize}
     \item Data interface: implements the callback engine to make calls from R via xml-rpc protocol. It sets \emph{R} as client and \emph{RedeR} as server. 
     \item Graphic interface: implements the callback engine to make calls from Java via dynamic libraries. It wraps R graphics into RedeR classes. 
-\end{itemize}
+    \end{itemize}
 
-The design of the software is depicted from Figure 1. One unique feature of this concept is how R methods can be wrapped and exported. For example, in a few lines of code
-\emph{RedeR} sends R methods to the Java app using the \emph{submitPlugin} function, which gives rise to a new Java plugin. Also, complex graphs with many attributes 
-can be transferred from-and-to \emph{R} using \emph{addGraph} and \emph{getGraph} functions. \\
+The design of the software is depicted from Figure 1. One unique feature of this concept is how R methods can be wrapped and exported. For example, in a few lines of code \emph{RedeR} sends R methods to the Java app using the \emph{submitPlugin} function, which gives rise to a new Java plugin. Also, complex graphs with many attributes can be transferred from-and-to \emph{R} using \emph{addGraph} and \emph{getGraph} functions. \\
 
 
 %%%%%%
@@ -68,8 +70,8 @@ The first step is to build the server port, which will be required in all remote
 
 \begin{small}
 <<label=Main call, eval=TRUE>>=
-   library (RedeR)
-   rdp <- RedPort () 
+library (RedeR)
+rdp <- RedPort () 
 @ 
 \end{small}
 
@@ -77,15 +79,15 @@ Next, invoke RedeR using the method \emph{calld}:
 
 \begin{small}
 <<label=Main call, eval=FALSE>>=
-   calld(rdp)
+calld(rdp)
 @ 
 \end{small}
 
 Within an active interface, then the method 'addGraph' can easily send R graphs to the application. For example, the following chunk adds an \emph{igraph}\cite{igraph} object:
 \begin{small}
 <<label= Add graph, eval= TRUE>>=
-   g1 <- graph.lattice(c(5,5,5))
-   addGraph( rdp, g1, layout.kamada.kawai(g1) )
+g1 <- graph.lattice(c(5,5,5))
+addGraph( rdp, g1, layout.kamada.kawai(g1) )
 @
 \end{small}
 
@@ -104,23 +106,22 @@ Within an active interface, then the method 'addGraph' can easily send R graphs 
 Conversely, RedeR graphs can be transferred to R and wrapped in \emph{igraph} objects:
 \begin{small}
 <<label= Get graph, eval= TRUE>>=
-   g2 <- getGraph(rdp)
-   resetd(rdp)
+g2 <- getGraph(rdp)
+resetd(rdp)
 @
 \end{small}
-The interface accepts additional graph attributes, as for example edge direction, edge width, edge weight, node shape, node size, node color etc. In \emph{igraph} objects, vertex and edge attributes can be assigned as arbitrary R objects. In order to pass these extensible features to \emph{RedeR} the attributes must be provided in a valid syntax.
-\footnote{See \emph{getGraph} and \emph{addGraph} specification for additional details.}
+The interface accepts additional graph attributes, as for example edge direction, edge width, edge weight, node shape, node size, node color etc. In \emph{igraph} objects, vertex and edge attributes can be assigned as arbitrary R objects. In order to pass these extensible features to \emph{RedeR} the attributes must be provided in a valid syntax. \footnote{See \emph{getGraph} and \emph{addGraph} specification for additional details.}
 
 
 Another strategy is to wrap graphs into containers and then send it to the Java app. Next, the subgraphs g3 and g4 are assigned to different nested structures (Fig.3).
 \begin{small}
 <<label= Build subgraphs, eval= TRUE>>=
-   g3 <- barabasi.game(10)
-   g4 <- barabasi.game(10)
-   V(g3)$name<-paste("sn",1:10,sep="")
-   V(g4)$name<-paste("sm",1:10,sep="")
-   addGraph(rdp, g3, isNest =TRUE, gcoord=c(25,25), gscale=50)
-   addGraph(rdp, g4, isNest =TRUE, gcoord=c(75,75), gscale=50 )
+g3 <- barabasi.game(10)
+g4 <- barabasi.game(10)
+V(g3)$name<-paste("sn",1:10,sep="")
+V(g4)$name<-paste("sm",1:10,sep="")
+addGraph(rdp, g3, isNest =TRUE, gcoord=c(25,25), gscale=50)
+addGraph(rdp, g4, isNest =TRUE, gcoord=c(75,75), gscale=50 )
 @
 \end{small}
 
@@ -140,9 +141,9 @@ In this case, the subgraphs can be handled apart from each other. For example, t
 
 \begin{small}
 <<label= Get subgraph, eval= TRUE>>=
-   selectNodes(rdp,"N0")
-   g5 <- getGraph(rdp, status= "selected")
-   resetd(rdp)
+selectNodes(rdp,"N0")
+g5 <- getGraph(rdp, status= "selected")
+resetd(rdp)
 @
 \end{small}
 
@@ -157,15 +158,15 @@ In this case, the subgraphs can be handled apart from each other. For example, t
 The next chunk generates a scale-free graph according to the Barabasi-Albert model\cite{igraph} and sends the graph to RedeR without any layout information.
 \begin{small}
 <<label= Build scale-free graph and send to the app, eval=TRUE>>=
-   g6 <- barabasi.game(500)
-   addGraph(rdp, g6, zoom=20)
+g6 <- barabasi.game(500)
+addGraph(rdp, g6, zoom=20)
 @
 \end{small}
 
 Then using the "relax" options available in the app you can tune the graph layout as presented in Figure 4.
 \begin{small}
 <<label= Start relax , eval=TRUE>>=
-   relax(rdp,p2=400,p5=30,ps=T)
+relax(rdp,p2=400,p5=30,ps=T)
 @
 \end{small}
 
@@ -197,9 +198,9 @@ In Figure 5a the same graph is used to exemplify the community structure mapped 
 For the next example you will need to reproduce in \emph{RedeR} app the graph from Figure 5b (or any graph with containers), then select one of the communities and run the chunk below:  a simple degree distribution should be plotted in the R side (Fig.6). This is the first step to illustrate how to build an interactive plugin.
 \begin{small}
 <<label= Map clic communities, eval= TRUE>>=
-   g <- getGraph(rdp, status= "selected")
-   if(vcount(g)>0)plot(degree.distribution(g), xlab = "k", ylab = "P(k)", pch=19)
-   resetd(rdp)
+g <- getGraph(rdp, status= "selected")
+if(vcount(g)>0)plot(degree.distribution(g), xlab = "k", ylab = "P(k)", pch=19)
+resetd(rdp)
 @
 \end{small}
 
@@ -209,7 +210,7 @@ For the next example you will need to reproduce in \emph{RedeR} app the graph fr
 
 \section{Workflow samples}
 
-This section provides a sequence of steps that illustrate how users might integrate its own pre-processed data with a given network in order to visualize subgraphs and nested networks. The full description soon will be available in a new communication!
+This section provides a sequence of steps that illustrate how users might integrate its own pre-processed data with a given network in order to visualize subgraphs and nested networks. Please refer to Castro et al. \cite{Castro2012} for more details about the biological background and experimental design of the case study.
 
 \subsection{Subgraphs}
 
@@ -343,7 +344,7 @@ nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
 
 \item 7 - assign edges to containers:
 <<label=Workflow 2: assign edges to containers, eval=TRUE>>=
-mergeOutEdges(rdp)
+mergeOutEdges(rdp,nlev=2)
 @
 
 \item 8 - relax the network:
@@ -379,10 +380,7 @@ resetd(rdp)
 
 \section{Plugin builder}
 
-RedeR plug-ins have two main sections: methods and add-ons. The 'methods' section can be regarded as the plug-in trigger. 
-When installed in the Java app, this trigger is used to start a given analysis by unfolding the R expressions wrapped in the methods. 
-Add-ons use the same strategy, but remains hidden in the app -- and it is optional. Formal functions can be passed to add-ons as additional arguments. 
-Prior to the main call, all functions are automatically loaded in R, making the source code available to the subsequent analysis.\
+RedeR plug-ins have two main sections: methods and add-ons. The 'methods' section can be regarded as the plug-in trigger. When installed in the Java app, this trigger is used to start a given analysis by unfolding the R expressions wrapped in the methods. Add-ons use the same strategy, but remains hidden in the app -- and it is optional. Formal functions can be passed to add-ons as additional arguments. Prior to the main call, all functions are automatically loaded in R, making the source code available to the subsequent analysis.\
 
 \subsubsection*{A simple example} 
 
@@ -390,18 +388,16 @@ Prior to the main call, all functions are automatically loaded in R, making the 
 
 \item Wrap methods in functions
 
-Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R.
-\footnote{Due to build/check errors, this package was not available at the occasion of Bioconductor release; therefore, it had to be removed from RedeR dependencies. It can be installed by command line, as indicate in \emph{Installation} section.}
+Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R. \footnote{Due to build/check errors, this package was not available at the occasion of Bioconductor release; therefore, it had to be removed from RedeR dependencies. It can be installed by command line, as indicate in \emph{Installation} section.}
 
 \begin{small}
 <<label= Set a simple method, eval= TRUE>>=
-      mt1 <- function() 
-      {
-  	rdp <- RedPort('MyPort')
-  	dynwin(rdp)
-   	g <- getGraph(rdp, status= "selected")
-	if(vcount(g)>0)plot(degree.distribution(g), xlab = "k", ylab = "P(k)", pch=19)
-       }
+mt1 <- function(){
+ rdp <- RedPort('MyPort')
+ dynwin(rdp)
+ g <- getGraph(rdp, status= "selected")
+ if(vcount(g)>0)plot(degree.distribution(g), xlab="k", ylab="P(k)", pch=19)
+}
 @
 \end{small}
 
@@ -410,7 +406,7 @@ Here, the degree distribution is used in the same way as illustrated in the prev
 Now the method \emph{mt1} is added to the \emph{PluginBuilder}, and is ready to be sent to the application.
 \begin{small}
 <<label= Build a plugin skeleton, eval= TRUE>>=
-    plugin <- PluginBuilder(title="MyPlugin", allMethods=list(mt1=mt1))
+plugin <- PluginBuilder(title="MyPlugin", allMethods=list(mt1=mt1))
 @                             
 \end{small}
 
@@ -419,9 +415,9 @@ Now the method \emph{mt1} is added to the \emph{PluginBuilder}, and is ready to 
 The submission is straightforward: in the Java side, the plugin will be displayed in the main menu provided that the interface is properly set to find \emph{R}.
 \begin{small}
 <<label= Submit plugin to the app (p.s. JavaGD will be required: see footnotes!), eval= TRUE>>=
-  submitPlugin(rdp, plugin)
-  updatePlugins(rdp)
-  exitd(rdp)
+submitPlugin(rdp, plugin)
+updatePlugins(rdp)
+exitd(rdp)
 @
 \end{small}
 
@@ -454,9 +450,9 @@ The developing version is available at \url{http://bioconductor.org/packages/dev
 
 \begin{scriptsize}
 <<label= Devel version, eval= FALSE>>=
-install.packages(c("RCurl", "XML", "rJava", "igraph", "JavaGD"), repos = "http://cran.r-project.org")
-install.packages("XMLRPC", repos = "http://www.omegahat.org/R", type = "source")
-install.packages('/devel.tar.gz', type='source')  ## i.e. the path to the downloaded .tar.gz file!
+install.packages(c('RCurl','XML','rJava','igraph','JavaGD'), repos='http://cran.r-project.org')
+install.packages('XMLRPC', repos = 'http://www.omegahat.org/R', type='source')
+install.packages('xxx.tar.gz', type='source')  ## i.e. the path to the downloaded .tar.gz file!
 @
 \end{scriptsize}
 

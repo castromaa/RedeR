@@ -20,6 +20,46 @@ exportMethods (
 
   getNodes,
   getNodeIDs,
+  addNodes,        
+  deleteNodes,     
+  nestNodes,     
+  nesthc,  
+                  
+  updateContainerSize,
+  mergeOutEdges,
+  getContainerComponets,
+  mergeNodes,      
+                  
+  getEdges,
+  getEdgeIDs,
+  getSourceEdgeIDs,
+  getTargetEdgeIDs,
+  setArrowDirection,  
+  addEdges,               
+  deleteEdges,     
+  addEdgeBetweenContainers,
+                  
+  selectEdges,
+  selectNodes,
+  selectAllEdges,
+  selectAllNodes,
+  selectGraph,
+
+  deSelectEdges,
+  deSelectNodes,
+  deSelectGraph,
+
+  deleteSelectedEdges,
+  deleteSelectedNodes,
+                  
+  isDynamicsActive,
+  submitPlugin,
+  deletePlugin,
+  updatePlugins,
+
+  exitd,
+  resetd,
+
   getNodeAliases,
   getNodeX,
   getNodeY,
@@ -38,77 +78,31 @@ exportMethods (
   getNodeFontX,
   getNodeFontY,
   getNodeWeight,
-
   setNodeAlias,
-  setNodeXY,       
-  setNodeBend,    
-  setNodeSize,     
-  setNodeShape,    
-  setNodeColor,    
-  setNodeLineWidth, 
+  setNodeXY,
+  setNodeBend,
+  setNodeSize,
+  setNodeShape,
+  setNodeColor,
+  setNodeLineWidth,
   setNodeLineColor,
-  setNodeFontName, 
+  setNodeFontName,
   setNodeFontStyle,
-  setNodeFontSize, 
+  setNodeFontSize,
   setNodeFontColor,
-  setNodeFontXY,   
-  setNodeWeight,  
-                  
-  addNodes,        
-  deleteNodes,     
-  nestNodes,     
-  nesthc,  
-                  
-  updateContainerSize,
-  mergeOutEdges,
-  getContainerComponets,
-  mergeNodes,      
-                  
-  getEdges,        
-  getSourceEdges,  
-  getTargetEdges,  
-                  
-  getEdgeIDs,      
-  getSourceEdgeIDs,
-  getTargetEdgeIDs,
+  setNodeFontXY,
+  setNodeWeight,
+  getSourceEdges,
+  getTargetEdges,
   getArrowDirection,
-                  
-  getEdgeWidth,    
-  getEdgeColor,    
-  getEdgeType,     
-  getEdgeWeight,   
-                  
-  setArrowDirection,
-  setEdgeWidth,    
-  setEdgeColor,    
-  setEdgeType,     
-  setEdgeWeight,   
-   
-  addEdges,               
-  deleteEdges,     
-  addEdgeBetweenContainers,
-                  
-  selectEdges,      
-  selectNodes,      
-                  
-  selectAllEdges,  
-  selectAllNodes,  
-  selectGraph,     
-                  
-  deSelectEdges,   
-  deSelectNodes,   
-  deSelectGraph,   
-                  
-  deleteSelectedEdges,
-  deleteSelectedNodes,
-                  
-  isDynamicsActive,
-  submitPlugin,
-  deletePlugin,
-  updatePlugins,
-
-  exitd,
-  resetd
+  getEdgeWidth,
+  getEdgeColor,
+  getEdgeType,
+  getEdgeWeight,
+  setEdgeWidth,
+  setEdgeColor,
+  setEdgeType,
+  setEdgeWeight
 
    )
 
@@ -137,7 +131,9 @@ importFrom(XML, newXMLNode, saveXML)
 
 importFrom(RCurl, postForm)
 
-import(igraph0)
+importFrom(JavaGD, JavaGD)
+
+import(igraph)
 
 
 

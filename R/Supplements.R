@@ -26,15 +26,15 @@ gtoy.rm=function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
 	}
 	p3= p3[1]
 	nver=function(nmax,p1){sum(runif(nmax)>1-p1)}
-	gg=graph.empty(n=0, directed=FALSE)
+	gg=igraph::graph.empty(n=0, directed=FALSE)
 	mdmap=c()	
 	for(i in 1:m){
 		v=max(nmin,nver(nmax,p1))
-		g=erdos.renyi.game(n=v, p.or.m=p3, type="gnp", directed=FALSE)
-		gg=graph.disjoint.union(gg,g)
+		g=igraph::erdos.renyi.game(n=v, p.or.m=p3, type="gnp", directed=FALSE)
+		gg=igraph::graph.disjoint.union(gg,g)
 		mdmap=c(mdmap,rep(i,v))		
 	}
-	adj=get.adjacency(gg)
+	adj=igraph::get.adjacency(gg,sparse=FALSE)
 	adj[,]=0
 	adj[,]=runif(nrow(adj)*ncol(adj))
 	adj[adj<(1-(p2/m))]=0
@@ -42,10 +42,10 @@ gtoy.rm=function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
 		adj[mdmap==i,mdmap==i]=0
 	}
 	adj[adj>0]=1
-	adj=adj+get.adjacency(gg)
-	gg=graph.adjacency(adj, mode="undirected",diag=FALSE)
-	gg=simplify(gg, remove.multiple = TRUE, remove.loops = TRUE)
-	V(gg)$name=paste("n",1:vcount(gg),sep="")
+	adj=adj+igraph::get.adjacency(gg, sparse=FALSE)
+	gg=igraph::graph.adjacency(adj, mode="undirected",diag=FALSE)
+	gg=igraph::simplify(gg, remove.multiple = TRUE, remove.loops = TRUE)
+	V(gg)$name=paste("n",1:igraph::vcount(gg),sep="")
 	cols=terrain.colors(m)
 	V(gg)$nodeColor=cols[mdmap]
 	V(gg)$module.id=mdmap
@@ -54,6 +54,9 @@ gtoy.rm=function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
 
 #-------------------------------------------------------------
 # simplified remote calls for RedeR!
+# return value is implementation dependent!
+# designed for an internal handler!
+# usefull only for simple calls!
 rederpost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){
 	aXML=function(method, gdata){
 		a=newXMLNode("methodCall", newXMLNode("methodName", method))
@@ -83,7 +86,10 @@ rederpost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){
 }
 
 #-------------------------------------------------------------
-#Express post: direct calls to RedeR (to get a better loading speed for large/sequential objects)!
+# express post: direct calls to RedeR (to get better loading speed for large/sequential objects)!
+# return value is implementation dependent!
+# designed for an internal handler!
+# usefull for large and complex calls!
 rederexpresspost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){	
 	getminimumxml<-function(x, method){
 		getserial=function(x){
@@ -141,7 +147,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		return(invisible())
 	}
     # check igraph object and main args---------------------------------
-    if(!is.igraph(g)){
+    if(!igraph::is.igraph(g)){
         stop("Not an igraph object!")
     }	
 	if(!is.character(from))stop("NOTE: arg. 'from' should be a string!")
@@ -149,8 +155,8 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 	if(!is.character(to) && !is.numeric(to) && !is.integer(to) )stop("NOTE: arg. 'to' should be a string or an integer!")
 	to=to[1]
 	# get ref. att---
-	fromatt=get.vertex.attribute(g, from)	
-	if(is.null(fromatt) || length(fromatt)!=vcount(g)){
+	fromatt=igraph::get.vertex.attribute(g, from)
+	if(is.null(fromatt) || length(fromatt)!=igraph::vcount(g)){
 		stop(paste("NOTE: graph attribute '",from,"' count is not consistent with node count!",sep=""))
 	}
 	if(is.numeric(to) || is.integer(to)){
@@ -461,11 +467,11 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 	}
 	# return updated graph
 	if(!is.null(att)){
-		g=set.vertex.attribute(graph=g, name=to, value=att$res)
+		g=igraph::set.vertex.attribute(graph=g, name=to, value=att$res)
 		if(is.logical(getleg) && getleg){
 			to=gsub("\\b(\\w)","\\U\\1",to,perl=TRUE)
 			leg=paste("leg",to,sep="")
-			g=set.graph.attribute(graph=g, name=leg, value=att$leg)
+			g=igraph::set.graph.attribute(graph=g, name=leg, value=att$leg)
 		}
 	} else {
 		message("...unable to conclude the command!")
@@ -496,7 +502,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		return(invisible())
 	}
     # check igraph object and main args---------------------------------
-    if(!is.igraph(g)){
+    if(!igraph::is.igraph(g)){
         stop("Not an igraph object!")
     }	
 	if(!is.character(from))stop("NOTE: arg. 'from' should be a string!")
@@ -504,8 +510,8 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 	if(!is.character(to) && !is.numeric(to) && !is.integer(to) )stop("NOTE: arg. 'to' should be a string or an integer!")
 	to=to[1]
 	# get ref. att---
-	fromatt=get.edge.attribute(g, from)	
-	if(is.null(fromatt) || length(fromatt)!=ecount(g)){
+	fromatt=igraph::get.edge.attribute(g, from)	
+	if(is.null(fromatt) || length(fromatt)!=igraph::ecount(g)){
 		stop(paste("NOTE: graph attribute '",from,"' count is not consistent with edge count!",sep=""))
 	}
 	if(is.numeric(to) || is.integer(to)){
@@ -809,11 +815,11 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 	}
 	# return updated graph
 	if(!is.null(att)){
-		g=set.edge.attribute(graph=g, name=to, value=att$res)
+		g=igraph::set.edge.attribute(graph=g, name=to, value=att$res)
 		if(is.logical(getleg) && getleg){
 			to=gsub("\\b(\\w)","\\U\\1",to,perl=TRUE)
 			leg=paste("leg",to,sep="")
-			g=set.graph.attribute(graph=g, name=leg, value=att$leg)
+			g=igraph::set.graph.attribute(graph=g, name=leg, value=att$leg)
 		}
 	} else {
 		message("...unable to conclude the command!")
@@ -827,13 +833,13 @@ att.mapv=function(g, dat, refcol=1){
 	if(!is.data.frame(dat)){
 		stop("not a data frame!")
 	}
-    # check igraph object and main args---------------------------------
-    if(!is.igraph(g)){
-        stop("Not an igraph object!")
-    }	
+	# check igraph object and main args---------------------------------
+	if(!igraph::is.igraph(g)){
+	  stop("Not an igraph object!")
+	}
 	# get vecs to match!
 	nodes=V(g)$name
-	if(is.null(nodes) || vcount(g)!=length(nodes)){
+	if(is.null(nodes) || igraph::vcount(g)!=length(nodes)){
 		stop("NOTE: require 'name' attribute in igraph vertices!")
 	}
 	dc=dat[[refcol[1]]]
@@ -870,12 +876,11 @@ att.mapv=function(g, dat, refcol=1){
 		if(i!=refcol){
 			att=dat[[i]]
 			if(is.factor(att))att=levels(att)[att]
-			g=set.vertex.attribute(graph=g, name=names(dat)[i],value=att)
+			g=igraph::set.vertex.attribute(graph=g, name=names(dat)[i],value=att)
 		}
 	}
 	return(g)
 }
-
 
 #------------------------------------------------------------------------------
 # map edge att. to an igraph object
@@ -884,15 +889,15 @@ att.mape=function(g, dat, refcol=c(1,2)){
 		stop("not a data frame!")
 	}
     # check igraph object
-    if(!is.igraph(g)){
+    if(!igraph::is.igraph(g)){
         stop("Not an igraph object!")
     }
 	# get vecs to match!
 	nodes=V(g)$name
-	if(is.null(nodes) || vcount(g)!=length(nodes)){
+	if(is.null(nodes) || igraph::vcount(g)!=length(nodes)){
 		stop("NOTE: require 'name' attribute in igraph vertices!")
 	}
-	edges=get.edgelist(g)
+	edges=igraph::get.edgelist(g)
 	edgevec=array(NA,dim=nrow(edges))
 	for(i in 1:nrow(edges)){
 		edgevec[i]=paste(edges[i,],collapse=",")
@@ -923,7 +928,7 @@ att.mape=function(g, dat, refcol=c(1,2)){
 		if(!i%in%refcol){
 			att=dat[[i]]
 			if(is.factor(att))att=levels(att)[att]
-			g=set.edge.attribute(graph=g, name=names(dat)[i],value=att)
+			g=igraph::set.edge.attribute(graph=g, name=names(dat)[i],value=att)
 		}
 	}
 	return(g)
@@ -939,23 +944,23 @@ subg=function(g, dat, refcol=1, maincomp=TRUE, connected=TRUE, transdat=TRUE){
 	} else {
 		stop("not a data frame!")
 	}
-    if(!is.igraph(g)){
-        stop("Not an igraph object!")
-    }
-    if(is.null(V(g)$name))V(g)$name=as.character(V(g))
-    ids=allids[allids%in%V(g)$name]
-	if(length(ids)!=length(allids)){
-		message("...note: not all genes found in the network!")
+	if(!igraph::is.igraph(g)){
+	  stop("Not an igraph object!")
 	}
-	sg=subgraph(graph=g,v=ids)
+	if(is.null(V(g)$name))V(g)$name=as.character(V(g))
+	ids=allids[allids%in%V(g)$name]
+	if(length(ids)!=length(allids)){
+	  message("...note: not all genes found in the network!")
+	}
+	sg=igraph::induced.subgraph(graph=g,vids=ids)
 	if(maincomp){
-		comp <- clusters(sg)
-		cids <- which.max(comp$csize) - 1
-		sg <- subgraph(sg, V(sg)[comp$membership == cids])
+		comp <- igraph::clusters(sg)
+		cids <- which.max(comp$csize)
+		sg <- igraph::induced.subgraph(graph=sg, vids=V(sg)[comp$membership == cids])
 	} else if(connected){
-		dg=igraph0::degree(sg)>0
-		nodes=V(sg)$name[dg] 
-		sg=subgraph(graph=sg,v=nodes)
+		dg=igraph::degree(sg)>0
+		nodes=V(sg)$name[dg]
+		sg=igraph::induced.subgraph(graph=sg,vids=nodes)
 	}
 	if(transdat && is.data.frame(dat)){
 		sg <- att.mapv(g=sg, dat=dat, refcol=refcol)
@@ -1217,7 +1222,7 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 		}
 	}
 	if(plotcea){
-		ptcea(rescea,...)
+		#ptcea(rescea,...)
 	}
 	return(rescea$decision.mt)
 }

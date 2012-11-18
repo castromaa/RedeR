@@ -13,8 +13,6 @@ RedeR is an R-based package combined with a stand-alone Java application for dyn
 \tabular{ll}{
 Package: \tab RedeR \cr
 Type: \tab Package\cr
-Version: \tab 1.0.1\cr
-Date: \tab 2011-05-01\cr
 License: \tab GPL \cr
 LazyLoad: \tab yes\cr
 }
@@ -28,6 +26,6 @@ LazyLoad: \tab yes\cr
 Mauro Castro <mauro.a.castro@gmail.com>
 }
 \references{
-Castro, M. A. A. et al. \emph{RedeR: bridging the gap between network analysis and visualization}. Journal Paper (in preparation), 2011.
+Castro, M. et al. \emph{RedeR: R/Bioconductor package for representing modular structures, nested networks and multiple levels of hierarchical associations}. Genome Biology 13(4):R29, 2012.
 }
 \keyword{ package }
