@@ -2817,3 +2817,652 @@ setMethod ('addLegend.shape', 'RedPort',
              
            }
 )
+
+
+
+############################################################
+############################################################
+############## All Deprecated Methods ######################
+############################################################
+############################################################
+
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeAliases', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeAliases") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeAliases', type, status))
+           }
+)
+.getNodeAliases<-function (obj, status="all", type="node") { 
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeAliases', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeX', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeX") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeX', type, status))
+           }
+)
+.getNodeX<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeX', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeY', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeY") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeY', type, status))
+           }
+)
+.getNodeY<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeY', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeBend', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeBend") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeBend', type, status))
+           }
+)
+.getNodeBend<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeBend', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeSize', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeSize") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeSize', type, status))
+           }
+)
+.getNodeSize<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeSize', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeShape', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeShape") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeShape', type, status))
+           }
+)
+.getNodeShape<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeShape', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeColor', 'RedPort', 
+           function (obj, status="all", type="node") {
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeColor") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeColor', type, status))
+           }
+)
+.getNodeColor<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeColor', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeLineWidth', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeLineWidth") #2
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeLineWidth', type, status))
+           }
+)
+.getNodeLineWidth<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeLineWidth', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeLineColor', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeLineColor") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeLineColor', type, status))
+           }
+)
+.getNodeLineColor<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeLineColor', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeFontSize', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeFontSize") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeFontSize', type, status))
+           }
+)
+.getNodeFontSize<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeFontSize', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeFontColor', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeFontColor") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeFontColor', type, status))
+           }
+)
+.getNodeFontColor<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeFontColor', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeWeight', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeWeight") #2
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeWeight', type, status))
+           }
+)    
+.getNodeWeight<-function(obj, status="all", type="node"){
+  return (xml.rpc (obj@uri, 'RedHandler.getNodeWeight', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getArrowDirection', 'RedPort', 
+           function (obj, status="all", type="node") {
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getArrowDirection") #2
+             
+             return (xml.rpc(obj@uri, 'RedHandler.getArrowDirection', type, status))
+           }
+)
+.getArrowDirection<-function(obj, status="all", type="node"){
+  return (xml.rpc(obj@uri, 'RedHandler.getArrowDirection', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getEdgeWidth', 'RedPort', 
+           function (obj, status="all", type="node") {
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getEdgeWidth") #2
+             
+             return (xml.rpc(obj@uri, 'RedHandler.getEdgeWidth', type, status))
+           }
+)
+.getEdgeWidth<-function(obj, status="all", type="node"){
+  return (xml.rpc(obj@uri, 'RedHandler.getEdgeWidth', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getEdgeColor', 'RedPort', 
+           function (obj, status="all", type="node") {
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getEdgeColor") #2
+             
+             return (xml.rpc(obj@uri, 'RedHandler.getEdgeColor', type, status))
+           }
+)
+.getEdgeColor<-function(obj, status="all", type="node"){
+  return (xml.rpc(obj@uri, 'RedHandler.getEdgeColor', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getEdgeType', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getEdgeType") #2
+             
+             return (xml.rpc(obj@uri, 'RedHandler.getEdgeType', type, status))
+           }
+)
+.getEdgeType<-function(obj, status="all", type="node"){
+  return (xml.rpc(obj@uri, 'RedHandler.getEdgeType', type, status))
+}
+
+#-------------------------------------------------------------------------------
+setMethod ('getEdgeWeight', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getEdgeWeight") #2
+             
+             return (xml.rpc(obj@uri, 'RedHandler.getEdgeWeight', type, status))
+           }
+)
+.getEdgeWeight<-function(obj, status="all", type="node"){
+  return (xml.rpc(obj@uri, 'RedHandler.getEdgeWeight', type, status))
+}
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeW', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeW") 
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeW', type, status))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeH', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeH") 
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeH', type, status))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeFontName', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeFontName") 
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeFontName', type, status))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeFontStyle', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeFontStyle") 
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeFontStyle', type, status))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeFontX', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeFontX") 
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeFontX', type, status))
+           }
+)    
+
+#-------------------------------------------------------------------------------
+setMethod ('getNodeFontY', 'RedPort', 
+           function (obj, status="all", type="node") { 
+             if(ping(obj)==0)return(NULL)
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="getNodeFontY") 
+             
+             return (xml.rpc (obj@uri, 'RedHandler.getNodeFontY', type, status))
+           }
+)
+
+#Methods to set node attributes
+#-------------------------------------------------------------------------------
+setMethod ('setNodeAlias', 'RedPort', 
+           function (obj, node, alias) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeAlias") 
+             
+             node=as.character(node)
+             alias=as.character(alias)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeAlias', node, alias))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeXY', 'RedPort', 
+           function (obj, node, x, y) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeXY") 
+             
+             c1=!is.numeric(x)
+             c2=!is.numeric(y)
+             if(c1 && c2){
+               stop("Node coords. must be provided as numerics!")
+             }
+             if(sum(is.na(x))>0 || sum(is.na(y))>0 ){
+               stop("Invalid node coords. declaration: 'NA' found'!")
+             }     
+             node=as.character(node) 
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeXY', node, x, y))
+           }
+) 
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeBend', 'RedPort', 
+           function (obj, node, bend) {  
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeBend") 
+             
+             c1=!is.numeric(bend)
+             if(c1){
+               stop("Node 'bend' must be provided as numerics!")
+             }
+             if(sum(is.na(bend))>0){
+               stop("Invalid node 'bend' declaration: 'NA' found'!")
+             }       
+             if(sum(bend<0)>0 || sum(bend>100)>0){
+               stop("Invalid node 'bend' declaration (options: 0-100%)" )
+             }      
+             node=as.character(node)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeBend', node, bend))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeSize', 'RedPort', 
+           function (obj, node, size) {
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeSize") 
+             
+             c1=!is.numeric(size)
+             if(c1){
+               stop("Node 'size' must be provided as numerics!")
+             }
+             if(sum(is.na(size))>0){
+               stop("Invalid node 'size' declaration: 'NA' found'!")
+             }
+             if(sum(size<0)>0){
+               stop("Invalid node 'size' declaration (options: >= 0)")
+             }      
+             node=as.character(node)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeSize', node, size))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeShape', 'RedPort', 
+           function (obj, node, shape) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeShape") 
+             
+             node=as.character(node)
+             shape=as.character(shape)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeShape', node, shape))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeColor', 'RedPort', 
+           function (obj, node, color) {
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeColor") 
+             
+             if(!is.null(color)){       
+               c1=!is.character(color)
+               if(c1){
+                 warning("NOTE: node 'color' must be provided as character (hexadecimal)!")
+               } else if(is.na(color)){
+                 warning("NOTE: invalid node 'color' declaration: 'NA' found'!")
+               } else if(nchar(color)>9 ){
+                 warning("NOTE: invalid node 'color' specification: not 'rgb' space! (ps. alpha not supported)")
+               } else {
+                 node=as.character(node)
+                 color=as.character(color) 
+                 if(nchar(color)>7) color=substr(color,0,7)
+                 return (rederexpresspost(obj@uri, 'RedHandler.setNodeColor', node, color))
+               }      
+             }   
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeLineWidth', 'RedPort', 
+           function (obj, node, width) {  
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeLineWidth") 
+             
+             c1=!is.numeric(width)
+             if(c1){
+               stop("Node line 'width' must be provided as numerics!")
+             }
+             if(sum(is.na(width))>0){
+               stop("Invalid node line 'width' declaration: 'NA' found'!")
+             }
+             if(sum(width<0)>0){
+               stop("Invalid node line 'width' declaration (options: >= 0)")
+             }      
+             node=as.character(node)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeLineWidth', node, width))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeLineColor', 'RedPort', 
+           function (obj, node, color) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeLineColor") 
+             
+             node=as.character(node)
+             color=as.character(color)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeLineColor', node, color))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeFontName', 'RedPort', 
+           function (obj, node, name) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeFontName") 
+             
+             node=as.character(node)
+             name=as.character(name)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeFontName', node, name))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeFontStyle', 'RedPort', 
+           function (obj, node, style) {
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeFontStyle") 
+             
+             c1=!is.integer(style)
+             c2=!is.numeric(style)
+             if(c1 && c2){
+               stop("Node 'style' must be provided as integers!")
+             }
+             if(sum(is.na(style))>0){
+               stop("Invalid node 'style' declaration: 'NA' found'!")
+             }
+             if(sum(style<0)>0 || style>3){
+               stop("Invalid node 'style' declaration (options: 0, 1 or 2)")
+             }      
+             node=as.character(node)
+             style=as.numeric(style)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeFontStyle', node, style))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeFontSize', 'RedPort', 
+           function (obj, node, size) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeFontSize") 
+             
+             c1=!is.numeric(size)
+             if(c1){
+               stop("Node 'font size' must be provided as numerics!")
+             }
+             if(sum(is.na(size))>0){
+               stop("Invalid node 'font size' declaration: 'NA' found'!")
+             }
+             if(sum(size<0)>0){
+               stop("Invalid node 'font size' declaration (options: >= 0)")
+             }      
+             node=as.character(node)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeFontSize', node, size))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeFontColor', 'RedPort', 
+           function (obj, node, color) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeFontColor") 
+             
+             node=as.character(node)
+             color=as.character(color)
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeFontColor', node, color))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeFontXY', 'RedPort', 
+           function (obj, node, x, y) {  
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeFontXY")
+             
+             c1=!is.numeric(x)
+             c2=!is.numeric(y)
+             if(c1 && c2){
+               stop("Node 'font coords.' must be provided as numerics!")
+             }
+             if(sum(is.na(x))>0 || sum(is.na(y))>0 ){
+               stop("Invalid 'font coords.' declaration: 'NA' found'!")
+             }   
+             node=as.character(node)   
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeFontXY', node, x, y))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setNodeWeight', 'RedPort', 
+           function (obj, node, weight) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setNodeWeight") 
+             
+             c1=!is.numeric(weight)
+             if(c1){
+               stop("Node 'weight' must be provided as numerics!")
+             }
+             if(sum(is.na(weight))>0){
+               stop("Invalid node 'weight' declaration: 'NA' found'!")
+             }         
+             node=as.character(node) 
+             return (rederexpresspost(obj@uri, 'RedHandler.setNodeWeight', node, weight))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setEdgeWidth', 'RedPort', 
+           function (obj, nodeA, nodeB, width) {  
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setEdgeWidth") 
+             
+             c1=!is.numeric(width)
+             if(c1){
+               stop("Edge 'width' must be provided as numerics!")
+             }
+             if(sum(is.na(width))>0){
+               stop("Invalid edge 'width' declaration: 'NA' found'!")
+             }
+             if(sum(width<=0)>0){
+               stop("Invalid edge 'width' declaration (options: > 0)")
+             }      
+             nodeA=as.character(nodeA)
+             nodeB=as.character(nodeB)
+             return (rederexpresspost(obj@uri, 'RedHandler.setEdgeWidth', nodeA, nodeB, width))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setEdgeColor', 'RedPort', 
+           function (obj, nodeA, nodeB, color) {
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setEdgeColor") 
+             
+             nodeA=as.character(nodeA)
+             nodeB=as.character(nodeB)  
+             color=as.character(color)
+             return (rederexpresspost(obj@uri, 'RedHandler.setEdgeColor', nodeA, nodeB, color))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setEdgeType', 'RedPort', 
+           function (obj, nodeA, nodeB, type) { 
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setEdgeType") 
+             
+             nodeA=as.character(nodeA)
+             nodeB=as.character(nodeB)  
+             type=as.character(type)
+             return (rederexpresspost(obj@uri, 'RedHandler.setEdgeType', nodeA, nodeB, type))
+           }
+)
+
+#-------------------------------------------------------------------------------
+setMethod ('setEdgeWeight', 'RedPort', 
+           function (obj, nodeA, nodeB, weight) {  
+             if(ping(obj)==0)return(invisible())
+             
+             .Deprecated(new="addGraph/getGraph related methods",old="setEdgeWeight") 
+             
+             c1=!is.numeric(weight)
+             if(c1){
+               stop("Edge 'weight' must be provided as numerics!")
+             }
+             if(sum(is.na(weight))>0){
+               stop("Invalid edge 'weight' declaration: 'NA' found'!")
+             }      
+             nodeA=as.character(nodeA)
+             nodeB=as.character(nodeB)
+             return (rederexpresspost(obj@uri,'RedHandler.setEdgeWeight', nodeA, nodeB, weight))
+           }
+)
