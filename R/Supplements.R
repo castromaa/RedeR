@@ -1017,7 +1017,7 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 	decisionMt[decision]=0.0
 	rescea=list(corr.mt=corrMt, decision.mt=decisionMt, pvalue.adj=pvalAdj, null.dist=nulldist)
 	# function to plot decision matx
-	ptcea=function(rescea, ptype=1, bk=0.2, n.breaks=100, plotnull=TRUE, avnull=TRUE, nullcol="black"){
+	ptcea=function(rescea, ptype=4, bk=0.2, n.breaks=100, plotnull=TRUE, avnull=TRUE, nullcol="black"){
 		if(!is.numeric(bk))bk=0.2
 		bk=min(1,max(0.1,bk))
 		n.breaks=as.integer(n.breaks)
@@ -1222,7 +1222,7 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 		}
 	}
 	if(plotcea){
-		#ptcea(rescea,...)
+		ptcea(rescea,...)
 	}
 	return(rescea$decision.mt)
 }
