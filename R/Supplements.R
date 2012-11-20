@@ -1018,6 +1018,7 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 	rescea=list(corr.mt=corrMt, decision.mt=decisionMt, pvalue.adj=pvalAdj, null.dist=nulldist)
 	# function to plot decision matx
 	ptcea=function(rescea, ptype=4, bk=0.2, n.breaks=100, plotnull=TRUE, avnull=TRUE, nullcol="black"){
+	  ptype=4
 		if(!is.numeric(bk))bk=0.2
 		bk=min(1,max(0.1,bk))
 		n.breaks=as.integer(n.breaks)
