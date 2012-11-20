@@ -131,8 +131,6 @@ importFrom(XML, newXMLNode, saveXML)
 
 importFrom(RCurl, postForm)
 
-importFrom(JavaGD, JavaGD)
-
 import(igraph)
 
 

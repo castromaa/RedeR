@@ -388,7 +388,7 @@ RedeR plug-ins have two main sections: methods and add-ons. The 'methods' sectio
 
 \item Wrap methods in functions
 
-Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R. \footnote{Due to build/check errors, this package was not available at the occasion of Bioconductor release; therefore, it had to be removed from RedeR dependencies. It can be installed by command line, as indicate in \emph{Installation} section.}
+Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R. \footnote{This package might not work out of the box under Linux and, herefore, it is not installed by default. It can be installed by command line, as indicate in \emph{installation} section.}
 
 \begin{small}
 <<label= Set a simple method, eval= TRUE>>=

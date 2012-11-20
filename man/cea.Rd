@@ -24,8 +24,6 @@ cea(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, plotcea=TR
 \details{       
 Additional arguments: 
 \describe{
-  \item{ptype}{If plotcea=TRUE, ptype provides 5 pre-defined plotting options: 1, 2, 3, 4, 5 (Default=1) <integer>. } 
-  \item{bk}{If plotcea=TRUE, bk removes non-significant values from the density distribution (0 <= bk <=1 ) <numerics>. } 
   \item{n.breaks}{If plotcea=TRUE, n.breaks sets the number of histogram breaks <integer>. } 
   \item{plotnull}{Logical value, whether to plot the null distribution (Default=TRUE).}
   \item{avnull}{If plotnull=TRUE, avnull takes the average null distribution (Default=TRUE). }
@@ -55,7 +53,7 @@ exp <- ER.deg$exp
 idx <- sample(1:nrow(exp))[1:100] 
 exp <- exp[idx,]
 
-res <- cea(x=exp, nper=100, plot=FALSE, ptype=4) #ps set 'nper' for at least 1000
+res <- cea(x=exp, nper=100, plot=FALSE) #ps set 'nper' for at least 1000
 
 }
 
