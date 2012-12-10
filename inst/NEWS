@@ -1,17 +1,20 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
- 1.6.0  	2012-15-11
+
+ 1.4.0  	2012-12-10
 
   IMPROVED FEATURES
     o Interface simplification: several deprecated low-level functions were moved to the addGraph/getGraph related methods.
     o All graph attributes are now set via addGraph/getGraph methods.
-    o Plugins: JavaGD now can be imported by default.
     o Loading performance: better xml serialization, data packing and post formats.
 
   BUG FIXES
     o Re-established GUI -> R calls.
+    o Plugins: re-established JavaGD conection if required!
     o Some routines were simplified for better maintenance.
+
+ 1.3.0		-
 
  1.2.0		2012-03-25
 
@@ -28,7 +31,9 @@
     o Legend color is fixed for two-palette option.
     o The method 'addGraph' is fixed to load/convert directed graphs from igraph to RedeR.
 
- 1.00		2011-11-01	[1st public release in Bioconductor]
+ 1.1.0		-
+
+ 1.0.0		2011-11-01	[1st public release in Bioconductor]
 
   NEW FEATURES
     o Improved settings for nested objects (parent, gscale, and gcoord features).

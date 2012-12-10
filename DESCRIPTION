@@ -1,8 +1,8 @@
 Package: RedeR
 Type: Package
-Title: Bridging the gap between hierarchical network representation and functional analysis.
-Version: 1.5.7
-Date: 2012-11-21
+Title: Interactive visualization and manipulation of nested networks and hierarchical structures.
+Version: 1.5.8
+Date: 2012-12-10
 Author: Mauro Castro, Xin Wang, Florian Markowetz
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
 Depends: R (>= 2.15), methods, igraph, RCurl, XML
