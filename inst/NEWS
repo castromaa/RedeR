@@ -2,10 +2,19 @@
 --------------------------
 
 
- 1.4.0  	2012-12-10
-
+ 1.6.0  	2012-12-14
+ 
   IMPROVED FEATURES
     o Interface simplification: several deprecated low-level functions were moved to the addGraph/getGraph related methods.
+
+  BUG FIXES
+    o Re-established conection with igraph (from igraph0 to the new igraph version).
+
+ 1.5.0		-
+
+ 1.4.0  	2012-10-10
+
+  IMPROVED FEATURES
     o All graph attributes are now set via addGraph/getGraph methods.
     o Loading performance: better xml serialization, data packing and post formats.
 
