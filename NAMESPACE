@@ -123,7 +123,7 @@ export(
 
    )
 
-importFrom(methods, "@<-", new)
+importFrom(methods, new)
 
 importFrom(XMLRPC, xml.rpc)
 
