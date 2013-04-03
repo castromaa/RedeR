@@ -26,6 +26,6 @@ LazyLoad: \tab yes\cr
 Mauro Castro <mauro.a.castro@gmail.com>
 }
 \references{
-Castro, M. et al. \emph{RedeR: R/Bioconductor package for representing modular structures, nested networks and multiple levels of hierarchical associations}. Genome Biology 13(4):R29, 2012.
+Castro, MAA et al. \emph{RedeR: R/Bioconductor package for representing modular structures, nested networks and multiple levels of hierarchical associations}. Genome Biology 13(4):R29, 2012.
 }
 \keyword{ package }

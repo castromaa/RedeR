@@ -2,7 +2,7 @@
 --------------------------
 
 
- 1.6.0  	2012-12-14
+ 1.6.0  	2013-04-03
  
   IMPROVED FEATURES
     o Interface simplification: several deprecated low-level functions were moved to the addGraph/getGraph related methods.

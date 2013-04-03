@@ -388,7 +388,7 @@ RedeR plug-ins have two main sections: methods and add-ons. The 'methods' sectio
 
 \item Wrap methods in functions
 
-Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R. \footnote{This package might not work out of the box under Linux and, herefore, it is not installed by default. It can be installed by command line, as indicate in \emph{installation} section.}
+Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R. \footnote{This package might not work out of the box under Linux and, herefore, it is not installed by default (please, see \emph{installation} section).}
 
 \begin{small}
 <<label= Set a simple method, eval= TRUE>>=
@@ -457,7 +457,7 @@ install.packages('xxx.tar.gz', type='source')  ## i.e. the path to the downloade
 \end{scriptsize}
 
 \subsubsection*{The JAVA application}
-The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>= 5). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task, but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. If you find any difficulty, please contact us.
+The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version 5 or 6). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task, but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. If you find any difficulty, please contact us.
 
 
 \newpage

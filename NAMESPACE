@@ -123,15 +123,14 @@ export(
 
    )
 
-importFrom(methods, new)
+import(igraph)
 
 importFrom(XMLRPC, xml.rpc)
 
-importFrom(XML, newXMLNode, saveXML)
+importFrom(XML, newXMLNode, saveXML,xmlParse,xmlValue,xmlChildren)
 
-importFrom(RCurl, postForm)
+importFrom(RCurl, postForm, getCurlHandle)
 
-import(igraph)
 
 
 
