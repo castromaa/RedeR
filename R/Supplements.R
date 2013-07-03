@@ -127,7 +127,10 @@ rederexpresspost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()
 # set RedeR att. to vertices in igraph objects
 #TODO: patela 2 somente aceita vetor de cores de numero par!!!
 att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=grey(0.7), 
-	xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=2){
+                  xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, 
+                  roundleg=1,title=NULL){
+  #check loaded igraph
+  igraph.check()
 	# set att---------------------------------------------------------
 	coltype=c('nodeColor','nodeLineColor','nodeFontColor')
 	numtype=c('nodeSize','nodeLineWidth','nodeFontSize','nodeBend','coordX','coordY')
@@ -146,10 +149,10 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		print(cbind(shape=defaultshapes,id=1:5),quote=F)
 		return(invisible())
 	}
-    # check igraph object and main args---------------------------------
-    if(!igraph::is.igraph(g)){
-        stop("Not an igraph object!")
-    }	
+	# check igraph object and main args---------------------------------
+	if(!igraph::is.igraph(g)){
+	  stop("Not an igraph object!")
+	}
 	if(!is.character(from))stop("NOTE: arg. 'from' should be a string!")
 	from=from[1]
 	if(!is.character(to) && !is.numeric(to) && !is.integer(to) )stop("NOTE: arg. 'to' should be a string or an integer!")
@@ -157,7 +160,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 	# get ref. att---
 	fromatt=igraph::get.vertex.attribute(g, from)
 	if(is.null(fromatt) || length(fromatt)!=igraph::vcount(g)){
-		stop(paste("NOTE: graph attribute '",from,"' count is not consistent with node count!",sep=""))
+		stop(paste("NOTE: graph attribute '",from,"' is absent or not consistent with node count!",sep=""))
 	}
 	if(is.numeric(to) || is.integer(to)){
 		to=as.integer(to)
@@ -192,6 +195,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 	if(sum(is.null(xlim)>0))stop("NOTE: 'xlim' arg. does not support null values!")
 	if(!is.logical(isrev))stop("NOTE: 'isrev' arg. should be a logical value!")
 	if(!is.null(nquant) && !is.numeric(nquant))stop("NOTE: 'nquant' arg. should be an integer!");nquant=nquant[1]
+	if(is.null(title) || !is.character(title) )title<-from
 	#----------------------------------------	
 	# main functions to set attribute scales!
 	#----------------------------------------	
@@ -221,7 +225,9 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-unique(breaks);nquant=length(breaks)
+			if(length(breaks)<3)stop("NOTE: not enough intervals for 'nquant'!")
 		}
 		if(is.null(cols))cols=c("darkblue","blue","orange","cyan","red","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}	
@@ -255,7 +261,9 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		# check args
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-unique(breaks);nquant=length(breaks)
+			if(length(breaks)<3)stop("NOTE: not enough intervals for 'nquant'!")
 		}	
 		if(is.null(cols))cols=c("darkblue","white","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}
@@ -344,7 +352,9 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
-			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-unique(breaks);nquant=length(breaks)
+			if(length(breaks)<3)stop("NOTE: not enough intervals for 'nquant'!")
 		}	
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
@@ -428,7 +438,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 	# map attribute to default names!---------------------------------------
 	att=NULL
 	if(to%in%coltype){
-		if(is.null(breaks)){
+		if(is.null(breaks) && is.null(nquant)){
 			att=colorcategory(fromatt,cols,na.col,categvec,isrev)
 		} else {
 			if(pal==1){
@@ -471,6 +481,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		if(is.logical(getleg) && getleg){
 			to=gsub("\\b(\\w)","\\U\\1",to,perl=TRUE)
 			leg=paste("leg",to,sep="")
+			att$leg$title<-title
 			g=igraph::set.graph.attribute(graph=g, name=leg, value=att$leg)
 		}
 	} else {
@@ -483,7 +494,10 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 #------------------------------------------------------------------------------
 # set RedeR att. to edges in igraph objects
 att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=grey(0.7),
-	xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=2){
+                  xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, 
+                  isrev=FALSE, getleg=TRUE, roundleg=1,title=NULL){
+  #check loaded igraph
+  igraph.check()
 	# set att---------------------------------------------------------
 	coltype=c('edgeColor')
 	numtype=c('edgeWidth','edgeWeight','arrowDirection')
@@ -512,7 +526,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 	# get ref. att---
 	fromatt=igraph::get.edge.attribute(g, from)	
 	if(is.null(fromatt) || length(fromatt)!=igraph::ecount(g)){
-		stop(paste("NOTE: graph attribute '",from,"' count is not consistent with edge count!",sep=""))
+		stop(paste("NOTE: graph attribute '",from,"' is absent or not consistent with edge count!",sep=""))
 	}
 	if(is.numeric(to) || is.integer(to)){
 		to=as.integer(to)
@@ -547,6 +561,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 	if(sum(is.null(xlim)>0))stop("NOTE: 'xlim' arg. does not support null values!")
 	if(!is.logical(isrev))stop("NOTE: 'isrev' arg. should be a logical value!")
 	if(!is.null(nquant) && !is.numeric(nquant))stop("NOTE: 'nquant' arg. should be an integer!");nquant=nquant[1]
+	if(is.null(title) || !is.character(title) )title<-from
 	#----------------------------------------	
 	# main functions to set attribute scales!
 	#----------------------------------------	
@@ -577,6 +592,8 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
 			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-unique(breaks);nquant=length(breaks)
+			if(length(breaks)<3)stop("NOTE: not enough intervals for 'nquant'!")
 		}
 		if(is.null(cols))cols=c("darkblue","blue","orange","cyan","red","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}	
@@ -611,6 +628,8 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
 			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-unique(breaks);nquant=length(breaks)
+			if(length(breaks)<3)stop("NOTE: not enough intervals for 'nquant'!")
 		}	
 		if(is.null(cols))cols=c("darkblue","white","darkred")
 		if(is.null(na.col)){na.col=grey(0.7)} else {na.col=na.col[1]}
@@ -700,6 +719,8 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
 			breaks=quantile(x,probs=seq(0,1,length.out=nquant),na.rm=TRUE,names=FALSE)
+			breaks<-unique(breaks);nquant=length(breaks)
+			if(length(breaks)<3)stop("NOTE: not enough intervals for 'nquant'!")
 		}	
 		if(is.character(x))stop("NOTE: 'breaks' arg. can not be applyed to characters!")
 		if(sum(is.null(breaks))>0)stop("NOTE: breaks do not support null values!")
@@ -781,7 +802,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 	# map attribute to default names!---------------------------------------
 	att=NULL
 	if(to%in%coltype){
-		if(is.null(breaks)){
+		if(is.null(breaks) && is.null(nquant)){
 			att=colorcategory(fromatt,cols,na.col,categvec,isrev)
 		} else {
 			if(pal==1){
@@ -819,6 +840,7 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 		if(is.logical(getleg) && getleg){
 			to=gsub("\\b(\\w)","\\U\\1",to,perl=TRUE)
 			leg=paste("leg",to,sep="")
+			att$leg$title<-title
 			g=igraph::set.graph.attribute(graph=g, name=leg, value=att$leg)
 		}
 	} else {
@@ -830,6 +852,8 @@ att.sete=function(g=NULL, from='name', to='edgeColor', pal=1, cols=NULL, na.col=
 #------------------------------------------------------------------------------
 # map vertices att. to an igraph object
 att.mapv=function(g, dat, refcol=1){
+  #check loaded igraph
+  igraph.check()
 	if(!is.data.frame(dat)){
 		stop("not a data frame!")
 	}
@@ -885,6 +909,8 @@ att.mapv=function(g, dat, refcol=1){
 #------------------------------------------------------------------------------
 # map edge att. to an igraph object
 att.mape=function(g, dat, refcol=c(1,2)){
+  #check loaded igraph
+  igraph.check()
 	if(!is.data.frame(dat)){
 		stop("not a data frame!")
 	}
@@ -1226,4 +1252,131 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 		ptcea(rescea,...)
 	}
 	return(rescea$decision.mt)
+}
+##-----------------------------------------------------------------------------
+#Use default igraph atts if available------------------
+check.igraph.format<-function(g){
+  if(!is.null(V(g)$color) && is.null(V(g)$nodeColor) )V(g)$nodeColor=V(g)$color
+  if(!is.null(V(g)$frame.color) && is.null(V(g)$nodeLineColor) )V(g)$nodeLineColor=V(g)$frame.color
+  if(!is.null(V(g)$size) && is.null(V(g)$nodeSize) )V(g)$nodeSize=V(g)$size*2.5
+  if(!is.null(V(g)$label) && is.null(V(g)$nodeAlias) )V(g)$nodeAlias=V(g)$label
+  if(!is.null(V(g)$label.cex) && is.null(V(g)$nodeFontSize) )V(g)$nodeFontSize=V(g)$label.cex*16
+  if(!is.null(V(g)$label.color) && is.null(V(g)$nodeFontColor) )V(g)$nodeFontColor=V(g)$label.color
+  if(!is.null(V(g)$shape) && is.null( ) ){
+    shapes<-V(g)$shape
+    shapes[shapes=="circle"]="ELLIPSE"
+    shapes[shapes!="circle"]="RECTANGLE"
+    V(g)$nodeShape<-shapes
+  }    			
+  if(!is.null(E(g)$width) && is.null(E(g)$edgeWidth) )E(g)$edgeWidth<-E(g)$width
+  if(!is.null(E(g)$color) && is.null(E(g)$edgeColor) )E(g)$edgeColor<-E(g)$color
+  if(!is.null(E(g)$weight) && is.null(E(g)$edgeWeight) )E(g)$edgeWeight<-E(g)$weight
+  if(!is.null(E(g)$lty) && is.null(E(g)$edgeType) ){
+    edgeType<-E(g)$lty
+    tp<-c("blank","blank","solid","dashed","dotdash","longdash","twodash")
+    if(is.numeric(edgeType))tp=c(0:6)
+    edgeType[edgeType==0]="SOLID"
+    edgeType[edgeType==1]="SOLID"
+    edgeType[edgeType==2]="DOTTED"	
+    edgeType[edgeType==3]="DOTTED_SHORT"
+    edgeType[edgeType==4]="DOTTED"
+    edgeType[edgeType==5]="LONG_DASH"	
+    edgeType[edgeType==6]="DOTTED"
+    E(g)$edgeType=edgeType
+  }
+  if(is.null(V(g)$nodeLineColor) && !is.null(V(g)$color) ) V(g)$nodeLineColor="black"
+  return(g)
+}
+##-----------------------------------------------------------------------------
+check.igraph.direction<-function(g){
+  #Check direction and type
+  #---set mode if available---#
+  arrowType = E(g)$arrowType
+  if(!is.null(arrowType) && length(arrowType)>0){
+    c1=!is.integer(arrowType)
+    c2=!is.numeric(arrowType)
+    c3=(sum(arrowType< -1)>0 || sum(arrowType>1)>0)
+    if(c1 && c2){
+      stop("NOTE: 'arrow type' must be provided as integers!")
+    } else if(sum(is.na(arrowType))>0){
+      stop("NOTE: invalid 'arrow type' declaration: 'NA' found'!")
+    } else if(c3){
+      stop("NOTE: invalid 'arrow type' input (options: -1, 0 or 1)")
+    }
+    g<-arrowtype4reder(g)
+    #---
+    #E(g)$arrowLength<-5
+    #E(g)$arrowAngle<-15
+    #idx<-E(g)$arrowType<0
+    #E(g)$arrowLength[idx]<-3   
+    #E(g)$arrowAngle[idx]<-90
+    E(g)$arrowDirection<-E(g)$arrowType
+  } else {
+    # set direction to edge attributes
+    idxmutual<-igraph::is.mutual(g)
+    E(g)$arrowDirection=1
+    E(g)$arrowDirection[idxmutual]=3
+    #g=igraph::as.undirected(g, mode="collapse") //essa funcao nao retorno ordem correta!!! controlado agora em J!
+    c1=length(igraph::list.edge.attributes(g))>0
+    c2=sum(idxmutual)>0
+    if(c1 && c2){
+      warning("NOTE: attributes from mutual edges were collapsed to unique edges (see 'addGraph' doc).")
+      #isso sera feito no lado Java, ultimo link define valor final!!!
+    }
+    #Remove multiple edges and loops (obs. for directed graphs order does matter)
+    if(!igraph::is.simple(g)){
+      g=igraph::simplify(g, remove.multiple = TRUE, remove.loops = TRUE)
+      warning("NOTE: loops and/or multiple edges were removed from your graph (see 'addGraph' doc)!")
+    }
+  }
+  return(g)
+}
+##-----------------------------------------------------------------------------
+##format arrowType
+arrowtype4reder<-function(g){
+  #---get edges and mode
+  edgeMtx<-igraph::get.adjacency(g, sparse=FALSE,attr=NULL, names=FALSE)
+  modeMtx<-igraph::get.adjacency(g, sparse=FALSE,attr="arrowType", names=FALSE)
+  ix<-igraph::get.edgelist(g,names=FALSE)
+  #---differentiate upper.tri/lower.tri
+  modeMtx[upper.tri(modeMtx)]<-modeMtx[upper.tri(modeMtx)]*10
+  edgeMtx[modeMtx!=0]<-modeMtx[modeMtx!=0]*10
+  #---set arrowType for reder
+  arrowType<-NULL
+  sapply(1:nrow(ix),function(i){
+    tp<-edgeMtx[ix[i,1],ix[i,2]]+edgeMtx[ix[i,2],ix[i,1]]
+    arrowType<<-c(arrowType,tp)
+  })
+  arrowType[arrowType==1 | arrowType==2]<-0
+  #---map mutual edges and remove duplicated
+  idx<-is.mutual(g) & ix[,1]>ix[,2]
+  arrowType<-arrowType[!idx]
+  g<-delete.edges(g,edges=which(idx))
+  #---set mode---#
+  # arrow key, related to 'A->B' orientation
+  #  0 = undirected:  0 (A-B or B-A)
+  # +1 = simple: +10 (A->B)
+  # -1 = simple: -10 (A-/B)  
+  # +2 = simple: +100 (B->A)
+  # -2 = simple: -100 (B-/A)
+  # +3 = double: +110 (same mode, A->B and B->A)
+  # -3 = double: -110 (same mode, A-\B and B-\A)
+  # +4 = double: +90 (inverse mode, A->B and B-\A)
+  # -4 = double: -90 (inverse mode, A-\B and B->A)
+  key<-c(0,10,-10,100,-100,110,-110,90,-90)
+  lab<-c(0,1,-1,1,-1,3,-3,4,-4)
+  arrowType<-sapply(1:length(arrowType),function(i){
+    tp<-arrowType[i]
+    lab[which(key==tp)]
+  })
+  E(g)$arrowType<-arrowType
+  return(g)
+}
+# chech igraph compatibility
+igraph.check<-function(){
+  b1<-"package:igraph0" %in% search()
+  b2<- "igraph0" %in%  loadedNamespaces()
+  if( b1 || b2) {
+    stop("\n\n ...conflict with 'igraph0': please use the new 'igraph' package!")
+  }
 }

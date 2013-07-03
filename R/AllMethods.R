@@ -170,6 +170,9 @@ setMethod ('getGraph', 'RedPort',
            function (obj, status="all", type="node", attribs="plain") {
              if(ping(obj)==0)return(igraph::graph.empty(n=0, directed=FALSE))
              
+             #check loaded igraph
+             igraph.check()
+             
              #Get graph objects from RedeR app
              nodes = getNodes(obj, status, type)
              edges = getEdges(obj, status, type) 
@@ -249,6 +252,10 @@ setMethod ('getGraph', 'RedPort',
 setMethod ('addSubgraph.list', 'RedPort', 
            function (obj, g, nodeList, gridRows=2, gridScale=80, gscale=20, gatt=NULL, update=NULL, theme='tm0') {
              if(ping(obj)==0)return(invisible())
+             
+             #check loaded igraph
+             igraph.check()
+             
              #Check igraph object-----------------------------------------------
              if(!igraph::is.igraph(g)){
                stop("Not an igraph object!")
@@ -411,6 +418,9 @@ setMethod ('addSubgraph', 'RedPort',
                if(ping(obj)==0)return(invisible())
              }
              
+             #check loaded igraph
+             igraph.check()
+             
              #Check igraph object-----------------------------------------------
              if(!igraph::is.igraph(g)){
                stop("Not an igraph object!")
@@ -548,6 +558,9 @@ setMethod ('duplicateGraph', 'RedPort',
            function (obj, isToCopyEdges=TRUE, isDefaultCopy=TRUE, nodes=NULL) {
              if(ping(obj)==0)return(invisible())
              
+             #check loaded igraph
+             igraph.check()
+             
              if(!is.null(nodes)){
                arg1="yes"
                arg2="yes" 
@@ -578,6 +591,9 @@ setMethod ('duplicateGraph', 'RedPort',
 setMethod ('addSeries', 'RedPort', 
            function (obj, g, setnodes=TRUE, setedges=TRUE) {
              if(ping(obj)==0)return(invisible())
+             
+             #check loaded igraph 
+             igraph.check()
              
              #Check igraph object-----------------------------------------------
              if(!igraph::is.igraph(g)){
@@ -636,68 +652,21 @@ setMethod ('addGraph', 'RedPort',
                      zoom=NULL, isNest=FALSE, nestImage='plain', isAnchor=TRUE, isAssign=FALSE, 
                      loadEdges=TRUE, parent=NULL, minimal=FALSE, theme='tm0', igraphatt=TRUE, 
                      ntransform=FALSE, .callchecks=TRUE) {
+             #Callcheck
+             if(.callchecks)if(ping(obj)==0)return(invisible())
              
-             if(.callchecks){
-               if(ping(obj)==0)return(invisible())
-             }
+             #check loaded igraph
+             igraph.check()
              
              #Check igraph object-----------------------------------------------
-             if(!igraph::is.igraph(g)){
-               stop("Not an igraph object!")
-             }
+             if(!igraph::is.igraph(g))stop("Not an igraph object!")
              
-             #Use default (compatible) igraph atts if available------------------
-             if(igraphatt==TRUE){
-               if(!is.null(V(g)$color) && is.null(V(g)$nodeColor) )V(g)$nodeColor=V(g)$color
-               if(!is.null(V(g)$frame.color) && is.null(V(g)$nodeLineColor) )V(g)$nodeLineColor=V(g)$frame.color
-               if(!is.null(V(g)$size) && is.null(V(g)$nodeSize) )V(g)$nodeSize=V(g)$size*2.5
-               if(!is.null(V(g)$label) && is.null(V(g)$nodeAlias) )V(g)$nodeAlias=V(g)$label
-               if(!is.null(V(g)$label.cex) && is.null(V(g)$nodeFontSize) )V(g)$nodeFontSize=V(g)$label.cex*16
-               if(!is.null(V(g)$label.color) && is.null(V(g)$nodeFontColor) )V(g)$nodeFontColor=V(g)$label.color
-               if(!is.null(V(g)$shape) && is.null( ) ){
-                 shapes<-V(g)$shape
-                 shapes[shapes=="circle"]="ELLIPSE"
-                 shapes[shapes!="circle"]="RECTANGLE"
-                 V(g)$nodeShape<-shapes
-               }					
-               if(!is.null(E(g)$width) && is.null(E(g)$edgeWidth) )E(g)$edgeWidth<-E(g)$width
-               if(!is.null(E(g)$color) && is.null(E(g)$edgeColor) )E(g)$edgeColor<-E(g)$color
-               if(!is.null(E(g)$weight) && is.null(E(g)$edgeWeight) )E(g)$edgeWeight<-E(g)$weight
-               if(!is.null(E(g)$lty) && is.null(E(g)$edgeType) ){
-                 edgeType<-E(g)$lty
-                 tp<-c("blank","blank","solid","dashed","dotdash","longdash","twodash")
-                 if(is.numeric(edgeType))tp=c(0:6)
-                 edgeType[edgeType==0]="SOLID"
-                 edgeType[edgeType==1]="SOLID"
-                 edgeType[edgeType==2]="DOTTED"	
-                 edgeType[edgeType==3]="DOTTED_SHORT"
-                 edgeType[edgeType==4]="DOTTED"
-                 edgeType[edgeType==5]="LONG_DASH"	
-                 edgeType[edgeType==6]="DOTTED"
-                 E(g)$edgeType=edgeType
-               }
-               if(is.null(V(g)$nodeLineColor) && !is.null(V(g)$color) ) V(g)$nodeLineColor="black"
-             }
+             #Check igraph direction
+             if(igraph::is.directed(g))g<-check.igraph.direction(g)
              
-             #Remove multiple edges and loops---
-             if(!igraph::is.simple(g)){
-               g=igraph::simplify(g, remove.multiple = TRUE, remove.loops = TRUE)
-               warning("NOTE: loops and/or multiple edges were removed from your graph (see 'addGraph' doc)!")
-             }
-             #Check direction
-             if(igraph::is.directed(g)){
-               # set direction to edge attributes
-               idxmutual<-is.mutual(g)
-               E(g)$arrowDirection=1
-               E(g)$arrowDirection[idxmutual]=3
-               # collapse mutual edges to unique edges and check edge attributes
-               #g=igraph::as.undirected(g, mode="collapse") //essa funcao nao retorno ordem correta!!! controlado agora em J!
-               c1=length(igraph::list.edge.attributes(g))>0
-               c2=sum(idxmutual)>0
-               if(c1 && c2){
-                 warning("NOTE: attributes from mutual edges were collapsed to unique edges (see 'addGraph' doc).")
-               }
-             }
+             #Check igraph format
+             if(igraphatt==TRUE)g<-check.igraph.format(g)
+
              #Check igraph size-------------------------------------------------
              #...if empty graph!
              if(igraph::vcount(g)==0){
@@ -1172,10 +1141,10 @@ setMethod ('addGraph', 'RedPort',
              
              #set compatibility with igraph!          
              if(is.null(edgeWeight) && !is.null(igraphWeight)) edgeWeight=igraphWeight 
-             #to correct vector in case of only one attr/one edge.
+             #correct vectors case only one attr/edge is provided (use dummy values).
              if(nrow(edges)==1){
                edges=rbind(edges,edges)
-               if(!is.null(arrowDirection)) arrowDirection=c(arrowDirection,-1)
+               if(!is.null(arrowDirection)) arrowDirection=c(arrowDirection,-10)
                if(!is.null(arrowLength))arrowLength=c(arrowLength,-1)
                if(!is.null(arrowAngle))arrowAngle=c(arrowAngle,-1)
                if(!is.null(linkType))linkType=c(linkType,'')
@@ -1190,25 +1159,25 @@ setMethod ('addGraph', 'RedPort',
              if(!is.null(arrowDirection) && length(arrowDirection)>0){       
                c1=!is.integer(arrowDirection)
                c2=!is.numeric(arrowDirection)
-               c3=(sum(arrowDirection<0)>0 || sum(arrowDirection>3)>0)
+               c3=(sum(arrowDirection< -4)>0 || sum(arrowDirection>4)>0)
                c4=length(arrowDirection)==2 && sum(arrowDirection<0)==1
                if(c1 && c2){
                  warning("NOTE: edge 'direction' must be provided as integers!")
-                 arrowDirection=as.numeric(c(-1,-1))
+                 arrowDirection=as.numeric(c(-10,-10))
                }
                else if(sum(is.na(arrowDirection))>0){
                  warning("NOTE: invalid edge 'direction' declaration: 'NA' found'!")
-                 arrowDirection=as.numeric(c(-1,-1))
+                 arrowDirection=as.numeric(c(-10,-10))
                }
                else if(c3 && !c4){
-                 warning("NOTE: invalid 'direction' input (options: 0,1,2 or 3)")
-                 arrowDirection=as.numeric(c(-1,-1))
+                 warning("NOTE: invalid 'direction' input (options: (+-) 0, 1, 2, 3 or 4)")
+                 arrowDirection=as.numeric(c(-10,-10))
                } else { 
-                 arrowDirection=as.numeric(arrowDirection)            
-                 message("** ... edge 'arrow direction'")
+                 arrowDirection=as.numeric(as.integer(arrowDirection))           
+                 message("** ... edge 'arrow type/direction'")
                }
              } else {
-               arrowDirection=as.numeric(c(-1,-1))
+               arrowDirection=as.numeric(c(-10,-10))
              }
              #arrowLength
              if(!is.null(arrowLength) && length(arrowLength)>0){       
@@ -1477,6 +1446,9 @@ setMethod ('nestNodes', 'RedPort',
              if(.callchecks){
                if(ping(obj)==0)return(invisible())
              }
+             
+             #check loaded igraph
+             igraph.check()
              
              #Further checks---------------------------------------------------- 
              if(!is.list(gatt)){
@@ -2104,6 +2076,9 @@ setMethod ('nesthc', 'RedPort',
              
              if(ping(obj)==0)return(invisible())
              
+             #check loaded igraph
+             igraph.check()
+             
              #check hclust object-----------------------------------------------
              hctype="hclust"
              if(class(hc)=="pvclust"){
@@ -2459,6 +2434,9 @@ setMethod ('addLegend.color', 'RedPort',
              
              if(ping(obj)==0)return(invisible())
              
+             #check loaded igraph
+             igraph.check()
+             
              # checks--------------------------------------------------------- 
              
              if(!is.character(type))type="nodecolor"
@@ -2468,19 +2446,26 @@ setMethod ('addLegend.color', 'RedPort',
              if(igraph::is.igraph(colvec)){
                if(type=="nodecolor"){
                  if(!is.null(G(colvec,"legNodeColor")$scale)){
-                   if(!is.null(G(colvec,"legNodeColor")$legend) && is.null(labvec))labvec=G(colvec,"legNodeColor")$legend
+                   if(!is.null(G(colvec,"legNodeColor")$legend) && is.null(labvec)){
+                     labvec=G(colvec,"legNodeColor")$legend
+                     if(is.null(title))title=G(colvec,"legNodeColor")$title
+                   }
                    colvec=G(colvec,"legNodeColor")$scale
                  } else {
                    stop("NOTE: there is no valid 'legNodeColor' legend information for this igraph object!!")
                  }
                } else {
                  if(!is.null(G(colvec,"legEdgeColor")$scale)){
-                   if(!is.null(G(colvec,"legEdgeColor")$legend) && is.null(labvec))labvec=G(colvec,"legEdgeColor")$legend
+                   if(!is.null(G(colvec,"legEdgeColor")$legend) && is.null(labvec)){
+                     labvec=G(colvec,"legEdgeColor")$legend
+                     if(is.null(title))title=G(colvec,"legEdgeColor")$title
+                   }
                    colvec=G(colvec,"legEdgeColor")$scale
                  } else {
                    stop("NOTE: there is no valid 'legEdgeColor' legend information for this igraph object!!")
                  }			
                }
+               
              }
              
              # color vec
@@ -2544,19 +2529,25 @@ setMethod ('addLegend.color', 'RedPort',
                if(is.null(dxborder))dxborder=5
                if(is.null(dyborder))dyborder=5
                if(is.null(vertical))vertical=FALSE
-               if(is.null(ftsize))ftsize=8
+               if(is.null(ftsize))ftsize=10
                if(is.null(title))title="nodecolorscale"
-               if(is.null(dxtitle))dxtitle=35
+               if(is.null(dxtitle)){
+                 mc<-max(nchar(labvec))
+                 dxtitle=ftsize+ftsize*mc*0.6
+               }
                if(is.null(size))size=20
                if(is.null(bend))bend=0.85	
              } else {
                if(is.null(position))position="topRight"
                if(is.null(dxborder))dxborder=5
-               if(is.null(dyborder))dyborder=100
+               if(is.null(dyborder))dyborder=120
                if(is.null(vertical))vertical=FALSE
-               if(is.null(ftsize))ftsize=8
+               if(is.null(ftsize))ftsize=10
                if(is.null(title))title="edgecolorscale"
-               if(is.null(dxtitle))dxtitle=35
+               if(is.null(dxtitle)){
+                 mc<-max(nchar(labvec))
+                 dxtitle=ftsize+ftsize*mc*0.6
+               }
                if(is.null(size))size=20
                if(is.null(bend))bend=0.85
              }
@@ -2579,6 +2570,9 @@ setMethod ('addLegend.size', 'RedPort',
              
              if(ping(obj)==0)return(invisible())
              
+             #check loaded igraph
+             igraph.check()
+             
              # checks---------------------------------------------------- 
              if(!is.character(type))type="nodesize"
              type=switch(type, node="nodesize", edge="edgewidth", "nodesize")
@@ -2587,14 +2581,20 @@ setMethod ('addLegend.size', 'RedPort',
              if(igraph::is.igraph(sizevec)){
                if(type=="nodesize"){
                  if(!is.null(G(sizevec,"legNodeSize")$scale)){
-                   if(!is.null(G(sizevec,"legNodeSize")$legend) && is.null(labvec))labvec=G(sizevec,"legNodeSize")$legend
+                   if(!is.null(G(sizevec,"legNodeSize")$legend) && is.null(labvec)){
+                     labvec=G(sizevec,"legNodeSize")$legend
+                     if(is.null(title))title=G(sizevec,"legNodeSize")$title
+                   }
                    sizevec=G(sizevec,"legNodeSize")$scale
                  } else {
                    stop("NOTE: there is no valid 'legNodeSize' legend information for this igraph object!!")
                  }
                } else {
                  if(!is.null(G(sizevec,"legEdgeWidth")$scale)){
-                   if(!is.null(G(sizevec,"legEdgeWidth")$legend) && is.null(labvec))labvec=G(sizevec,"legEdgeWidth")$legend
+                   if(!is.null(G(sizevec,"legEdgeWidth")$legend) && is.null(labvec)){
+                     labvec=G(sizevec,"legEdgeWidth")$legend
+                     if(is.null(title))title=G(sizevec,"legEdgeWidth")$title
+                   }
                    sizevec=G(sizevec,"legEdgeWidth")$scale
                  } else {
                    stop("NOTE: there is no valid 'legEdgeWidth' legend information for this igraph object!!")
@@ -2661,20 +2661,26 @@ setMethod ('addLegend.size', 'RedPort',
                if(is.null(dxborder))dxborder=10
                if(is.null(dyborder))dyborder=10
                if(is.null(vertical))vertical=FALSE
-               if(is.null(ftsize))ftsize=8
+               if(is.null(ftsize))ftsize=10
                if(is.null(title))title="nodesize"
-               if(is.null(dxtitle))dxtitle=40
+               if(is.null(dxtitle)){
+                 mc<-max(nchar(labvec))
+                 dxtitle=ftsize+ftsize*mc*0.6
+               }
                if(is.null(col))col="#000000"
-               if(is.null(intersp))intersp=10	
+               if(is.null(intersp))intersp=3	
                if(is.null(edgelen))edgelen=0 #not used for nodes!
              } else {
                if(is.null(position))position="bottomLeft"
                if(is.null(dxborder))dxborder=10
                if(is.null(dyborder))dyborder=120
                if(is.null(vertical))vertical=TRUE
-               if(is.null(ftsize))ftsize=8
+               if(is.null(ftsize))ftsize=10
                if(is.null(title))title="edgewidth"
-               if(is.null(dxtitle))dxtitle=40
+               if(is.null(dxtitle)){
+                 mc<-max(nchar(labvec))
+                 dxtitle=ftsize+ftsize*mc*0.6
+               }
                if(is.null(col))col="#000000"
                if(is.null(intersp))intersp=10
                if(is.null(edgelen))edgelen=50
@@ -2698,6 +2704,9 @@ setMethod ('addLegend.shape', 'RedPort',
              
              if(ping(obj)==0)return(invisible())
              
+             #check loaded igraph
+             igraph.check()
+             
              # checks---------------------------------------------------- 
              
              if(!is.character(type))type="nodeshape"
@@ -2707,14 +2716,20 @@ setMethod ('addLegend.shape', 'RedPort',
              if(igraph::is.igraph(shapevec)){
                if(type=="nodeshape"){
                  if(!is.null(G(shapevec,"legNodeShape")$shape)){
-                   if(!is.null(G(shapevec,"legNodeShape")$legend) && is.null(labvec))labvec=G(shapevec,"legNodeShape")$legend
+                   if(!is.null(G(shapevec,"legNodeShape")$legend) && is.null(labvec)){
+                     labvec=G(shapevec,"legNodeShape")$legend
+                     if(is.null(title))title=G(shapevec,"legNodeShape")$title
+                   }
                    shapevec=G(shapevec,"legNodeShape")$shape
                  } else {
                    stop("NOTE: there is no valid 'legNodeShape' legend information for this igraph object!!")
                  }
                } else {
                  if(!is.null(G(shapevec,"legEdgeType")$shape)){
-                   if(!is.null(G(shapevec,"legEdgeType")$legend) && is.null(labvec))labvec=G(shapevec,"legEdgeType")$legend
+                   if(!is.null(G(shapevec,"legEdgeType")$legend) && is.null(labvec)){
+                     labvec=G(shapevec,"legEdgeType")$legend
+                     if(is.null(title))title=G(shapevec,"legEdgeType")$title
+                   }
                    shapevec=G(shapevec,"legEdgeType")$shape
                  } else {
                    stop("NOTE: there is no valid 'legEdgeType' legend information for this igraph object!!")
@@ -2786,22 +2801,28 @@ setMethod ('addLegend.shape', 'RedPort',
              if(type=="nodeshape"){
                if(is.null(position))position="topRight"
                if(is.null(dxborder))dxborder=5
-               if(is.null(dyborder))dyborder=200
+               if(is.null(dyborder))dyborder=260
                if(is.null(vertical))vertical=TRUE
-               if(is.null(ftsize))ftsize=8
-               if(is.null(title))title="nodeshape"
-               if(is.null(dxtitle))dxtitle=40
+               if(is.null(ftsize))ftsize=10
+               if(is.null(title))title=""
+               if(is.null(dxtitle)){
+                 mc<-max(nchar(labvec))
+                 dxtitle=ftsize+ftsize*mc*0.6
+               }
                if(is.null(col))col="#000000"
                if(is.null(size))size=15
                if(is.null(intersp))intersp=5	
              } else {
                if(is.null(position))position="topRight"
                if(is.null(dxborder))dxborder=100
-               if(is.null(dyborder))dyborder=200
+               if(is.null(dyborder))dyborder=260
                if(is.null(vertical))vertical=TRUE
-               if(is.null(ftsize))ftsize=8
-               if(is.null(title))title="edgeshape"
-               if(is.null(dxtitle))dxtitle=40
+               if(is.null(ftsize))ftsize=10
+               if(is.null(title))title=""
+               if(is.null(dxtitle)){
+                 mc<-max(nchar(labvec))
+                 dxtitle=ftsize+ftsize*mc*0.6
+               }
                if(is.null(col))col="#000000"
                if(is.null(size))size=1.2
                if(is.null(intersp))intersp=10

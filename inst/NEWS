@@ -1,6 +1,11 @@
  NEWS/ChangeLog for RedeR
 --------------------------
 
+ 1.9.1  	2013-07-03
+
+  IMPROVED FEATURES
+    o Better compatibility with directed graph structure from igraph objects.
+    o Additional arrow options to deal with directed graph associations.
 
  1.6.0  	2013-04-03
  

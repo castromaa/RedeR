@@ -11,8 +11,8 @@ These functions map data frames containing edge/vertex attributes to an igraph o
 }
 
 \usage{
-att.setv(g, from, to='nodeColor', pal=1, cols=NULL, na.col=grey(0.7), xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=2)
-att.sete(g, from, to='edgeColor', pal=1, cols=NULL, na.col=grey(0.7), xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=2)
+att.setv(g, from, to='nodeColor', pal=1, cols=NULL, na.col=grey(0.7), xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=1, title=NULL)
+att.sete(g, from, to='edgeColor', pal=1, cols=NULL, na.col=grey(0.7), xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, roundleg=1, title=NULL)
 att.mapv(g, dat, refcol=1)
 att.mape(g, dat, refcol=c(1,2))
 }
@@ -34,6 +34,7 @@ att.mape(g, dat, refcol=c(1,2))
   \item{dat}{A data frame with the attributes to be mapped to 'g'. } 
   \item{refcol}{The reference columns in the 'data' object with either node ids (one column <integer>) or edge ids (two columns <vector of two integers>). } 
   \item{roundleg}{Integer indicating the number of decimal places (round) in the legend of numerical attributes}.
+  \item{title}{Optional: legend title}.  
 }
 
 

@@ -1,4 +1,4 @@
-.onLoad<-function(libname, pkgname){
+.onAttach<-function(libname, pkgname){
   version <- utils::packageVersion("RedeR")
   msg <- paste("***This is RedeR ",version,"! For a quick start, please type 'vignette('RedeR')'.
    Supporting information is available at Genome Biology 13:R29, 2012,

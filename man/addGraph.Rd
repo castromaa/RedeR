@@ -88,7 +88,12 @@ Submits R graphs to RedeR app.
 
 \subsection{Edge attributes}{
   \describe{
-    \item{arrowDirection}{ Edge attribute 'arrow direction', Options: 0 (A-B), 1 (A->B), 2 (A<-B) or 3 (A<->B) (Default=0) <integer>. } 
+    \item{arrowDirection}{
+    Edge attribute 'arrow direction', used to set mixed associations in undirected graphs.
+    Options: 0 (A-B), 1 (A-> B), -1 (A-| B), 2 (A <-B), -2 (A |-B), 3 (A <-> B), -3 (A |-| B), 
+    4 (A |-> B) and  -4 (A <-| B) (Default=0) <integer>.}
+    \item{arrowType}{ Edge attribute 'arrow type', used to set the association mode in directed graphs. 
+    Options: -1, 0 and 1 (Default=1) <integer>. }
     \item{edgeWeight}{ Edge attribute 'weight', options: >= 0 (Default=0.0) <numeric>. } 
     \item{edgeWidth}{ Edge attribute 'width', options: >=0 (Default=1.0) <numeric>. } 	
     \item{edgeColor}{ Edge attribute 'color', e.g. "#ff0000" for red <hexadecimal>. } 
@@ -160,7 +165,8 @@ resetd(rdp)
 
 ###...to check loading of an interactome!
 
-data(hs.inter)system.time( addGraph(rdp, hs.inter, layout=NULL) )
+data(hs.inter)
+system.time( addGraph(rdp, hs.inter, layout=NULL) )
 
 
 }
