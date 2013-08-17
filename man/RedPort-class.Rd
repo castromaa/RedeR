@@ -21,68 +21,15 @@
         \describe{
             \item{\link[RedeR:getNodes]{getNodes}}{}
             \item{\link[RedeR:getNodeIDs]{getNodeIDs}}{}
-            \item{\link[RedeR:getNodeAliases]{getNodeAliases}}{}
-            \item{\link[RedeR:getNodeX]{getNodeX}}{}
-            \item{\link[RedeR:getNodeY]{getNodeY}}{}
-            \item{\link[RedeR:getNodeW]{getNodeW}}{}
-            \item{\link[RedeR:getNodeH]{getNodeH}}{}
-            \item{\link[RedeR:getNodeBend]{getNodeBend}}{}
-            \item{\link[RedeR:getNodeSize]{getNodeSize}}{}
-            \item{\link[RedeR:getNodeShape]{getNodeShape}}{}
-            \item{\link[RedeR:getNodeColor]{getNodeColor}}{}
-            \item{\link[RedeR:getNodeLineWidth]{getNodeLineWidth}}{}
-            \item{\link[RedeR:getNodeLineColor]{getNodeLineColor}}{}
-            \item{\link[RedeR:getNodeFontName]{getNodeFontName}}{}
-            \item{\link[RedeR:getNodeFontStyle]{getNodeFontStyle}}{}
-            \item{\link[RedeR:getNodeFontSize]{getNodeFontSize}}{}
-            \item{\link[RedeR:getNodeFontColor]{getNodeFontColor}}{}
-            \item{\link[RedeR:getNodeFontX]{getNodeFontX}}{}
-            \item{\link[RedeR:getNodeFontY]{getNodeFontY}}{}
-            \item{\link[RedeR:getNodeWeight]{getNodeWeight}}{}
-        }      
-    }
-    
-    \subsection{Set node attributes from a RedeR session}{
-        \describe{
-          \item{\link[RedeR:setNodeXY]{setNodeXY}}{}
-          \item{\link[RedeR:setNodeBend]{setNodeBend}}{}
-          \item{\link[RedeR:setNodeSize]{setNodeSize}}{}
-          \item{\link[RedeR:setNodeShape]{setNodeShape}}{}
-          \item{\link[RedeR:setNodeColor]{setNodeColor}}{}
-          \item{\link[RedeR:setNodeLineWidth]{setNodeLineWidth}}{}
-          \item{\link[RedeR:setNodeLineColor]{setNodeLineColor}}{}
-          \item{\link[RedeR:setNodeFontName]{setNodeFontName}}{}
-          \item{\link[RedeR:setNodeFontStyle]{setNodeFontStyle}}{}
-          \item{\link[RedeR:setNodeFontSize]{setNodeFontSize}}{}
-          \item{\link[RedeR:setNodeFontColor]{setNodeFontColor}}{}
-          \item{\link[RedeR:setNodeFontXY]{setNodeFontXY}}{}
-          \item{\link[RedeR:setNodeWeight]{setNodeWeight}}{}
         }      
     }
     
   \subsection{Get edge attributes from a RedeR session}{  
     \describe{
       \item{\link[RedeR:getEdges]{getEdges}}{}
-      \item{\link[RedeR:getSourceEdges]{getSourceEdges}}{}
-      \item{\link[RedeR:getTargetEdges]{getTargetEdges}}{}
       \item{\link[RedeR:getEdgeIDs]{getEdgeIDs}}{}
       \item{\link[RedeR:getSourceEdgeIDs]{getSourceEdgeIDs}}{}
       \item{\link[RedeR:getTargetEdgeIDs]{getTargetEdgeIDs}}{}
-      \item{\link[RedeR:getArrowDirection]{getArrowDirection}}{}
-      \item{\link[RedeR:getEdgeWidth]{getEdgeWidth}}{}
-      \item{\link[RedeR:getEdgeColor]{getEdgeColor}}{}
-      \item{\link[RedeR:getEdgeType]{getEdgeType}}{}
-      \item{\link[RedeR:getEdgeWeight]{getEdgeWeight}}{}
-    }
-  } 
-  
-  \subsection{Set edge attributes from a RedeR session}{  
-    \describe{
-      \item{\link[RedeR:setArrowDirection]{setArrowDirection}}{}
-      \item{\link[RedeR:setEdgeWidth]{setEdgeWidth}}{}
-      \item{\link[RedeR:setEdgeColor]{setEdgeColor}}{}
-      \item{\link[RedeR:setEdgeType]{setEdgeType}}{}
-      \item{\link[RedeR:setEdgeWeight]{setEdgeWeight}}{}
     }
   }
   
@@ -100,6 +47,7 @@
         \item{\link[RedeR:addEdges]{addEdges}}{}
         \item{\link[RedeR:addEdgeBetweenContainers]{addEdgeBetweenContainers}}{}
         \item{\link[RedeR:deleteEdges]{deleteEdges}}{}
+        \item{\link[RedeR:setArrowDirection]{setArrowDirection}}{}
     }
   }
 
@@ -107,9 +55,9 @@
     \describe{
         \item{\link[RedeR:addGraph]{addGraph}}{}
         \item{\link[RedeR:getGraph]{getGraph}}{} 
-	\item{\link[RedeR:addSubgraph]{addSubgraph}}{}
-	\item{\link[RedeR:addSeries]{addSeries}}{}
-	\item{\link[RedeR:duplicateGraph]{duplicateGraph}}{}
+	      \item{\link[RedeR:addSubgraph]{addSubgraph}}{}
+	      \item{\link[RedeR:addSeries]{addSeries}}{}
+	      \item{\link[RedeR:duplicateGraph]{duplicateGraph}}{}
     }
   }        
           
@@ -143,7 +91,7 @@
   \subsection{Methods to build RedeR plugins}{  
     \describe{
         \item{\link[RedeR:PluginBuilder]{PluginBuilder}}{}
-	\item{\link[RedeR:submitPlugin]{submitPlugin}}{}
+	      \item{\link[RedeR:submitPlugin]{submitPlugin}}{}
         \item{\link[RedeR:deletePlugin]{deletePlugin}}{}
         \item{\link[RedeR:updatePlugins]{updatePlugins}}{}
         \item{\link[RedeR:pluginParser]{pluginParser}}{} 

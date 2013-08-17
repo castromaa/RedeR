@@ -30,8 +30,7 @@ The direction is set according to the edge order in the app (i.e. the edge list 
 }
 
 \seealso{
-\code{\link[RedeR:RedPort]{RedPort}},
-\code{\link[RedeR:getArrowDirection]{getArrowDirection}}
+\code{\link[RedeR:RedPort]{RedPort}}
 }
 
 \examples{

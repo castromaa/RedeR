@@ -5,7 +5,7 @@
 \title{Class 'PluginBuilder' }
 
 \description{
-A class providing methods to build plugins to RedeR application.
+A class providing methods to build plugins to RedeR application (deprecated).
 }
 
 \section{Slots}{
@@ -20,12 +20,7 @@ A class providing methods to build plugins to RedeR application.
 \author{Mauro Castro}
 
 \examples{
-
-    #Initiates a new method, say mt1
-    mt1<-function(){"#Your code here!"}
-    #Initiates a plugin skeleton
-    plugin <- PluginBuilder ( title = "MyPlugin", allMethods = list(mt1=mt1) )
-    
+#.Deprecated  
 }
 \keyword{graphs}
 \keyword{classes}

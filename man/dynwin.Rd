@@ -5,7 +5,7 @@
 \title{Wrap R graphics.}
 
 \description{
-Method to wrap R graphics in RedeR Java classes. 
+Method to wrap R graphics in RedeR Java classes (deprecated). 
 }
 
 \usage{
@@ -42,13 +42,7 @@ This method should be called only from RedeR plugins!
 }
 
 \examples{
-
-#To be used just in Rcalls from RedeR plugins!
-
-\dontrun{
-
-dynwin( rdp, width=400, height=300, ps=10 )
-}
+#.Deprecated
 }
 
 \keyword{graph}

@@ -7,7 +7,7 @@ Update RedeR plugins.
 }
 
 \description{
-Method to call RedeR application in order to update plugins sent by R command.
+Method to call RedeR application in order to update plugins sent by R command (deprecated).
 }
 
 \usage{
@@ -36,12 +36,7 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 }
 
 \examples{
-rdp <- RedPort('MyPort') 
-                           
-\dontrun{
-  calld(rdp)  
-  updatePlugins(rdp)
-}  
+#.Deprecated  
 }
 
 \keyword{graph}

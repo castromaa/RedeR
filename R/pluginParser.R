@@ -3,6 +3,9 @@
 
 pluginParser = function(dyname, dyncode, args=FALSE)
 {	
+  
+  .Deprecated(new="addGraph/getGraph related methods",old="PluginBuilder") 
+  
   #Prepare sections:
   if(args){
   		dyncode=deparse(dyncode)

@@ -4,6 +4,9 @@
 
 PluginBuilder = function(title='plugin', allMethods, allAddons=NULL)
 {
+  
+  .Deprecated(new="addGraph/getGraph related methods",old="PluginBuilder") 
+  
     #1st input check
     if(is.null(allMethods) || is.na(allMethods) || !is.list(allMethods)){
       print("invalid 'allMethods' declaration!")

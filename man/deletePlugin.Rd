@@ -6,7 +6,7 @@
 Remove plugins from RedeR application.
 }
 \description{
-Method to remove plugins from the RedeR application, including the main menu.
+Method to remove plugins from the RedeR application, including the main menu (deprecated).
 }
 \usage{
 deletePlugin(obj, pluginName)
@@ -39,16 +39,5 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 }
 
 \examples{
-
-#Prior calling this method build "MyPlugin" using the PluginBuilder!
-
-rdp <- RedPort('MyPort') 
-  
-\dontrun{
-
-  calld(rdp) 
-  deletePlugin(rdp, "MyPlugin")
-  updatePlugins(rdp)
-  #Remove the plugin "MyPlugin" from RedeR
-}  
+#.deprecated
 }

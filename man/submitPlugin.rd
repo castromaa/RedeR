@@ -7,7 +7,7 @@ Submit plugins to RedeR application.
 }
 
 \description{
-Method to send R-code to RedeR app in order to upload a new plugin.
+Method to send R-code to RedeR app in order to upload a new plugin (deprecated).
 }
 
 \usage{
@@ -39,23 +39,8 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 
 \examples{
                            
-#Set a simple example to initiate a plugin skeleton
+#.Deprecated
 
-#Initiates a new method, say mt1
-mt1<-function(){"#Your code here!"}
-
-#Initiates a plugin skeleton
-plugin <- PluginBuilder ( title = "MyPlugin", allMethods = list(mt1=mt1) )
-                                         
-\dontrun{
-  #Invoke RedeR application and load the new plugin
-  rdp <- RedPort('MyPort') 
-  calld(rdp)
-  submitPlugin(rdp, plugin)
-  updatePlugins(rdp)
-}
-
-  
 }
 
 

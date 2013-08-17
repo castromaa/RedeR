@@ -6,7 +6,6 @@ exportMethods (
   ping,
   version,
   updateGraph,
-  dynwin,
   getGraph,
   addGraph,
   addSeries,
@@ -53,64 +52,19 @@ exportMethods (
   deleteSelectedNodes,
                   
   isDynamicsActive,
+  exitd,
+  resetd,
+  
   submitPlugin,
   deletePlugin,
   updatePlugins,
-
-  exitd,
-  resetd,
-
-  getNodeAliases,
-  getNodeX,
-  getNodeY,
-  getNodeW,
-  getNodeH,
-  getNodeBend,
-  getNodeSize,
-  getNodeShape,
-  getNodeColor,
-  getNodeLineWidth,
-  getNodeLineColor,
-  getNodeFontName,
-  getNodeFontStyle,
-  getNodeFontSize,
-  getNodeFontColor,
-  getNodeFontX,
-  getNodeFontY,
-  getNodeWeight,
-  setNodeAlias,
-  setNodeXY,
-  setNodeBend,
-  setNodeSize,
-  setNodeShape,
-  setNodeColor,
-  setNodeLineWidth,
-  setNodeLineColor,
-  setNodeFontName,
-  setNodeFontStyle,
-  setNodeFontSize,
-  setNodeFontColor,
-  setNodeFontXY,
-  setNodeWeight,
-  getSourceEdges,
-  getTargetEdges,
-  getArrowDirection,
-  getEdgeWidth,
-  getEdgeColor,
-  getEdgeType,
-  getEdgeWeight,
-  setEdgeWidth,
-  setEdgeColor,
-  setEdgeType,
-  setEdgeWeight
+  dynwin
 
    )
 
 export(
 
   RedPort,
-  PluginBuilder,
-  pluginParser,
   gtoy.rm,
   rederpost,
   rederexpresspost,
@@ -119,7 +73,10 @@ export(
   att.mapv,
   att.mape,
   subg,
-  cea
+  cea,
+  
+  PluginBuilder,
+  pluginParser
 
    )
 

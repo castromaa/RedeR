@@ -18,7 +18,7 @@ pluginParser(dyname, dyncode, args=FALSE)
 }
 
 \value{
-Returns parsed but unevaluated expressions. 
+Returns parsed but unevaluated expressions (deprecated). 
 }
 
 \note{
@@ -32,8 +32,7 @@ This function is used internally by the 'PluginBuilder' to parse plug-in methods
 }
 
 \examples{
-x<-function(){...}
-pluginParser('MyMethod', x, args=TRUE)
+#.deprecated
 }
 
 \keyword{graph}
