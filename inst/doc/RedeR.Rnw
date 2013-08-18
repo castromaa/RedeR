@@ -378,86 +378,13 @@ resetd(rdp)
 
 \newpage
 
-\section{Plugin builder}
-
-RedeR plug-ins have two main sections: methods and add-ons. The 'methods' section can be regarded as the plug-in trigger. When installed in the Java app, this trigger is used to start a given analysis by unfolding the R expressions wrapped in the methods. Add-ons use the same strategy, but remains hidden in the app -- and it is optional. Formal functions can be passed to add-ons as additional arguments. Prior to the main call, all functions are automatically loaded in R, making the source code available to the subsequent analysis.\
-
-\subsubsection*{A simple example} 
-
-\begin{itemize}
-
-\item Wrap methods in functions
-
-Here, the degree distribution is used in the same way as illustrated in the previous section but -- prior to execute the analysis -- the plugin requires two commands: \emph{RedPort} to set the interface, and \emph{dynwin} to wrap R graphics in RedeR Java classes. Additionally, the "JavaGD" package should be available in R. \footnote{This package might not work out of the box under Linux and, herefore, it is not installed by default (please, see \emph{installation} section).}
-
-\begin{small}
-<<label= Set a simple method, eval= TRUE>>=
-mt1 <- function(){
- rdp <- RedPort('MyPort')
- dynwin(rdp)
- g <- getGraph(rdp, status= "selected")
- if(vcount(g)>0)plot(degree.distribution(g), xlab="k", ylab="P(k)", pch=19)
-}
-@
-\end{small}
-
-\item Initiate plugin skeleton:
-
-Now the method \emph{mt1} is added to the \emph{PluginBuilder}, and is ready to be sent to the application.
-\begin{small}
-<<label= Build a plugin skeleton, eval= TRUE>>=
-plugin <- PluginBuilder(title="MyPlugin", allMethods=list(mt1=mt1))
-@                             
-\end{small}
-
-\item Submit new plugins to RedeR:
-
-The submission is straightforward: in the Java side, the plugin will be displayed in the main menu provided that the interface is properly set to find \emph{R}.
-\begin{small}
-<<label= Submit plugin to the app (p.s. JavaGD will be required: see footnotes!), eval= TRUE>>=
-submitPlugin(rdp, plugin)
-updatePlugins(rdp)
-exitd(rdp)
-@
-\end{small}
-
-\end{itemize}
-
-
-
-
-%%%%%%
-%Fig6%
-%%%%%%
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=0.6\textwidth]{fig6.pdf}
-\end{center}
-\label{fig6}
-\caption{RedeR plugins: a simple example to illustrate the concept (degree distribution of selected subgraphs). One subgraph from Figure 5b was interactively selected in \emph{RedeR} and then plotted either in the R side or in the Java side of the interface using the plugin described above.}
-\end{figure}
-
-
-\newpage 
-
 \section{Installation}
 
 \subsubsection*{Release version}
 The RedeR package is freely available from Bioconductor at \url{http://bioconductor.org/packages/release/bioc/html/RedeR.html}.
 
-\subsubsection*{Developing version}
-The developing version is available at \url{http://bioconductor.org/packages/devel/bioc/html/RedeR.html}.  In order to install RedeR devel please download the \emph{Package Source} (the .tar.gz file!!) and install all dependences in R:
-
-\begin{scriptsize}
-<<label= Devel version, eval= FALSE>>=
-install.packages(c('RCurl','XML','rJava','igraph','JavaGD'), repos='http://cran.r-project.org')
-install.packages('XMLRPC', repos = 'http://www.omegahat.org/R', type='source')
-install.packages('xxx.tar.gz', type='source')  ## i.e. the path to the downloaded .tar.gz file!
-@
-\end{scriptsize}
-
 \subsubsection*{The JAVA application}
-The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version 5 or 6). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task, but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. If you find any difficulty, please contact us.
+The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>=5). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task, but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. If you find any difficulty, please contact us.
 
 
 \newpage
