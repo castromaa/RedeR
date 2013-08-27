@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Main vignette: RedeR Overview}
+%\VignetteIndexEntry{Main vignette: interactive visualization and manipulation of nested networks}
 %\VignetteKeywords{Graph}
 %\VignettePackage{RedeR}
 
