@@ -86,18 +86,6 @@
         \item{\link[RedeR:exitd]{exitd}}{}   
         \item{\link[RedeR:resetd]{resetd}}{} 
     }
-  } 
-  
-  \subsection{Methods to build RedeR plugins}{  
-    \describe{
-        \item{\link[RedeR:PluginBuilder]{PluginBuilder}}{}
-	      \item{\link[RedeR:submitPlugin]{submitPlugin}}{}
-        \item{\link[RedeR:deletePlugin]{deletePlugin}}{}
-        \item{\link[RedeR:updatePlugins]{updatePlugins}}{}
-        \item{\link[RedeR:pluginParser]{pluginParser}}{} 
-        \item{\link[RedeR:dynwin]{dynwin}}{}         
-        
-    }
   }   
     
 }

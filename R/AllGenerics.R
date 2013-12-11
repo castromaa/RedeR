@@ -115,15 +115,4 @@ setGeneric ('isDynamicsActive',     signature='obj', function (obj)
 setGeneric ('relax',     signature='obj', 
 function (obj,p1=100,p2=100,p3=100,p4=100, p5=100,p6=100,p7=10,p8=10,ps=FALSE)
             standardGeneric ('relax'), package='RedeR') 
-            
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-setGeneric ('submitPlugin', signature='obj', function (obj, plugin)     
-            standardGeneric ('submitPlugin'),   package='RedeR')                                                                                                                 
-setGeneric ('deletePlugin', signature='obj', function (obj, pluginName) 
-            standardGeneric ('deletePlugin'),   package='RedeR')
-setGeneric ('updatePlugins',signature='obj', function (obj)             
-            standardGeneric ('updatePlugins'),  package='RedeR')
-setGeneric ('dynwin',             signature='obj', function (obj, ...)            
-  standardGeneric ('dynwin'),        package='RedeR')
-                   
+

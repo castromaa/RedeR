@@ -2,7 +2,14 @@
 \title{RedeR News}
 \encoding{UTF-8}
 
-\section{Version 2.0.0}{
+\section{Version 1.12.0}{
+  \itemize{
+    \item End of release cycle for deprecated functions, moved to the addGraph/getGraph related methods.
+    \item Deprecated plugin builder methods have been removed.
+  }
+}
+
+\section{Version 1.10.0}{
   \itemize{
     \item Improved graph attribute settings and interface.
   }

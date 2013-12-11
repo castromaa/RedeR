@@ -2598,7 +2598,7 @@ setMethod ('addLegend.size', 'RedPort',
                if(is.null(title))title="nodesize"
                if(is.null(dxtitle)){
                  mc<-max(nchar(labvec))
-                 dxtitle=ftsize+ftsize*mc*0.6
+                 dxtitle=ftsize+ftsize*mc*0.7
                }
                if(is.null(col))col="#000000"
                if(is.null(intersp))intersp=3	
@@ -2845,84 +2845,3 @@ setMethod ('addLegend.shape', 'RedPort',
   return (xml.rpc(obj@uri, 'RedHandler.getEdgeWeight', type, status))
 }
 
-
-############################################################
-##############  Deprecated Functions  ######################
-############################################################
-#since version 1.9.2 (o8/2013)
-#-------------------------------------------------------------------------------
-setMethod ('deletePlugin', 'RedPort', 
-           function (obj, pluginName) { 
-             if(ping(obj)==0)return(invisible())
-             
-             .Deprecated(new="addGraph/getGraph related methods",old="deletePlugin")
-             
-             pluginName=as.character(pluginName)      
-             invisible (rederexpresspost(obj@uri, 'RedHandler.deletePlugin', pluginName))
-           }
-) 
-
-#-------------------------------------------------------------------------------
-setMethod ('updatePlugins', 'RedPort', 
-           function (obj) {   
-             if(ping(obj)==0)return(invisible())
-             
-             .Deprecated(new="addGraph/getGraph related methods",old="updatePlugins")
-             
-             invisible (rederexpresspost(obj@uri, 'RedHandler.updatePlugins'))
-           }
-)    
-#-------------------------------------------------------------------------------
-setMethod ('submitPlugin', 'RedPort', 
-           function (obj, plugin) {
-             if(ping(obj)==0)return(invisible())
-             
-             .Deprecated(new="addGraph/getGraph related methods",old="submitPlugin")
-             
-             if(class(plugin)!="PluginBuilder"){
-               print("Not a 'PluginBuilder' class!")
-               return(NULL)       
-             }	
-             #Pack methods
-             for(i in 1:length(plugin@allMethods)){
-               nm=names(plugin@allMethods)[i]
-               mt=plugin@allMethods[[i]]
-               mt=pluginParser(nm,mt,args=FALSE)
-               plugin@allMethods[[i]]=mt
-             }
-             #Pack addons
-             if(is.function(plugin@allAddons[[1]])){
-               for(i in 1:length(plugin@allAddons)){
-                 nm=names(plugin@allAddons)[i]
-                 ft=plugin@allAddons[[i]]
-                 ft=pluginParser(nm,ft,args=TRUE)
-                 plugin@allAddons[[i]]=ft
-               }
-             }
-             pluginTitle   = as.character(plugin@title)
-             pluginMethods = as.character(c(plugin@allMethods,''))
-             pluginAddons  = as.character(c(plugin@allAddons,''))  
-             #Submit plugin to RedeR
-             invisible (xml.rpc(obj@uri, 'RedHandler.buildPlugin', pluginTitle, 
-                                pluginMethods, pluginAddons))
-           }
-) 
-#-------------------------------------------------------------------------------
-setMethod ('dynwin', 'RedPort', 
-           function (obj, width=400, height=300, ps=10) {
-             if(ping(obj)==0)return(invisible())
-             
-             .Deprecated(new="addGraph/getGraph related methods",old="dynwin")
-             
-             
-             width=as.integer(width)
-             height=as.integer(height)
-             ps=as.integer(ps)
-             if(width<0)return('Invalid width!') 
-             if(height<0)return('Invalid height!')  
-             if(ps<0)return('Invalid ps!')   
-             Sys.setenv('JAVAGD_CLASS_NAME'=obj@jclass)
-             JavaGD(width=width, height=height, ps=ps)
-           }
-)
-##PS. 'PluginBuilder' and 'pluginParser' also deprecated!!!

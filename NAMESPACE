@@ -1,4 +1,4 @@
-exportClasses (RedPort,PluginBuilder)
+exportClasses (RedPort)
 
 exportMethods (
 
@@ -53,17 +53,11 @@ exportMethods (
                   
   isDynamicsActive,
   exitd,
-  resetd,
-  
-  submitPlugin,
-  deletePlugin,
-  updatePlugins,
-  dynwin
+  resetd
 
-   )
+  )
 
 export(
-
   RedPort,
   gtoy.rm,
   rederpost,
@@ -73,22 +67,11 @@ export(
   att.mapv,
   att.mape,
   subg,
-  cea,
-  
-  PluginBuilder,
-  pluginParser
+  cea
+  )
 
-   )
-
+importFrom(XMLRPC,xml.rpc)
+importFrom(XML,newXMLNode,saveXML,xmlParse,xmlValue,xmlChildren)
+importFrom(RCurl,postForm,getCurlHandle)
 import(igraph)
-
-importFrom(XMLRPC, xml.rpc)
-
-importFrom(XML, newXMLNode, saveXML,xmlParse,xmlValue,xmlChildren)
-
-importFrom(RCurl, postForm, getCurlHandle)
-
-
-
-
-
+import(methods)
