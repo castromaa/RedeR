@@ -60,8 +60,6 @@ exportMethods (
 export(
   RedPort,
   gtoy.rm,
-  rederpost,
-  rederexpresspost,
   att.setv,
   att.sete,
   att.mapv,
@@ -70,8 +68,7 @@ export(
   cea
   )
 
-importFrom(XMLRPC,xml.rpc)
-importFrom(XML,newXMLNode,saveXML,xmlParse,xmlValue,xmlChildren)
-importFrom(RCurl,postForm,getCurlHandle)
-import(igraph)
 import(methods)
+import(igraph)
+importFrom(RCurl,postForm,getCurlHandle,dynCurlReader)
+importFrom(XML,newXMLNode,saveXML,xmlParse,xmlValue,xmlChildren,xmlName,xpathApply,newXMLCDataNode,xmlApply)

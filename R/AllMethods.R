@@ -1360,7 +1360,7 @@ G<-function(g,att){
 setMethod ('getNodes', 'RedPort', 
            function (obj, status="selected", type="node") { 
              if(ping(obj)==0)return(NULL)
-             return (xml.rpc(obj@uri, 'RedHandler.getNodes', type, status))
+             return (rederpost(obj@uri, 'RedHandler.getNodes', type, status))
            }
 )
 
@@ -1368,7 +1368,7 @@ setMethod ('getNodes', 'RedPort',
 setMethod ('getNodeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             nodes<-xml.rpc (obj@uri, 'RedHandler.getNodeIDs', type, status)
+             nodes<-rederpost (obj@uri, 'RedHandler.getNodeIDs', type, status)
              nodes<-nodes+1 #set index for R!
              return(nodes)
            }
@@ -1378,7 +1378,7 @@ setMethod ('getNodeIDs', 'RedPort',
 setMethod ('getEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             edges<-xml.rpc(obj@uri, 'RedHandler.getEdgeIDs', type, status)
+             edges<-rederpost(obj@uri, 'RedHandler.getEdgeIDs', type, status)
              edges<-edges+1 #set index for R!
              return(edges)
            }
@@ -1388,7 +1388,7 @@ setMethod ('getEdgeIDs', 'RedPort',
 setMethod ('getSourceEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)  
-             edges<-xml.rpc(obj@uri, 'RedHandler.getSourceEdgeIDs', type, status)
+             edges<-rederpost(obj@uri, 'RedHandler.getSourceEdgeIDs', type, status)
              edges<-edges+1 #set index for R!
              return(edges)
            }
@@ -1398,9 +1398,9 @@ setMethod ('getSourceEdgeIDs', 'RedPort',
 setMethod ('getTargetEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             edges<-xml.rpc(obj@uri, 'RedHandler.getTargetEdgeIDs', type, status)
+             edges<-rederpost(obj@uri, 'RedHandler.getTargetEdgeIDs', type, status)
              edges<-edges+1 #set index for R!
-             return (xml.rpc(edges))
+             return (rederpost(edges))
            }
 )
 
@@ -1768,7 +1768,7 @@ setMethod ('getContainerComponets', 'RedPort',
            function (obj, container) { 
              if(ping(obj)==0)return(invisible())
              container=as.character(container)
-             return (xml.rpc(obj@uri, 'RedHandler.getContainerComponets', container))
+             return (rederpost(obj@uri, 'RedHandler.getContainerComponets', container))
            }
 )
 
@@ -1786,7 +1786,7 @@ setMethod ('mergeNodes', 'RedPort',
 setMethod ('getEdges', 'RedPort', 
            function (obj, status="selected", type="node") { 
              if(ping(obj)==0)return(NULL)
-             return (xml.rpc(obj@uri, 'RedHandler.getEdges', type, status))
+             return (rederpost(obj@uri, 'RedHandler.getEdges', type, status))
            }
 )
 
@@ -2778,70 +2778,70 @@ setMethod ('addLegend.shape', 'RedPort',
 
 #-------------------------------------------------------------------------------
 .getNodeAliases<-function (obj, status="all", type="node") { 
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeAliases', type, status))
+  return ( rederpost(obj@uri, 'RedHandler.getNodeAliases', type, status) )
 }
 #-------------------------------------------------------------------------------
 .getNodeX<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeX', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeX', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeY<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeY', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeY', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeBend<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeBend', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeBend', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeSize<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeSize', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeSize', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeShape<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeShape', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeShape', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeColor<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeColor', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeColor', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeLineWidth<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeLineWidth', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeLineWidth', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeLineColor<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeLineColor', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeLineColor', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeFontSize<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeFontSize', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeFontSize', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeFontColor<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeFontColor', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeFontColor', type, status))
 }
 #-------------------------------------------------------------------------------   
 .getNodeWeight<-function(obj, status="all", type="node"){
-  return (xml.rpc (obj@uri, 'RedHandler.getNodeWeight', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getNodeWeight', type, status))
 }
 #-------------------------------------------------------------------------------
 .getArrowDirection<-function(obj, status="all", type="node"){
-  return (xml.rpc(obj@uri, 'RedHandler.getArrowDirection', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getArrowDirection', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeWidth<-function(obj, status="all", type="node"){
-  return (xml.rpc(obj@uri, 'RedHandler.getEdgeWidth', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getEdgeWidth', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeColor<-function(obj, status="all", type="node"){
-  return (xml.rpc(obj@uri, 'RedHandler.getEdgeColor', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getEdgeColor', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeType<-function(obj, status="all", type="node"){
-  return (xml.rpc(obj@uri, 'RedHandler.getEdgeType', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getEdgeType', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeWeight<-function(obj, status="all", type="node"){
-  return (xml.rpc(obj@uri, 'RedHandler.getEdgeWeight', type, status))
+  return (rederpost(obj@uri, 'RedHandler.getEdgeWeight', type, status))
 }
 

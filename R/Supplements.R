@@ -1,5 +1,6 @@
-#Simple function to generate random graphs with a modular structure------------------
-gtoy.rm=function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
+#-------------------------------------------------------------
+#Simple function to generate random graphs with a modular structure
+gtoy.rm<-function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
 	#check args------------------------------------
 	if(!is.numeric(m) || m<1){
 		stop("NOTE: 'm' must be a number > 0!")
@@ -54,54 +55,60 @@ gtoy.rm=function(m=3, nmax=30, nmin=3, p1=0.5, p2=0.05, p3=0.9){
 
 #-------------------------------------------------------------
 # simplified remote calls for RedeR!
-# return value is implementation dependent!
-# designed for an internal handler!
-# usefull only for simple calls!
-rederpost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){
-	aXML=function(method, gdata){
-		a=newXMLNode("methodCall", newXMLNode("methodName", method))
-		b=newXMLNode("params", parent=a)
-		sapply(gdata, function(x) newXMLNode("param", bXML(x), parent=b))
-		return(a)
-	}	
-	bXML=function(x){
-		type=c("integer"="double", "double"="double", "character"="string")[typeof(x)]
-		if(length(x)==1){
-			newXMLNode("value", newXMLNode(type,x))
-		} else {
-			a=newXMLNode("value")
-			b=newXMLNode("array", parent=a)
-			c=newXMLNode("data", parent=b)
-			invisible(sapply(x, function(x) newXMLNode("value",newXMLNode(type,x), parent=c)))
-			return(a)
-		}
-	}
-	doc=aXML(method,gdata)
-	doc=saveXML(doc)
-	doc=gsub("\\s","",doc)
-	doc=list(httpheader=c('Content-Type'="text/xml"), postfields=doc)
-	p=postForm(uri=uri, .opts=doc, style="POST", curl=hdl)
-	p=xmlParse(p, asText=TRUE)
-	xmlValue(xmlChildren(p)[[1]])		
+# designed for internal handler, only for simple calls!
+rederpost<-function(url, RedHandler, ..., .args=list(...),.curl=getCurlHandle()){
+  aXML<-function(method, .args){
+    node<-newXMLNode("methodCall", newXMLNode("methodName", method))
+    params<-newXMLNode("params", parent=node)
+    nattrs<-function(x)newXMLNode("value",newXMLNode("string",newXMLCDataNode(x)))
+    sapply(.args,function(x)newXMLNode("param",nattrs(x),parent=params))
+    node
+  }
+  bXML<-function(node){
+    if(is.null(node))return(node)
+    if(xmlName(node)=="value")node<-node[[1]]
+    if(is(node, "XMLInternalTextNode"))return(xmlValue(node))
+    type<-xmlName(node)
+    if(type=='array'){
+      node<-xmlApply(node[["data"]], function(x) bXML(x[[1]]))
+      bl<-!is.list(node[[1]]) && all(sapply(node, typeof)==typeof(node[[1]]))
+      if(bl) node<-structure(unlist(node),names=NULL)
+    } else {
+      node<-xmlValue(node)
+    }
+    if(type=="i4"||type=="int")node<-as.integer(node)
+    if(type=="double")node<-as.numeric(node)
+    node
+  }
+  cXML<-dynCurlReader(.curl, baseURL=url)
+  dXML<-list(httpheader=c('Content-Type'="text/xml"), 
+             followlocation=TRUE, useragent="R-XMLRPC",
+             postfields=saveXML(aXML(RedHandler,.args)),
+             headerfunction=cXML$update)
+  postForm(url,.opts=dXML,style="POST",curl=.curl)
+  rdcall<-cXML$value()
+  rdcall<-xmlParse(rdcall,asText=TRUE)
+  rdcall<-xpathApply(rdcall, "//param/value", bXML)
+  if(length(rdcall)==1)rdcall<-rdcall[[1]]
+  rdcall
 }
 
 #-------------------------------------------------------------
-# express post: direct calls to RedeR (to get better loading speed for large/sequential objects)!
-# return value is implementation dependent!
-# designed for an internal handler!
-# usefull for large and complex calls!
-rederexpresspost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){	
+# express post: direct calls to RedeR 
+# improve loading performance for large/sequential objects!
+# designed for internal handler, only for large and complex calls!
+rederexpresspost<-function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()){	
 	getminimumxml<-function(x, method){
-		getserial=function(x){
+		getserial<-function(x){
 			if(is.character(x)){
-				x=gsub("&","&amp;",x)
-				x=gsub("<","&lt;",x)
-				x=gsub(">","&gt;",x)
+				x<-gsub("&","&amp;",x)
+				x<-gsub("<","&lt;",x)
+				x<-gsub(">","&gt;",x)
 			}
-			type=c("integer"="double", "double"="double", "character"="string")[typeof(x)]
-			head=paste("<value><",type,">",sep="",collapse="")
-			tail=paste("</",type,"></value>",sep="",collapse="")
-			doc=paste(head,x,tail,sep="",collapse="")
+			type<-c("integer"="double", "double"="double", "character"="string")[typeof(x)]
+			head<-paste("<value><",type,">",sep="",collapse="")
+			tail<-paste("</",type,"></value>",sep="",collapse="")
+			doc<-paste(head,x,tail,sep="",collapse="")
 			if(length(x)==1){
 				paste("<param>",doc,"</param>",sep="", collapse="")					
 			} else {
@@ -109,23 +116,22 @@ rederexpresspost=function(uri, method, ..., gdata=list(...), hdl=getCurlHandle()
 				"</data></array></value></param>",sep="", collapse="")				
 			}
 		}
-		doc=sapply(x, function(x) getserial(x) )
-		doc=paste(doc,sep="", collapse="")
-		doc=paste("<params>",doc,"</params>",sep="", collapse="")	
-		mt=paste("<methodName>",method,"</methodName>", sep="", collapse="")
-		doc=paste("<methodCall>",mt,doc,"</methodCall>",sep="", collapse="")
+		doc<-sapply(x, function(x) getserial(x) )
+		doc<-paste(doc,sep="", collapse="")
+		doc<-paste("<params>",doc,"</params>",sep="", collapse="")	
+		mt<-paste("<methodName>",method,"</methodName>", sep="", collapse="")
+		doc<-paste("<methodCall>",mt,doc,"</methodCall>",sep="", collapse="")
 		list(httpheader=c('Content-Type'="text/xml"),postfields=doc)	
 	}	
-	doc=getminimumxml(gdata, method)
-	p=postForm(uri=uri, .opts=doc, style="POST", curl=hdl)
-	p=xmlParse(p, asText = TRUE)
+	doc<-getminimumxml(gdata, method)
+	p<-postForm(uri=uri, .opts=doc, style="POST", curl=hdl)
+	p<-xmlParse(p, asText = TRUE)
 	xmlValue(xmlChildren(p)[[1]])	
 }
 
-
 #------------------------------------------------------------------------------
-# set RedeR att. to vertices in igraph objects
-#TODO: patela 2 somente aceita vetor de cores de numero par!!!
+# Set RedeR att. to vertices in igraph objects
+#..todo: patela 2 somente aceita vetor de cores de numero par!!!
 att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=grey(0.7), 
                   xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, 
                   roundleg=1,title=NULL){
