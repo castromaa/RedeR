@@ -26,7 +26,7 @@
 \section{Version 1.6.0}{
   \itemize{
     \item Interface simplification: several deprecated low-level functions were moved to the addGraph/getGraph related methods.
-    \item Dependency changed from igraph to igraph0.
+    \item Dependence from igraph0 to igraph has been changed.
     \item Re-established conection with igraph.
   }
 }
