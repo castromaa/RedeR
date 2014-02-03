@@ -56,15 +56,8 @@ setMethod ('calld', 'RedPort',
              
              #Set local paths and call RedeR app:----------------------------------
              
-             #(1)Check rJava package, get path to JRI if present!------------------
-             jriPath=system.file("jri",package="rJava")
-             if(nchar(jriPath)>2){
-               if(nchar(ADDPATH)>2){
-                 ADDPATH=paste(ADDPATH, jriPath, sep=.Platform$path.sep)
-               } else {
-                 ADDPATH = jriPath
-               }
-             }   
+             #(1)Check ADDPATH------------------
+             if(nchar(ADDPATH)<=2)ADDPATH="  "
              
              #(2) get path to the 'reder.jar' file---------------------------------     
              if(filepath=="default"){
@@ -807,18 +800,19 @@ setMethod ('addGraph', 'RedPort',
              }
              
              #Check layout option-----------------------------------------------
-             b=is.null(V(g)$coordX) || is.null(V(g)$coordY) 
-             if(!is.null(layout) && !minimal && b){
+             if(!is.null(V(g)$coordX) && !is.null(V(g)$coordY)){
+               if( length(V(g)$coordX)==length(V(g)$coordY) ){
+                 layout<-cbind(V(g)$coordX,V(g)$coordY)
+               }
+             }
+             if(!is.null(layout) && !minimal){
                if(!is.matrix(layout)){
                  stop("Layout must be provided as matrix!")
-               }     
-               else if(ncol(layout)!=2){
+               } else if(ncol(layout)!=2){
                  stop("Layout matrix must have 2 cols (i.e. x and y coords)!")
-               } 
-               else if( nrow(layout)!=igraph::vcount(g) ) {
+               } else if( nrow(layout)!=igraph::vcount(g) ) {
                  stop("Layout does not match graph vertices: inconsistent row number!")
-               }
-               else {
+               } else {
                  s1=!is.numeric(gscale)
                  s2=is.null(gscale)
                  s3=is.na(gscale)
