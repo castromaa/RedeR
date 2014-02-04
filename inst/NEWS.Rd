@@ -4,9 +4,10 @@
 
 \section{Version 1.12.0}{
   \itemize{
-    \item Improved interactive layout algorithms.
-    \item Deprecated plugin builder methods have been removed.
+    \item Improved interactive layout algorithm.
+    \item User interface is simplified, some shortcuts have been added.
     \item Final release cycle of deprecated functions moved to the addGraph/getGraph related methods.
+    \item Deprecated plugin builder methods have been removed.    
   }
 }
 
