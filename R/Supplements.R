@@ -1002,7 +1002,7 @@ subg=function(g, dat, refcol=1, maincomp=TRUE, connected=TRUE, transdat=TRUE){
 
 #Simple function to generate random null distributions for co-expression analysis
 #------------------------------------------------------------------------------
-cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, plotcea=TRUE,...){
+cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=1000, plotcea=TRUE,...){
 	if(is.data.frame(x)){
 		x=as.matrix(x)
 	} else {
@@ -1255,7 +1255,7 @@ cea=function(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, p
 		}
 	}
 	if(plotcea){
-		ptcea(rescea,...)
+		ptcea(rescea,...=...)
 	}
 	return(rescea$decision.mt)
 }
@@ -1385,4 +1385,235 @@ igraph.check<-function(){
   if( b1 || b2) {
     stop("\n\n ...conflict with 'igraph0': please use the new 'igraph' package!")
   }
+}
+##-----------------------------------------------------------------------------
+##build nested maps from hclust objects
+treemap<-function(hc){
+  A=hc$merge
+  B=list()
+  C=list()
+  D=list()
+  E=list()
+  nest=list()
+  if(is.null(hc$labels))hc$labels=as.character(sort(hc$order))
+  for(i in 1:nrow(A)){
+    ai=A[i,1]
+    if(ai < 0){
+      B[[i]]= -ai
+      C[[i]]=1
+    } else {
+      B[[i]]=B[[ai]]      
+      C[[i]]=C[[ai]]+1 
+    }
+    ai=A[i,2]
+    if(ai < 0){
+      B[[i]]=sort(c(B[[i]],-ai))
+    } else {
+      B[[i]]=sort(c(B[[i]],B[[ai]]))
+      C[[i]]=max(C[[i]],C[[ai]]+1)
+    }
+    p=match(i,A)
+    D[[i]]=ifelse(p>nrow(A),p-nrow(A),p)
+    nest[[i]]=hc$labels[B[[i]]]
+  }
+  D[[nrow(A)]]=nrow(A)+1
+  for(i in 1:nrow(A)){
+    step=1
+    find=D[[i]]  
+    while(find<D[[nrow(A)]]){
+      find=D[[find]]
+      step=step+1
+    }
+    E[[i]]=step
+  }
+  # get dendogram xy position
+  nn=nrow(A) + 1
+  xaxis=c()
+  yaxis=hc$height
+  tp=rep(0,2)
+  mm=match(1:length(hc$order),hc$order)
+  for(i in 1:(nn-1)) {
+    ai=A[i,1]
+    if(ai < 0){
+      tp[1]=mm[-ai]
+    } else {
+      tp[1]=xaxis[ai]
+    }
+    ai=A[i,2]
+    if(ai < 0){
+      tp[2]=mm[-ai]
+    } else {
+      tp[2]=xaxis[ai]
+    }
+    xaxis[i]=mean(tp)
+  }
+  xyaxis=data.frame(xaxis=xaxis,yaxis=yaxis,stringsAsFactors=FALSE)
+  # return res
+  C=as.numeric(C)
+  D=as.numeric(D)
+  E=as.numeric(E)
+  N=hc$merge>0
+  N=N[,1]+N[,2]
+  obj<-list(nest=nest,compids=B,labels=hc$labels,parent=D,leafdist=C,
+            rootdist=E,height=hc$height,nnest=N, xyaxis=xyaxis)
+  #---get unified edges
+  N<-nrow(hc$merge);nn<-N+1
+  hcEdges<-NULL
+  eLength<-NULL
+  junk<-sapply(1:N,function(i){
+    y1<-hc$merge[i,1]
+    y2<-hc$merge[i,2]
+    if(y1>0){
+      l1<-hc$height[i] - hc$height[y1]
+    } else {
+      l1<-hc$height[i]
+    }
+    if(y2>0){
+      l2<-hc$height[i] - hc$height[y2]
+    } else {
+      l2<-hc$height[i]
+    }    
+    tp<-cbind(rbind(c(i,y1),c(i,y2)),c(l1,l2))
+    hcEdges<<-rbind(hcEdges,tp)
+    NULL
+  })
+  colnames(hcEdges)<-c("parentNode","childNode","length")
+  hcEdges<-data.frame(hcEdges,stringsAsFactors=FALSE)
+  #---get unified nodes
+  hcl<-data.frame(node=hc$labels,mergeId=-c(1:nn),hcId=c(1:nn), type="leaf",stringsAsFactors=FALSE)
+  hcn<-data.frame(node=paste("N",c(1:N),sep=""),mergeId=c(1:N),hcId=c(1:N),type="nest",stringsAsFactors=FALSE)
+  hcNodes<-rbind(hcl,hcn)
+  hcEdges$parentNode<-hcNodes$node[match(hcEdges$parentNode,hcNodes$mergeId)]
+  hcEdges$childNode<-hcNodes$node[match(hcEdges$childNode,hcNodes$mergeId)]
+  #---update and return
+  obj$hcNodes<-hcNodes;obj$hcEdges<-hcEdges
+  return(obj)
+}
+
+##-----------------------------------------------------------------------------
+##build an igraph object from hclust
+hclust2igraph<-function(hc,length.cutoff=NULL){
+  if(class(hc)!="hclust")stop("'hc' should be an 'hclust' object!")
+  if(is.null(hc$labels))hc$labels=as.character(sort(hc$order))
+  #get treemap
+  tmap<-treemap(hc)
+  hcNodes<-tmap$hcNodes
+  hcNests<-hcNodes[hcNodes$type=="nest",]
+  hcEdges<-tmap$hcEdges
+  nestList<-tmap$nest
+  #update nest names
+  names(nestList)[hcNests$hcId]<-hcNests$node
+  #remove nests based on length cutoff
+  if(!is.null(length.cutoff)){
+    #identify rmnodes
+    rmnodes<-hcEdges[hcEdges$length<length.cutoff,]
+    rmnodes<-rmnodes$childNode[rmnodes$childNode%in%hcNests$node]
+    #update hcEdges and nestList
+    hcEdges<-hcEdges.filter1(hcEdges,hcNodes,rmnodes)
+    nestList<-nestList[!names(nestList)%in%rmnodes]
+  }
+  #build igraph and return assigments
+  g<-graph.edgelist(as.matrix(hcEdges[,1:2]), directed=TRUE)
+  E(g)$edgeWeight<-hcEdges$length
+  list(g=g,nest=nestList)
+}
+##-----------------------------------------------------------------------------
+##build an igraph object from pvclust
+pvclust2igraph<-function(hc,alpha=0.95, max.only=TRUE){
+  if(class(hc)!="pvclust")stop("'hc' should be an 'pvclust' object!")
+  if(is.null(hc$hclust$labels))hc$hclust$labels=as.character(sort(hc$hclust$order))
+  #get treemap
+  tmap<-treemap(hc$hclust)
+  hcNodes<-tmap$hcNodes
+  hcNests<-hcNodes[hcNodes$type=="nest",]
+  hcEdges<-tmap$hcEdges
+  nestList<-tmap$nest
+  #update nest names
+  names(nestList)[hcNests$hcId]<-hcNests$node
+  #remove nests
+  rmnodes<-pvpick(hc,alpha=alpha,max.only=max.only)$edges
+  rmnodes<-hcNests[hcNests$hcId%in%rmnodes,"node"]
+  if(length(rmnodes)>0){
+    #update hcEdges and nestList
+    if(max.only){
+      hcEdges<-hcEdges.filter3(hcEdges,nests=nestList[rmnodes])
+    } else {
+      hcEdges<-hcEdges.filter2(hcEdges,hcNodes,rmnodes)
+    }
+    nestList<-nestList[names(nestList)%in%hcEdges$parentNode]
+  }
+  #build igraph and return assigments
+  g<-graph.edgelist(as.matrix(hcEdges[,1:2]), directed=TRUE)
+  E(g)$edgeWeight<-hcEdges$length
+  list(g=g,nest=nestList)
+}
+hcEdges.filter1<-function(hcEdges,hcNodes,rmnodes){
+  #get the correct order
+  rmNests<-hcNodes[hcNodes$node%in%rmnodes,]
+  rmEdges<-hcEdges[hcEdges$childNode%in%rmnodes,]
+  #get filtered hcEdges
+  hcEdges<-hcEdges[!hcEdges$childNode%in%rmNests$node,]
+  #update parents'ids
+  for(oldid in rmNests$node){
+    newid<-rmEdges$parentNode[which(rmEdges$childNode==oldid)]
+    idx<-which(hcEdges$parentNode==oldid)
+    hcEdges$parentNode[idx]<-newid
+  }
+  rownames(hcEdges)<-NULL
+  hcEdges
+}
+hcEdges.filter2<-function(hcEdges,hcNodes,rmnodes){
+  #get the correct order
+  rmNests<-hcNodes[hcNodes$node%in%rmnodes,]
+  rmEdges<-hcEdges[hcEdges$childNode%in%rmnodes,]
+  #check nest's child nodes
+  checkEdges<-hcEdges
+  lt<-sapply(rmNests$node,function(id){
+    idx<-which(checkEdges$parentNode==id)
+    child<-checkEdges$childNode[idx]
+    lt<-sum(hcNodes$type[hcNodes$node%in%child]=="nest")==0
+    if(lt){
+      newparent<-rmEdges$parentNode[rmEdges$childNode==id]
+      checkEdges$parentNode[idx]<<-newparent
+      checkEdges<<-checkEdges[-which(checkEdges$childNode==id),]
+    }
+    lt
+  })
+  rmNests<-rmNests[lt,]
+  #check nest's parent node
+  checkEdges<-hcEdges
+  lt<-sapply(rmNests$node,function(id){
+    idx<-which(checkEdges$childNode==id)
+    newparent<-checkEdges$parentNode[idx]
+    lt<-newparent%in%rmNests$node
+    if(lt){
+      idx<-which(checkEdges$parentNode==id)
+      checkEdges$parentNode[idx]<<-newparent
+      checkEdges<<-checkEdges[-which(checkEdges$childNode==id),]
+    }
+    lt
+  })
+  rmNests<-rmNests[lt,]
+  hcEdges<-checkEdges
+  rownames(hcEdges)<-NULL
+  hcEdges
+}
+hcEdges.filter3<-function(hcEdges, nests){
+  rmnodes<-lapply(names(nests),function(nest){
+    idx<-hcEdges$childNode%in%nests[[nest]] & !hcEdges$parentNode==nest
+    hcEdges$parentNode[idx]
+  })
+  names(rmnodes)<-names(nests)
+  rmnodes<-rmnodes[sapply(rmnodes,length)>0]
+  if(length(rmnodes)>0){
+    sapply(names(rmnodes),function(parent){
+      idx<-hcEdges$parentNode%in%rmnodes[[parent]]
+      hcEdges$parentNode[idx]<<-parent
+      idx<-hcEdges$childNode%in%rmnodes[[parent]]
+      hcEdges<<-hcEdges[-which(idx),]
+      NULL
+    })
+    rownames(hcEdges)<-NULL
+  }
+  hcEdges
 }

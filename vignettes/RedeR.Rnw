@@ -21,8 +21,9 @@ representation and functional analysis.
 Mauro AA Castro, Xin Wang, Michael NC Fletcher, \\ 
 Kerstin B Meyer and Florian Markowetz 
 \thanks{Cancer Research UK - Cambridge Research Institute, Robinson Way Cambridge, CB2 0RE, UK.} \\
-\texttt{\small http://www.markowetzlab.org/software/networks.html} \\
-\texttt{\small florian.markowetz@cancer.org.uk} \\
+\texttt{\small http://genomebiology.com/2012/13/4/R29} \\
+\texttt{\small mauro.a.castro@gmail.com} \\
+\texttt{\small florian.markowetz@cruk.cam.ac.uk} \\
 }
 
 \begin{document}
@@ -39,16 +40,18 @@ Kerstin B Meyer and Florian Markowetz
 
 \section{Overview}
 
-\emph{RedeR} is an R-based package combined with a Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, \emph{RedeR} takes advantage of \emph{\textbf{R}} to run robust statistics, while the R-to-Java interface bridge the gap between network analysis and visualization: for \textbf{R Developers}, it allows the development of Java plug-ins exclusively using R codes; for \textbf{Java Users}, it runs R methods implemented in a stand-alone application, and for \textbf{R Users} \emph{RedeR} interactively displays R graphs using a robust Java graphic engine embedded in \emph{R}.\\
+\emph{RedeR} is an R-based package combined with a Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, \emph{RedeR} takes advantage of \emph{\textbf{R}} to run robust statistics, while the R-to-Java interface bridge the gap between network analysis and visualization.
 
-\emph{RedeR} use different strategies to link R to Java: 
+RedeR is designed to deal with three key challenges in network analysis. Firstly, biological networks are modular and hierarchical, so network visualization needs to take advantage of such structural features. Secondly, network analysis relies on statistical methods, many of which are already available in resources like CRAN or Bioconductor. However, the missing link between advanced visualization and statistical computing makes it hard to take full advantage of R packages for network analysis. Thirdly, in larger networks user input is needed to focus the view of the network on the biologically relevant parts, rather than relying on an automatic layout function. RedeR is designed to address these challenges (additional information is available at Castro et al. \cite{Castro2012}).\\
+
+\emph{RedeR} uses different strategies to link R to Java: 
 
 \begin{itemize}
     \item Data interface: implements the callback engine to make calls from R via xml-rpc protocol. It sets \emph{R} as client and \emph{RedeR} as server. 
-    \item Graphic interface: implements the callback engine to make calls from Java via dynamic libraries. It wraps R graphics into RedeR classes. 
+    \item Graphic interface: it wraps R graphics into RedeR classes. 
     \end{itemize}
 
-The design of the software is depicted from Figure 1. One unique feature of this concept is how R methods can be wrapped and exported. For example, in a few lines of code \emph{RedeR} sends R methods to the Java app using the \emph{submitPlugin} function, which gives rise to a new Java plugin. Also, complex graphs with many attributes can be transferred from-and-to \emph{R} using \emph{addGraph} and \emph{getGraph} functions. \\
+The design of the software is depicted from Figure \ref{fig1}. Complex graphs with many attributes can be transferred from-and-to \emph{R} using \emph{addGraph} and \emph{getGraph} functions. \\
 
 
 %%%%%%
@@ -58,8 +61,9 @@ The design of the software is depicted from Figure 1. One unique feature of this
 \begin{center}
 \includegraphics[width=1.0\textwidth]{fig1.pdf}
 \end{center}
-\label{fig1}
-\caption{Schematic representation of RedeR calls. In the low-level interface, packages like XMLRPC\cite{XMLRPC} and rJava\cite{rJava} are used to link R to Java.}
+\caption{\label{fig1}%
+Schematic representation of RedeR calls. In the low-level interface, the Apache xmlrpc webserver\cite{Apache} is used to link R to Java.
+}
 \end{figure}
 
 \section{Quick start}
@@ -83,7 +87,7 @@ calld(rdp)
 @ 
 \end{small}
 
-Within an active interface, then the method 'addGraph' can easily send R graphs to the application. For example, the following chunk adds an \emph{igraph}\cite{igraph} object:
+Within an active interface, then the method 'addGraph' can easily send R graphs to the application. For example, the following chunk adds an \emph{igraph}\cite{igraph} object (Fig.\ref{fig2}):
 \begin{small}
 <<label= Add graph, eval= TRUE>>=
 g1 <- graph.lattice(c(5,5,5))
@@ -98,8 +102,9 @@ addGraph( rdp, g1, layout.kamada.kawai(g1) )
 \begin{center}
 \includegraphics[width=0.35\textwidth]{fig2.pdf}
 \end{center}
-\label{fig2}
-\caption{A toy example added to \emph{RedeR} by the \emph{addGraph} function.}
+\caption{\label{fig2}%
+A toy example added to \emph{RedeR} by the \emph{addGraph} function.
+}
 \end{figure}
 
 
@@ -110,10 +115,10 @@ g2 <- getGraph(rdp)
 resetd(rdp)
 @
 \end{small}
-The interface accepts additional graph attributes, as for example edge direction, edge width, edge weight, node shape, node size, node color etc. In \emph{igraph} objects, vertex and edge attributes can be assigned as arbitrary R objects. In order to pass these extensible features to \emph{RedeR} the attributes must be provided in a valid syntax. \footnote{See \emph{getGraph} and \emph{addGraph} specification for additional details.}
+The interface accepts additional graph attributes, as for example edge direction, edge width, edge weight, node shape, node size, node color etc. In \emph{igraph} objects, vertex and edge attributes can be assigned as arbitrary R objects. In order to pass these extensible features to \emph{RedeR} the attributes must be provided in a valid syntax.\footnote{See \emph{getGraph} and \emph{addGraph} specification for additional details.}
 
 
-Another strategy is to wrap graphs into containers and then send it to the Java app. Next, the subgraphs g3 and g4 are assigned to different nested structures (Fig.3).
+Another strategy is to wrap graphs into containers and then send it to the Java app. Next, the subgraphs g3 and g4 are assigned to different nested structures (Fig.\ref{fig3}).
 \begin{small}
 <<label= Build subgraphs, eval= TRUE>>=
 g3 <- barabasi.game(10)
@@ -132,12 +137,13 @@ addGraph(rdp, g4, isNest =TRUE, gcoord=c(75,75), gscale=50 )
 \begin{center}
 \includegraphics[width=0.8\textwidth]{fig3.pdf}
 \end{center}
-\label{fig3}
-\caption{Graphs nested in \emph{RedeR} by the command \emph{addGraph}.}
+\caption{\label{fig3}%
+Nested graphs in \emph{RedeR} using the command \emph{addGraph}.
+}
 \end{figure}
 
 
-In this case, the subgraphs can be handled apart from each other. For example, the following chunk selects all nodes assigned to the container "N0" and then gets back the subgraph (the selection step can also be done interactively!).
+In this case, the subgraphs can be handled apart from each other. For example, the following chunk selects all nodes assigned to the container "N0" and then gets back the subgraph (the selection step can also be done interactively).
 
 \begin{small}
 <<label= Get subgraph, eval= TRUE>>=
@@ -163,7 +169,7 @@ addGraph(rdp, g6, zoom=20)
 @
 \end{small}
 
-Then using the "relax" options available in the app you can tune the graph layout as presented in Figure 4.
+Then using the "relax" options available in the app you can tune the graph layout as presented in Figure \ref{fig4}.
 \begin{small}
 <<label= Start relax , eval=TRUE>>=
 relax(rdp,p2=400,p5=30,ps=T)
@@ -177,25 +183,26 @@ relax(rdp,p2=400,p5=30,ps=T)
 \begin{center}
 \includegraphics[width=0.7\textwidth]{fig4.pdf}
 \end{center}
-\label{fig4}
-\caption{Scale-free graph according to the Barabasi-Albert model\cite{igraph}.}
+\caption{\label{fig4}%
+Scale-free graph according to the Barabasi-Albert model\cite{igraph}.
+}
 \end{figure}
 
-In Figure 5a the same graph is used to exemplify the community structure mapped by the edge-betweenness function available in RedeR. In Figure 5b these communities are nested to containers, which are objects of the same class of the nodes but with additional behaviors: it can be hidden and anchored to the main panel (Fig.5c). You can build these containers either using \emph{R} or \emph{Java} functions (see options available in the \emph{clustering} main menu and in the shortcuts of nested objects, i.e., right-click a container!).
+In Figure \ref{fig5a} the same graph is used to exemplify the community structure mapped by the edge-betweenness function available in RedeR. In Figure \ref{fig5b} these communities are nested to containers, which are objects of the same class of the nodes but with additional behaviors (Fig.\ref{fig5c}). You can build these containers either using \emph{R} or \emph{Java} functions (see options available in the \emph{clustering} main menu and in the shortcuts of the nested objects, i.e., right-click a container).
 
 %%%%%%
 %Fig5%
 %%%%%%
 \begin{figure}[htbp]
   \centering
-  \subfloat[Communities]{\label{fig5a: Communities}\includegraphics[width=.5\textwidth]{fig5a.pdf}}              
-  \subfloat[Graphs into containers]{\label{fig5b:Graphs into containers}\includegraphics[width=.5\textwidth]{fig5b.pdf}} \\
-   \subfloat[Subnetworks]{\label{fig5c:Subnetworks}\includegraphics[width=.9\textwidth]{fig5c.pdf}}
+  \subfloat[Communities]{\label{fig5a}\includegraphics[width=.5\textwidth]{fig5a.pdf}}              
+  \subfloat[Graphs into containers]{\label{fig5b}\includegraphics[width=.5\textwidth]{fig5b.pdf}} \\
+  \subfloat[Subnetworks]{\label{fig5c}\includegraphics[width=.9\textwidth]{fig5c.pdf}}
   \caption{Community structure: (a) subgraphs detected based on edge betweenness; (b) nested communities into containers; (c) subnetworks in hidden containers.}
 \end{figure} 
 
 
-For the next example you will need to reproduce in \emph{RedeR} app the graph from Figure 5b (or any graph with containers), then select one of the communities and run the chunk below:  a simple degree distribution should be plotted in the R side (Fig.6). This is the first step to illustrate how to build an interactive plugin.
+For the next example you will need to reproduce the graph from Figure \ref{fig5b} (or any graph with containers) in the \emph{RedeR} app, then select one of the communities, and run the chunk below:  a simple degree distribution should be plotted in the R side.
 \begin{small}
 <<label= Map clic communities, eval= TRUE>>=
 g <- getGraph(rdp, status= "selected")
@@ -208,9 +215,9 @@ resetd(rdp)
 \newpage 
 
 
-\section{Workflow samples}
+\section{Workflow illustration}
 
-This section provides a sequence of steps that illustrate how users might integrate its own pre-processed data with a given network in order to visualize subgraphs and nested networks. Please refer to Castro et al. \cite{Castro2012} for more details about the biological background and experimental design of the case study.
+This section provides a sequence of steps that illustrates how users might integrate its own pre-processed data in a given network to visualize subgraphs and nested networks. Please refer to Castro et al. \cite{Castro2012} for more details about the biological background and experimental design of each example.
 
 \subsection{Subgraphs}
 
@@ -250,17 +257,18 @@ gt12 <- att.setv(g=gt12, from="Symbol", to="nodeAlias")
 gt12 <- att.setv(g=gt12, from="logFC.t12...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
 
-\item 6 - add subgraphs to the app:
+\item 6 - add subgraphs to the app (Fig.\ref{fig6}):
 <<label=Workflow 1: add subgraphs to the app, eval=TRUE>>=
-n0 <- addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
-n1 <- addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
-n2 <- addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
+addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
+addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
+addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
 @
 
 \item 7 - nest subgraphs (i.e. overlap time-series):
 <<label=Workflow 1: nest subgraphs, eval=TRUE>>=
-nestNodes(rdp, nodes=V(gt3)$name, parent=n1, theme='tm2')
-nestNodes(rdp, nodes=V(gt6)$name, parent=n2, theme='tm2')
+nestNodes(rdp, nodes=V(gt3)$name, parent="N1", theme='tm2')
+nestNodes(rdp, nodes=V(gt6)$name, parent="N2", theme='tm2')
+nestNodes(rdp, nodes=V(gt3)$name, parent="N4", theme='tm3')
 @
 
 \item 8 - assign edges to containers
@@ -273,16 +281,17 @@ mergeOutEdges(rdp)
 relax(rdp,50,400)
 @
 
-\item 10 - add a color legend (other types are available):
-\footnote{Legends are set only via command line in the current version.}
+
+\newpage
+
+
+\item 10 - add a color legend (other types are available):\footnote{Legends are set only via command line in the current version.}
 
 <<label=Workflow 1: add a color legend (other types are available), eval=TRUE>>=
 scl <- gt3$legNodeColor$scale
 leg <- gt3$legNodeColor$legend 
 addLegend.color(rdp, colvec=scl, labvec=leg, title="node color (logFC)")
 @
-
-\newpage
 
 \item 11 -  select a gene:
 <<label=Workflow 1: select a gene, eval=TRUE>>=
@@ -297,6 +306,22 @@ resetd(rdp)
 \end{scriptsize}
 
 \end{itemize}
+
+
+%%%%%%
+%Fig6%
+%%%%%%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.95\textwidth]{fig6.pdf}
+\end{center}
+\caption{\label{fig6}%
+Nested subnetworks. This graph shows genes differentially expressed in estrogen-treated MCF-7 cells at 3, 6 and 12 h (relative to 0 h). The insets correspond to the overlap between consecutive time points (adapted from Castro et al.\cite{Castro2012}).
+}
+\end{figure}
+
+
+\newpage
 
 
 \subsection{Nested networks and clustering}
@@ -325,7 +350,7 @@ sg <- att.setv(sg, from="logFC.t3...t0", to="nodeColor", breaks=seq(-1,1,0.2), p
 sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
 @
 
-\item 4 - add graph to the app:
+\item 4 - add graph to the app (Fig.\ref{fig7})::
 <<label=Workflow 2: add graph to the app, eval=TRUE>>=
 addGraph(rdp,sg)
 @
@@ -352,8 +377,7 @@ mergeOutEdges(rdp,nlev=2)
 relax(rdp)
 @
 
-\item 9 - add color and size legends: 
-\footnote{Legends are set only via command line in the current version.}
+\item 9 - add color and size legends:\footnote{Legends are set only via command line in the current version.}
 
 <<label=Workflow 2: add color legend, eval=TRUE>>=
 scl <- sg$legNodeColor$scale
@@ -376,6 +400,19 @@ resetd(rdp)
 
 \end{itemize}
 
+%%%%%%
+%Fig7%
+%%%%%%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{fig7.pdf}
+\end{center}
+\caption{\label{fig7}%
+Hierarchical networks. This graph is obtained by superimposing a dendrogram onto the corresponding co-expression gene network (adapted from Castro et al.\cite{Castro2012}).
+}
+\end{figure}
+
+
 \newpage
 
 \section{Installation}
@@ -384,8 +421,7 @@ resetd(rdp)
 The RedeR package is freely available from Bioconductor at \url{http://bioconductor.org/packages/release/bioc/html/RedeR.html}.
 
 \subsubsection*{The JAVA application}
-The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>=5). The RedeR software can be used as a stand-alone application, or even embedded in other softwares, but in order to use plugins the interface must be set properly in the Java side to find R (e.g. path to R home). This should be a simple task, but if your R environment deviates a lot from the default installation then it might be necessary to add some path manually. If you find any difficulty, please contact us.
-
+The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>=5).
 
 \newpage
 

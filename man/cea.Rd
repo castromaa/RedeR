@@ -8,7 +8,7 @@ Simple function for correlation analysis. This function computes a null distribu
 }
 
 \usage{
-cea(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, plotcea=TRUE, ...)
+cea(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=1000, plotcea=TRUE, ...)
 }
 
 \arguments{
@@ -24,15 +24,15 @@ cea(x, sig=0.01, p.adj.method="fdr", cor.method="spearman", nper=100, plotcea=TR
 \details{       
 Additional arguments: 
 \describe{
-  \item{n.breaks}{If plotcea=TRUE, n.breaks sets the number of histogram breaks <integer>. } 
-  \item{plotnull}{Logical value, whether to plot the null distribution (Default=TRUE).}
-  \item{avnull}{If plotnull=TRUE, avnull takes the average null distribution (Default=TRUE). }
-  \item{nullcol}{If plotnull=TRUE, nullcol sets the color of the null distribution (Default="black"). }
+  \item{n.breaks}{If plotcea=TRUE, 'n.breaks' sets the number of histogram breaks (Default=100 <integer>). } 
+  \item{plotnull}{If plotcea=TRUE, 'plotnull' sets whether to plot the null distribution (Default=TRUE <logical>).}
+  \item{avnull}{If plotcea=TRUE, 'avnull' takes the average null distribution (Default=TRUE <logical>). }
+  \item{nullcol}{If plotcea=TRUE, 'nullcol' sets the color of the null distribution (Default="black" <character>). }
 }
 }
 
 \value{
-Matrix with significant correlation values.
+An adjacency matrix with significant correlation values.
 }
 
 
@@ -53,8 +53,10 @@ exp <- ER.deg$exp
 idx <- sample(1:nrow(exp))[1:100] 
 exp <- exp[idx,]
 
-res <- cea(x=exp, nper=100, plot=FALSE) #ps set 'nper' for at least 1000
+\dontrun{
 
+res <- cea(x=exp, nper=100) #ps set 'nper' for at least 1000
+}
 }
 
 \keyword{cea}
