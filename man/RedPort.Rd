@@ -10,7 +10,7 @@ Constructor to build RedeR interface via XML-RPC (remote procedure call) server.
 }
 
 \usage{
-RedPort(title = 'default', host = '127.0.0.1', port = 9091, jclass = 'reder/rj/CanvasR')
+RedPort(title = 'default', host = '127.0.0.1', port = 9091)
 }
 
 \arguments{
@@ -23,10 +23,6 @@ RedPort(title = 'default', host = '127.0.0.1', port = 9091, jclass = 'reder/rj/C
   \item{port}{
     An integer specifying the port on which the XML-RPC server should listen.
 }
-  \item{jclass}{
-    A character string specifying the RedeR Java class that should wrap up R graphics.
-}
-
 }
 \value{
   An object of the RedPort Class.

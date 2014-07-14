@@ -163,7 +163,7 @@ addGraph( rdp, sg, parent="a" )
 
 resetd(rdp)
 
-###...to check loading of an interactome!
+###...to check loading an interactome!
 
 data(hs.inter)
 system.time( addGraph(rdp, hs.inter, layout=NULL) )

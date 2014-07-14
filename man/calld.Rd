@@ -18,13 +18,9 @@ calld(obj, ...)
 }
 
 \details{
-Other arguments can be passed to the system in order to open the application or set additional environment variables. 
-This maybe required when using the callback functions available in RedeR main panel (i.e. 'RCall'). 
-If this is the case, try to pass the location of R home and the path to the dynamic library directory.
+Other arguments can be passed to the system in order to open the application.
 \describe{
   \item{filepath}{Path to 'reder.jar' file <string>} 
-  \item{ADDPATH}{Add any additional path to RedeR shell <string>} 
-  \item{checks}{Paths' security checks. Option: 'lock' (default) or 'unlock' <string>} 	
   \item{maxlag}{Max acceptable lag time for the R-Java callback confirmation (default=300 ms) <numeric>}  
 }
 }

@@ -45,7 +45,7 @@ setMethod ('version', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('calld', 'RedPort',
            
-           function (obj, filepath='default', ADDPATH='', checks='lock', maxlag=300) {
+           function (obj, filepath='default', maxlag=300) {
              
              #Check if the port is not in use by the app---------------------------
              if(ping(obj)==1){
@@ -54,60 +54,17 @@ setMethod ('calld', 'RedPort',
              }
              if(!is.numeric(maxlag))maxlag=300
              
-             #Set local paths and call RedeR app:----------------------------------
-             
-             #(1)Check ADDPATH------------------
-             if(nchar(ADDPATH)<=2)ADDPATH="  "
-             
-             #(2) get path to the 'reder.jar' file---------------------------------     
+             #(1) get path to the 'reder.jar' file---------------------------------     
              if(filepath=="default"){
                filepath = system.file(package = "RedeR", "java/reder.jar")
              }
              
-             #(3) get adjusted paths to OS type--------------------------------      
-             os=regexpr("win", .Platform$OS.type, ignore.case=TRUE)
-             if(os[1]>=0){os="win"} else {os="unix.alikes"}
-             R_HOME=R.home()
-             if(os=="unix.alikes"){ 
-               shtype="sh"    
-               libPath=R.home(component="lib")
-               srdir=Sys.getenv("R_SHARE_DIR")
-               indir=Sys.getenv("R_INCLUDE_DIR")
-               dcdir=Sys.getenv("R_DOC_DIR")
-               userlbdir=Sys.getenv("R_LIBS_USER") 
-               myPaths=paste(R_HOME, libPath, ADDPATH, indir, srdir, dcdir, userlbdir, sep=.Platform$path.sep)                                                   
-             } else { ##...wind.
-               shtype="cmd"      
-               libPath=R.home(component="bin")
-               srdir=R.home(component="share")
-               indir=R.home(component="include")
-               dcdir=R.home(component="doc")
-               userlbdir=R.home(component="R_LIBS_USER")
-               myPaths=paste(R_HOME, libPath, ADDPATH, indir, srdir, dcdir, userlbdir, sep=.Platform$path.sep)
-               myPaths=gsub("/","\\\\", myPaths)                                                                           
-             }
-             
-             #(4) add myPaths to system paths--------------------------------------
-             PATH=paste(Sys.getenv("PATH"), myPaths, sep=.Platform$path.sep)
-             Sys.setenv(PATH=PATH)  
-             
-             #(5) quote paths to be passed to RedeR shell
-             filepath=shQuote(filepath, type=shtype)
-             R_HOME =shQuote(R_HOME, type=shtype) 
-             libPath=shQuote(libPath, type=shtype) 
-             ADDPATH =shQuote(ADDPATH, type=shtype) 
-             indir =shQuote(indir, type=shtype) 
-             srdir =shQuote(srdir, type=shtype)
-             dcdir =shQuote(dcdir, type=shtype)
-             userlbdir =shQuote(userlbdir, type=shtype) 
-             myPaths=paste(R_HOME, libPath, ADDPATH, indir, srdir, dcdir, userlbdir, sep=' ')
-             
-             #(6)Execute 'calld' and update app settings at RedeR preferences:-----               
-             argm    = paste('openshellDcall', obj@port, myPaths, checks, sep=' ')
+             #(2)Execute 'calld' and update app settings in RedeR preferences:-----               
+             argm    = paste('openshellDcall', obj@port, sep=' ')
              command = paste('java -jar',      filepath, argm,    sep=' ')
              system(command, ignore.stdout = TRUE, ignore.stderr = TRUE, wait=FALSE) 
              
-             #(7) Wait response from the app (implement a short-delay)-------------
+             #(3) Wait response from the app (implement a short-delay)-------------
              status="OFF"
              tdelta=0
              t0=proc.time()[2] #...used to start time delay! 
@@ -125,7 +82,7 @@ setMethod ('calld', 'RedPort',
                }
              }       
              
-             #(8) ..send message if dubious connection status!----------------------
+             #(4) ..send message if connection status is dubious!----------------------
              if(status=="OFFON") {
                message("Prior to call RedeR check the interface! (e.g. 'ping' function)")
              } 
@@ -493,25 +450,25 @@ setMethod ('addSubgraph', 'RedPort',
              
              #Add subgraph
              sg=igraph::induced.subgraph(graph=g,vids=nodes)
-             if(!is.null(zoom))    G(sg,"zoom") = zoom
-             if(!is.null(bgColor)) G(sg,"bgColor") = as.character(bgColor)
-             if(!is.null(scale))   G(sg,"gscale") = scale
-             if(!is.null(coordX))  G(sg,"coordX") = coordX
-             if(!is.null(coordY))  G(sg,"coordY") = coordY
-             if(!is.null(loadEdges)) G(sg,"loadEdges") = loadEdges
-             if(!is.null(isNest))    G(sg,"isNest") = isNest
-             if(!is.null(nestImage))   G(sg,"nestImage") = as.character(nestImage)
-             if(!is.null(isAnchor)){G(sg,"isAnchor") = isAnchor} else {G(sg,"isAnchor")=TRUE}
-             if(!is.null(nestAlias))G(sg,"nestAlias") = as.character(nestAlias)
-             if(!is.null(nestColor))  G(sg,"nestColor") = as.character(nestColor)
-             if(!is.null(nestFontSize)) G(sg,"nestFontSize") = nestFontSize
-             if(!is.null(nestFontColor))G(sg,"nestFontColor") = nestFontColor
-             if(!is.null(nestFontX)) G(sg,"nestFontX") = nestFontX
-             if(!is.null(nestFontY)) G(sg,"nestFontY") = nestFontY
-             if(!is.null(nestShape)) G(sg,"nestShape") = as.character(nestShape)
-             if(!is.null(nestSize))G(sg,"nestSize")=nestSize
-             if(!is.null(nestLineWidth)) G(sg,"nestLineWidth") = nestLineWidth
-             if(!is.null(nestLineColor)) G(sg,"nestLineColor") = as.character(nestLineColor)
+             if(!is.null(zoom))    sg$zoom = zoom
+             if(!is.null(bgColor)) sg$bgColor = as.character(bgColor)
+             if(!is.null(scale))   sg$gscale = scale
+             if(!is.null(coordX))  sg$coordX = coordX
+             if(!is.null(coordY))  sg$coordY = coordY
+             if(!is.null(loadEdges)) sg$loadEdges = loadEdges
+             if(!is.null(isNest))    sg$isNest = isNest
+             if(!is.null(nestImage)) sg$nestImage = as.character(nestImage)
+             if(!is.null(isAnchor)) { sg$isAnchor = isAnchor } else { sg$isAnchor = TRUE }
+             if(!is.null(nestAlias)) sg$nestAlias = as.character(nestAlias)
+             if(!is.null(nestColor))  sg$nestColor = as.character(nestColor)
+             if(!is.null(nestFontSize)) sg$nestFontSize = nestFontSize
+             if(!is.null(nestFontColor))sg$nestFontColor = nestFontColor
+             if(!is.null(nestFontX)) sg$nestFontX = nestFontX
+             if(!is.null(nestFontY)) sg$nestFontY = nestFontY
+             if(!is.null(nestShape)) sg$nestShape = as.character(nestShape)
+             if(!is.null(nestSize))  sg$nestSize = nestSize
+             if(!is.null(nestLineWidth)) sg$nestLineWidth = nestLineWidth
+             if(!is.null(nestLineColor)) sg$nestLineColor = as.character(nestLineColor)
              if(!is.null(nestLineType))G(sg,"nestLineType") = nestLineType
              if(!is.null(update)){
                if(update=="all" || update=="partial")G(sg,"isUpdate")=TRUE

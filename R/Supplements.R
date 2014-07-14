@@ -1479,6 +1479,7 @@ treemap<-function(hc){
   })
   colnames(hcEdges)<-c("parentNode","childNode","length")
   hcEdges<-data.frame(hcEdges,stringsAsFactors=FALSE)
+  hcEdges$parentHeight<-obj$height[hcEdges$parentNode]
   #---get unified nodes
   hcl<-data.frame(node=hc$labels,mergeId=-c(1:nn),hcId=c(1:nn), type="leaf",stringsAsFactors=FALSE)
   hcn<-data.frame(node=paste("N",c(1:N),sep=""),mergeId=c(1:N),hcId=c(1:N),type="nest",stringsAsFactors=FALSE)
@@ -1514,7 +1515,9 @@ hclust2igraph<-function(hc,length.cutoff=NULL){
   }
   #build igraph and return assigments
   g<-graph.edgelist(as.matrix(hcEdges[,1:2]), directed=TRUE)
-  E(g)$edgeWeight<-hcEdges$length
+  #E(g)$edgeWeight<-hcEdges$length
+  tp<-hcEdges$parentHeight-min(hcEdges$parentHeight)
+  E(g)$edgeWeight<-(max(tp)-tp)/max(tp)
   list(g=g,nest=nestList)
 }
 ##-----------------------------------------------------------------------------

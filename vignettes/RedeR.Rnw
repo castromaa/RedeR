@@ -126,7 +126,7 @@ g4 <- barabasi.game(10)
 V(g3)$name<-paste("sn",1:10,sep="")
 V(g4)$name<-paste("sm",1:10,sep="")
 addGraph(rdp, g3, isNest =TRUE, gcoord=c(25,25), gscale=50)
-addGraph(rdp, g4, isNest =TRUE, gcoord=c(75,75), gscale=50 )
+addGraph(rdp, g4, isNest =TRUE, gcoord=c(75,75), gscale=50)
 @
 \end{small}
 
@@ -239,7 +239,7 @@ gi <- hs.inter
 <<label=Workflow 1: extract a subgraph and set attributes to RedeR, eval=TRUE>>=
 gt3  <- subg(g=gi, dat=dt[dt$degenes.t3!=0,], refcol=1)
 gt3  <- att.setv(g=gt3, from="Symbol", to="nodeAlias")
-gt3  <- att.setv(g=gt3, from="logFC.t3...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+gt3  <- att.setv(g=gt3, from="logFC.t3", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
 \emph{ps. some genes will not be found in the interactome!}
 
@@ -247,14 +247,14 @@ gt3  <- att.setv(g=gt3, from="logFC.t3...t0", to="nodeColor", breaks=seq(-2,2,0.
 <<label=Workflow 1: extract another subgraph and set attributes to RedeR, eval=TRUE>>=
 gt6  <- subg(g=gi, dat=dt[dt$degenes.t6!=0,], refcol=1)
 gt6  <- att.setv(g=gt6, from="Symbol", to="nodeAlias")
-gt6  <- att.setv(g=gt6, from="logFC.t6...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+gt6  <- att.setv(g=gt6, from="logFC.t6", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
 
 \item 5 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t12-t0 contrast):
 <<label=Workflow 1: extract another subgraph and set attributes to RedeR, eval=TRUE>>=
 gt12 <- subg(g=gi, dat=dt[dt$degenes.t12!=0,], refcol=1)
 gt12 <- att.setv(g=gt12, from="Symbol", to="nodeAlias")
-gt12 <- att.setv(g=gt12, from="logFC.t12...t0", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
+gt12 <- att.setv(g=gt12, from="logFC.t12", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
 
 \item 6 - add subgraphs to the app (Fig.\ref{fig6}):
@@ -346,7 +346,7 @@ sg <- att.mapv(sg, dat=dt, refcol=1)
 \item 3 - set attributes to RedeR (i.e. gene symbols and two available numeric data):
 <<label=Workflow 2: set attributes to RedeR , eval=TRUE>>=
 sg <- att.setv(sg, from="Symbol", to="nodeAlias")
-sg <- att.setv(sg, from="logFC.t3...t0", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)	
+sg <- att.setv(sg, from="logFC.t3", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)	
 sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
 @
 
@@ -417,10 +417,10 @@ Hierarchical networks. This graph is obtained by superimposing a dendrogram onto
 
 \section{Installation}
 
-\subsubsection*{Release version}
+\subsubsection*{R package}
 The RedeR package is freely available from Bioconductor at \url{http://bioconductor.org/packages/release/bioc/html/RedeR.html}.
 
-\subsubsection*{The JAVA application}
+\subsubsection*{Java application}
 The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>=5).
 
 \newpage
