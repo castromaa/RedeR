@@ -6,12 +6,12 @@ citEntry(entry = "Article",
   volume = "13",
   pages = "R29",
   number = "4",
+  doi = "10.1186/gb-2012-13-4-r29",
   textVersion  = 
   paste("Castro MAA, Wang X, Fletcher MNC, Meyer KB, Markowetz F.", 
 	"RedeR: R/Bioconductor package for representing modular structures,",
 	"nested networks and multiple levels of hierarchical associations.",
-	"Genome Biology 13:R29, 2012.",
-	sep=" ")
+	"Genome Biology 13:R29, 2012.",sep=" ")
 )
 
 
