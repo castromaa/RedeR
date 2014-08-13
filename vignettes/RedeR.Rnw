@@ -421,7 +421,7 @@ Hierarchical networks. This graph is obtained by superimposing a dendrogram onto
 The RedeR package is freely available from Bioconductor at \url{http://bioconductor.org/packages/release/bioc/html/RedeR.html}.
 
 \subsubsection*{Java application}
-The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>=5).
+The RedeR jar file is already included in the R package and, as usual, to run Java applications your system should have a copy of the JRE (Java Runtime Environment, version>=6).
 
 \newpage
 
