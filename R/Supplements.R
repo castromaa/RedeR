@@ -133,7 +133,8 @@ rederexpresspost<-function(uri, method, ..., gdata=list(...), hdl=getCurlHandle(
 # Set RedeR att. to vertices in igraph objects
 #..todo: patela 2 somente aceita vetor de cores de numero par!!!
 att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=grey(0.7), 
-                  xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, isrev=FALSE, getleg=TRUE, 
+                  xlim=c(20,100,1), shapes=NULL, breaks=NULL, categvec=NULL, nquant=NULL, 
+                  isrev=FALSE, getleg=TRUE, 
                   roundleg=1,title=NULL){
   #check loaded igraph
   igraph.check()
@@ -354,7 +355,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		return(res)		
 	}
 	#--size scale with breaks
-	xscale=function(x,breaks,szmin,szmax,na.sz,isrev,nquant,roundleg){
+	xscale=function(x,breaks,szmin,szmax,na.sz,xlim,isrev,nquant,roundleg){
 		# check arg
 		if(!is.null(nquant)){
 			if(nquant<2)stop("NOTE: require at least two quantiles!")
@@ -371,6 +372,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		bkcenter=c(-Inf,bkcenter,+Inf)
 		# get sz levels
 		szlevs=seq(szmin,szmax,length.out=length(bkcenter)-1)
+    if(length(xlim)==length(szlevs))szlevs<-xlim
 		if(isrev)szlevs=rev(szlevs)		
 		# set sz to x
 		x.sz=rep(NA,length(x))
@@ -458,7 +460,8 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 	} else if(to%in%numtype){
 		szmin=xlim[1]
 		szmax=xlim[2]
-		na.sz=xlim[3]
+		na.sz=xlim[length(xlim)]
+		xlim<-xlim[-length(xlim)]
 		if(!to=='coordX' && !to=='coordY'){
 			szmin=max(0,szmin)
 			szmax=max(0,szmax)
@@ -472,7 +475,7 @@ att.setv=function(g=NULL, from='name', to='nodeColor', pal=1, cols=NULL, na.col=
 		if(is.null(breaks) && is.null(nquant)){
 			att=xcategory(fromatt,szmin,szmax,na.sz,categvec,isrev)
 		} else {
-			att=xscale(fromatt,breaks,szmin,szmax,na.sz,isrev,nquant,roundleg)
+			att=xscale(fromatt,breaks,szmin,szmax,na.sz,xlim,isrev,nquant,roundleg)
 		}
 	} else if(to=='nodeShape'){
 		att=shapecategory(fromatt,shapes,categvec,isrev)
@@ -1491,132 +1494,3 @@ treemap<-function(hc){
   return(obj)
 }
 
-##-----------------------------------------------------------------------------
-##build an igraph object from hclust
-hclust2igraph<-function(hc,length.cutoff=NULL){
-  if(class(hc)!="hclust")stop("'hc' should be an 'hclust' object!")
-  if(is.null(hc$labels))hc$labels=as.character(sort(hc$order))
-  #get treemap
-  tmap<-treemap(hc)
-  hcNodes<-tmap$hcNodes
-  hcNests<-hcNodes[hcNodes$type=="nest",]
-  hcEdges<-tmap$hcEdges
-  nestList<-tmap$nest
-  #update nest names
-  names(nestList)[hcNests$hcId]<-hcNests$node
-  #remove nests based on length cutoff
-  if(!is.null(length.cutoff)){
-    #identify rmnodes
-    rmnodes<-hcEdges[hcEdges$length<length.cutoff,]
-    rmnodes<-rmnodes$childNode[rmnodes$childNode%in%hcNests$node]
-    #update hcEdges and nestList
-    hcEdges<-hcEdges.filter1(hcEdges,hcNodes,rmnodes)
-    nestList<-nestList[!names(nestList)%in%rmnodes]
-  }
-  #build igraph and return assigments
-  g<-graph.edgelist(as.matrix(hcEdges[,1:2]), directed=TRUE)
-  #E(g)$edgeWeight<-hcEdges$length
-  tp<-hcEdges$parentHeight-min(hcEdges$parentHeight)
-  E(g)$edgeWeight<-(max(tp)-tp)/max(tp)
-  list(g=g,nest=nestList)
-}
-##-----------------------------------------------------------------------------
-##build an igraph object from pvclust
-pvclust2igraph<-function(hc,alpha=0.95, max.only=TRUE){
-  if(class(hc)!="pvclust")stop("'hc' should be an 'pvclust' object!")
-  if(is.null(hc$hclust$labels))hc$hclust$labels=as.character(sort(hc$hclust$order))
-  #get treemap
-  tmap<-treemap(hc$hclust)
-  hcNodes<-tmap$hcNodes
-  hcNests<-hcNodes[hcNodes$type=="nest",]
-  hcEdges<-tmap$hcEdges
-  nestList<-tmap$nest
-  #update nest names
-  names(nestList)[hcNests$hcId]<-hcNests$node
-  #remove nests
-  rmnodes<-pvpick(hc,alpha=alpha,max.only=max.only)$edges
-  rmnodes<-hcNests[hcNests$hcId%in%rmnodes,"node"]
-  if(length(rmnodes)>0){
-    #update hcEdges and nestList
-    if(max.only){
-      hcEdges<-hcEdges.filter3(hcEdges,nests=nestList[rmnodes])
-    } else {
-      hcEdges<-hcEdges.filter2(hcEdges,hcNodes,rmnodes)
-    }
-    nestList<-nestList[names(nestList)%in%hcEdges$parentNode]
-  }
-  #build igraph and return assigments
-  g<-graph.edgelist(as.matrix(hcEdges[,1:2]), directed=TRUE)
-  E(g)$edgeWeight<-hcEdges$length
-  list(g=g,nest=nestList)
-}
-hcEdges.filter1<-function(hcEdges,hcNodes,rmnodes){
-  #get the correct order
-  rmNests<-hcNodes[hcNodes$node%in%rmnodes,]
-  rmEdges<-hcEdges[hcEdges$childNode%in%rmnodes,]
-  #get filtered hcEdges
-  hcEdges<-hcEdges[!hcEdges$childNode%in%rmNests$node,]
-  #update parents'ids
-  for(oldid in rmNests$node){
-    newid<-rmEdges$parentNode[which(rmEdges$childNode==oldid)]
-    idx<-which(hcEdges$parentNode==oldid)
-    hcEdges$parentNode[idx]<-newid
-  }
-  rownames(hcEdges)<-NULL
-  hcEdges
-}
-hcEdges.filter2<-function(hcEdges,hcNodes,rmnodes){
-  #get the correct order
-  rmNests<-hcNodes[hcNodes$node%in%rmnodes,]
-  rmEdges<-hcEdges[hcEdges$childNode%in%rmnodes,]
-  #check nest's child nodes
-  checkEdges<-hcEdges
-  lt<-sapply(rmNests$node,function(id){
-    idx<-which(checkEdges$parentNode==id)
-    child<-checkEdges$childNode[idx]
-    lt<-sum(hcNodes$type[hcNodes$node%in%child]=="nest")==0
-    if(lt){
-      newparent<-rmEdges$parentNode[rmEdges$childNode==id]
-      checkEdges$parentNode[idx]<<-newparent
-      checkEdges<<-checkEdges[-which(checkEdges$childNode==id),]
-    }
-    lt
-  })
-  rmNests<-rmNests[lt,]
-  #check nest's parent node
-  checkEdges<-hcEdges
-  lt<-sapply(rmNests$node,function(id){
-    idx<-which(checkEdges$childNode==id)
-    newparent<-checkEdges$parentNode[idx]
-    lt<-newparent%in%rmNests$node
-    if(lt){
-      idx<-which(checkEdges$parentNode==id)
-      checkEdges$parentNode[idx]<<-newparent
-      checkEdges<<-checkEdges[-which(checkEdges$childNode==id),]
-    }
-    lt
-  })
-  rmNests<-rmNests[lt,]
-  hcEdges<-checkEdges
-  rownames(hcEdges)<-NULL
-  hcEdges
-}
-hcEdges.filter3<-function(hcEdges, nests){
-  rmnodes<-lapply(names(nests),function(nest){
-    idx<-hcEdges$childNode%in%nests[[nest]] & !hcEdges$parentNode==nest
-    hcEdges$parentNode[idx]
-  })
-  names(rmnodes)<-names(nests)
-  rmnodes<-rmnodes[sapply(rmnodes,length)>0]
-  if(length(rmnodes)>0){
-    sapply(names(rmnodes),function(parent){
-      idx<-hcEdges$parentNode%in%rmnodes[[parent]]
-      hcEdges$parentNode[idx]<<-parent
-      idx<-hcEdges$childNode%in%rmnodes[[parent]]
-      hcEdges<<-hcEdges[-which(idx),]
-      NULL
-    })
-    rownames(hcEdges)<-NULL
-  }
-  hcEdges
-}
