@@ -45,7 +45,7 @@ setMethod ('version', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('calld', 'RedPort',
            
-           function (obj, filepath='default', maxlag=300) {
+           function (obj, filepath='default', maxlag=300, checkcalls=FALSE) {
              
              #Check if the port is not in use by the app---------------------------
              if(ping(obj)==1){
@@ -62,7 +62,7 @@ setMethod ('calld', 'RedPort',
              #(2)Execute 'calld' and update app settings in RedeR preferences:-----               
              argm    = paste('openshellDcall', obj@port, sep=' ')
              command = paste('java -jar',      filepath, argm,    sep=' ')
-             system(command, ignore.stdout = TRUE, ignore.stderr = TRUE, wait=FALSE) 
+             system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              
              #(3) Wait response from the app (implement a short-delay)-------------
              status="OFF"
