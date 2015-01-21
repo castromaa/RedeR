@@ -22,6 +22,7 @@ Other arguments can be passed to the system in order to open the application.
 \describe{
   \item{filepath}{Path to 'reder.jar' file <string>} 
   \item{maxlag}{Max acceptable lag time for the R-Java callback confirmation (default=300 ms) <numeric>}  
+  \item{checkcalls}{Option to report eventual errors from R systems calls (default=FALSE) <logical>}
 }
 }
 
