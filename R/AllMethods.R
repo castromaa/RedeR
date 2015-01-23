@@ -67,13 +67,13 @@ setMethod ('calld', 'RedPort',
                  }
                  cat("(1) checking java version...\n")
                  system("java -version")
-                 cat("(2) checking interface without server...\n")
+                 cat("(2) checking interface...\n")
                  argm    = obj@port+1
                  command = paste('java -jar', filepath, argm, sep=' ')
                  system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
                }
                checkcalld(obj,filepath)
-               cat("(3) checking interface with server...\n")
+               cat("(3) checking interface and server...\n")
              }
              
              #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
