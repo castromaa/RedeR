@@ -59,12 +59,29 @@ setMethod ('calld', 'RedPort',
                filepath = system.file(package = "RedeR", "java/reder.jar")
              }
              
-             #(2)Execute 'calld' and update app settings in RedeR preferences:-----               
+             #(2) check calld
+             if(checkcalls){
+               checkcalld<-function(obj,filepath='default') {  
+                 if(filepath=="default"){
+                   filepath = system.file(package = "RedeR", "java/reder.jar")
+                 }
+                 cat("(1) checking java version...\n")
+                 system("java -version")
+                 cat("(2) checking interface without server...\n")
+                 argm    = obj@port+1
+                 command = paste('java -jar', filepath, argm, sep=' ')
+                 system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
+               }
+               checkcalld(obj,filepath)
+               cat("(3) checking interface with server...\n")
+             }
+             
+             #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
              argm    = paste('openshellDcall', obj@port, sep=' ')
              command = paste('java -jar',      filepath, argm,    sep=' ')
              system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              
-             #(3) Wait response from the app (implement a short-delay)-------------
+             #(4) Wait response from the app (implement a short-delay)-------------
              status="OFF"
              tdelta=0
              t0=proc.time()[2] #...used to start time delay! 
