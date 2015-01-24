@@ -45,14 +45,14 @@ setMethod ('version', 'RedPort',
 #-------------------------------------------------------------------------------
 setMethod ('calld', 'RedPort',
            
-           function (obj, filepath='default', maxlag=300, checkcalls=FALSE) {
+           function (obj, filepath='default', maxlag=20, checkcalls=FALSE) {
              
              #Check if the port is not in use by the app---------------------------
              if(ping(obj)==1){
                tx=paste("R interface is already in use! Port: ", obj@port, sep='') 
                return(tx)
              }
-             if(!is.numeric(maxlag))maxlag=300
+             if(!is.numeric(maxlag))maxlag=20
              
              #(1) get path to the 'reder.jar' file---------------------------------     
              if(filepath=="default"){
@@ -61,19 +61,14 @@ setMethod ('calld', 'RedPort',
              
              #(2) check calld
              if(checkcalls){
-               checkcalld<-function(obj,filepath='default') {  
-                 if(filepath=="default"){
-                   filepath = system.file(package = "RedeR", "java/reder.jar")
-                 }
-                 cat("(1) checking java version...\n")
-                 system("java -version")
-                 cat("(2) checking interface...\n")
-                 argm    = obj@port+1
-                 command = paste('java -jar', filepath, argm, sep=' ')
-                 system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
-               }
-               checkcalld(obj,filepath)
-               cat("(3) checking interface and server...\n")
+               message("(1) checking java version...")
+               system("java -version")
+               message("(2) checking interface and server...")
+               argm    = obj@port+1
+               command = paste('java -jar', filepath, argm, sep=' ')
+               system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
+             } else {
+               message("Initializing interface...")
              }
              
              #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
@@ -82,31 +77,37 @@ setMethod ('calld', 'RedPort',
              system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              
              #(4) Wait response from the app (implement a short-delay)-------------
-             status="OFF"
-             tdelta=0
-             t0=proc.time()[2] #...used to start time delay! 
-             maxlag=maxlag/100
-             while(status=="OFF"){        
-               #timer
-               tdelta = proc.time()[2] - t0
-               if(tdelta>maxlag){
-                 status="OFFON"
-               }
-               #
-               if(ping(obj)==1){
-                 status="ON"
-                 message("RedeR is ready!")
-               }
-             }       
-             
-             #(4) ..send message if connection status is dubious!----------------------
-             if(status=="OFFON") {
-               message("Prior to call RedeR check the interface! (e.g. 'ping' function)")
-             } 
-             
+             if(!checkcalls)testInterface(obj=obj,maxlag=maxlag)
+ 
            }
 )            
-
+testInterface<-function(obj,maxlag=20){
+  status="OFF"
+  tdelta=0
+  t0=proc.time()[3] #...used to start time delay! 
+  pb <- txtProgressBar(style=2, char=".")
+  while(status=="OFF"){
+    setTxtProgressBar(pb, tdelta/maxlag)
+    #timer
+    tdelta = proc.time()[3] - t0
+    if(tdelta>maxlag){
+      status="OFFON"
+    }
+    #
+    if(ping(obj)==1){
+      status="ON"
+      message("RedeR is ready!")
+    }
+  }      
+  close(pb)
+  #(4) ..send message if connection status is dubious!----------------------
+  if(status=="OFFON") {
+    message("\nThe Java interface is not responding to initialization!")
+    message("Please, check whether Java is already installed on your machine (JRE version>=6).")
+    message("For a general diagnosis, re-run the 'calld' function with 'checkcalls=TRUE', for example: \n> calld(rdp, checkcalls=TRUE)")
+    message("Any eventual error message please communicate to <mauro.a.castro at gmail.com>")
+  }
+}
 #-------------------------------------------------------------------------------
 setMethod ('updateGraph', 'RedPort', 
            function (obj) { 
