@@ -77,37 +77,37 @@ setMethod ('calld', 'RedPort',
              system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              
              #(4) Wait response from the app (implement a short-delay)-------------
+             testInterface<-function(obj,maxlag=20){
+               status="OFF"
+               tdelta=0
+               t0=proc.time()[3] #...used to start time delay! 
+               pb <- txtProgressBar(style=2, char=".")
+               while(status=="OFF"){
+                 setTxtProgressBar(pb, tdelta/maxlag)
+                 #timer
+                 tdelta = proc.time()[3] - t0
+                 if(tdelta>maxlag){
+                   status="OFFON"
+                 }
+                 #
+                 if(ping(obj)==1){
+                   status="ON"
+                   message("RedeR is ready!")
+                 }
+               }      
+               close(pb)
+               #(4) ..send message if connection status is dubious!----------------------
+               if(status=="OFFON") {
+                 message("\nThe Java interface is not responding to initialization!")
+                 message("Please, check whether Java is already installed on your machine (JRE version>=6).")
+                 message("For a general diagnosis, re-run the 'calld' function with 'checkcalls=TRUE', for example: \n> calld(rdp, checkcalls=TRUE)")
+                 message("Any eventual error message please communicate to <mauro.a.castro at gmail.com>")
+               }
+             }
              if(!checkcalls)testInterface(obj=obj,maxlag=maxlag)
  
            }
 )            
-testInterface<-function(obj,maxlag=20){
-  status="OFF"
-  tdelta=0
-  t0=proc.time()[3] #...used to start time delay! 
-  pb <- txtProgressBar(style=2, char=".")
-  while(status=="OFF"){
-    setTxtProgressBar(pb, tdelta/maxlag)
-    #timer
-    tdelta = proc.time()[3] - t0
-    if(tdelta>maxlag){
-      status="OFFON"
-    }
-    #
-    if(ping(obj)==1){
-      status="ON"
-      message("RedeR is ready!")
-    }
-  }      
-  close(pb)
-  #(4) ..send message if connection status is dubious!----------------------
-  if(status=="OFFON") {
-    message("\nThe Java interface is not responding to initialization!")
-    message("Please, check whether Java is already installed on your machine (JRE version>=6).")
-    message("For a general diagnosis, re-run the 'calld' function with 'checkcalls=TRUE', for example: \n> calld(rdp, checkcalls=TRUE)")
-    message("Any eventual error message please communicate to <mauro.a.castro at gmail.com>")
-  }
-}
 #-------------------------------------------------------------------------------
 setMethod ('updateGraph', 'RedPort', 
            function (obj) { 
