@@ -61,21 +61,30 @@ setMethod ('calld', 'RedPort',
              
              #(2) check calld
              if(checkcalls){
-               message("(1) checking java version...")
-               system("java -version")
-               message("(2) checking interface and server...")
+               cat("(1) checking Java Runtime Environment (JRE): version 1.6 or above should be installed!")
+               res<-system("java -version")
+               cat("(2) checking interface...")
                argm    = obj@port+1
                command = paste('java -jar', filepath, argm, sep=' ')
-               system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
+               res1<-system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
+               if(res1==0)cat("OK!\n") else cat("\n")
+               cat("(3) checking server...")              
+               argm    = paste('openshellDcall', obj@port, sep=' ')
+               command = paste('java -jar',      filepath, argm,    sep=' ')
+               res2<-system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE)
+               if(res2==0)cat("OK!\n") else cat("\n")
+               if(res1==0 && res2==0){
+                 cat("RedeR seems to be running ok, please close the testing interfaces \nand restart the software with default options.\n")
+               } else {
+                 message("\nPlease report any eventual error message to us <mauro.a.castro at gmail.com>")
+               }
              } else {
-               message("Initializing interface...")
+               #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
+               argm    = paste('openshellDcall', obj@port, sep=' ')
+               command = paste('java -jar',      filepath, argm,    sep=' ')
+               system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              }
-             
-             #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
-             argm    = paste('openshellDcall', obj@port, sep=' ')
-             command = paste('java -jar',      filepath, argm,    sep=' ')
-             system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
-             
+
              #(4) Wait response from the app (implement a short-delay)-------------
              testInterface<-function(obj,maxlag=20){
                status="OFF"
@@ -92,7 +101,7 @@ setMethod ('calld', 'RedPort',
                  #
                  if(ping(obj)==1){
                    status="ON"
-                   message("RedeR is ready!")
+                   cat("\nRedeR is ready!\n")
                  }
                }      
                close(pb)
@@ -101,7 +110,7 @@ setMethod ('calld', 'RedPort',
                  message("\nThe Java interface is not responding to initialization!")
                  message("Please, check whether Java is already installed on your machine (JRE version>=6).")
                  message("For a general diagnosis, re-run the 'calld' function with 'checkcalls=TRUE', for example: \n> calld(rdp, checkcalls=TRUE)")
-                 message("Any eventual error message please communicate to <mauro.a.castro at gmail.com>")
+                 message("Please report any eventual error message to us <mauro.a.castro at gmail.com>")
                }
              }
              if(!checkcalls)testInterface(obj=obj,maxlag=maxlag)
