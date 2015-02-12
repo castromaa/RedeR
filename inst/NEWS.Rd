@@ -2,6 +2,14 @@
 \title{RedeR News}
 \encoding{UTF-8}
 
+\section{Version 1.15.0}{
+  \itemize{
+    \item Improved app reliability.
+    \item Implemented new compatibility checks for the server connections.
+    \item Re-established call-back compatibility with some MS-Windows specifications.
+  }
+}
+
 \section{Version 1.14.0}{
   \itemize{
     \item Improved interface compatibility (call-back functions) for some Java platforms.

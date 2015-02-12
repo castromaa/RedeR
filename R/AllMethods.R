@@ -65,23 +65,23 @@ setMethod ('calld', 'RedPort',
                res<-system("java -version")
                cat("(2) checking interface...")
                argm    = obj@port+1
-               command = paste('java -jar', filepath, argm, sep=' ')
+               command = paste('java -jar', shQuote(filepath), argm, sep=' ')
                res1<-system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
                if(res1==0)cat("OK!\n") else cat("\n")
                cat("(3) checking server...")              
                argm    = paste('openshellDcall', obj@port, sep=' ')
-               command = paste('java -jar',      filepath, argm,    sep=' ')
+               command = paste('java -jar',      shQuote(filepath), argm,    sep=' ')
                res2<-system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE)
                if(res2==0)cat("OK!\n") else cat("\n")
                if(res1==0 && res2==0){
-                 cat("RedeR seems to be running ok, please close the testing interfaces \nand restart the software with default options.\n")
+                 cat("If you see two testing interfaces, please restart the software with default options,\notherwise please report any eventual error message to us <mauro.a.castro at gmail.com>.\n")
                } else {
                  message("\nPlease report any eventual error message to us <mauro.a.castro at gmail.com>")
                }
              } else {
                #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
                argm    = paste('openshellDcall', obj@port, sep=' ')
-               command = paste('java -jar',      filepath, argm,    sep=' ')
+               command = paste('java -jar',      shQuote(filepath), argm,    sep=' ')
                system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              }
 
