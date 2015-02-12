@@ -6,6 +6,7 @@
   \itemize{
     \item Improved app reliability.
     \item Implemented new compatibility checks for the server connections.
+    \item Re-established call-back compatibility with some MS-Windows specifications.
   }
 }
 
