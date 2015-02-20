@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{Main vignette: interactive visualization and manipulation of nested networks}
-%\VignetteKeywords{Graph}
+%\VignetteKeywords{RedeR}
 %\VignettePackage{RedeR}
 
 \documentclass[11pt]{article}

@@ -5,8 +5,8 @@
 \section{Version 1.15.0}{
   \itemize{
     \item Improved app reliability.
-    \item Implemented new compatibility checks for the server connections.
-    \item Re-established call-back compatibility with some MS-Windows specifications.
+    \item Implemented new compatibility checks for call-back functions.
+    \item Fix a client-server issue related with some MS-Windows specifications.
   }
 }
 
