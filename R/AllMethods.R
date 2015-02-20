@@ -42,15 +42,15 @@ setMethod ('version', 'RedPort',
            }
 )
 
+
 #-------------------------------------------------------------------------------
 setMethod ('calld', 'RedPort',
            
            function (obj, filepath='default', maxlag=20, checkcalls=FALSE) {
              
              #Check if the port is not in use by the app---------------------------
-             if(ping(obj)==1){
-               tx=paste("R interface is already in use! Port: ", obj@port, sep='') 
-               return(tx)
+             if(ping(obj)==1){ 
+               return("RedeR interface is already in use!")
              }
              if(!is.numeric(maxlag))maxlag=20
              
@@ -59,29 +59,28 @@ setMethod ('calld', 'RedPort',
                filepath = system.file(package = "RedeR", "java/reder.jar")
              }
              
+             #if(Sys.info()[['sysname']]=="Darwin"){
+             # cmd="open -n"
+             #} else {
+             # cmd="java -jar"
+             #}
+             
+             cmd="java -jar"
              #(2) check calld
              if(checkcalls){
-               cat("(1) checking Java Runtime Environment (JRE): version 1.6 or above should be installed!")
-               res<-system("java -version")
+               cat("(1) checking Java Runtime Environment (JRE version>=6)...")
+               system("java -version")
                cat("(2) checking interface...")
-               argm    = obj@port+1
-               command = paste('java -jar', shQuote(filepath), argm, sep=' ')
-               res1<-system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
-               if(res1==0)cat("OK!\n") else cat("\n")
-               cat("(3) checking server...")              
-               argm    = paste('openshellDcall', obj@port, sep=' ')
-               command = paste('java -jar',      shQuote(filepath), argm,    sep=' ')
-               res2<-system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE)
-               if(res2==0)cat("OK!\n") else cat("\n")
-               if(res1==0 && res2==0){
-                 cat("If you see two testing interfaces, please restart the software with default options,\notherwise please report any eventual error message to us <mauro.a.castro at gmail.com>.\n")
+               command = paste(cmd, shQuote(filepath), sep=' ')
+               res<-system(command, ignore.stdout = FALSE, ignore.stderr = FALSE, wait=FALSE)
+               if(res==0){
+                 cat("\nRestart the software with default options, otherwise please report \nany eventual error message to us <mauro.a.castro at gmail.com>.\n")
                } else {
                  message("\nPlease report any eventual error message to us <mauro.a.castro at gmail.com>")
                }
              } else {
                #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
-               argm    = paste('openshellDcall', obj@port, sep=' ')
-               command = paste('java -jar',      shQuote(filepath), argm,    sep=' ')
+               command = paste(cmd,      shQuote(filepath), sep=' ')
                system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              }
 
@@ -93,12 +92,10 @@ setMethod ('calld', 'RedPort',
                pb <- txtProgressBar(style=2, char=".")
                while(status=="OFF"){
                  setTxtProgressBar(pb, tdelta/maxlag)
-                 #timer
                  tdelta = proc.time()[3] - t0
                  if(tdelta>maxlag){
                    status="OFFON"
                  }
-                 #
                  if(ping(obj)==1){
                    status="ON"
                    cat("\nRedeR is ready!\n")
@@ -108,7 +105,7 @@ setMethod ('calld', 'RedPort',
                #(4) ..send message if connection status is dubious!----------------------
                if(status=="OFFON") {
                  message("\nThe Java interface is not responding to initialization!")
-                 message("Please, check whether Java is already installed on your machine (JRE version>=6).")
+                 message("Please, check whether Java is already installed in your machine (JRE version>=6).")
                  message("For a general diagnosis, re-run the 'calld' function with 'checkcalls=TRUE', for example: \n> calld(rdp, checkcalls=TRUE)")
                  message("Please report any eventual error message to us <mauro.a.castro at gmail.com>")
                }
