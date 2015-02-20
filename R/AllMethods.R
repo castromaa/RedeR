@@ -56,13 +56,13 @@ setMethod ('calld', 'RedPort',
              
              #(1) get path to the 'reder.jar' file---------------------------------     
              if(filepath=="default"){
-               filepath = system.file(package = "RedeR", "java/reder.jar")
+               filepath = system.file(package = "RedeR", "java/reder_v2.jar")
              }
              
              #if(Sys.info()[['sysname']]=="Darwin"){
-             # cmd="open -n"
+             #  cmd="open -n"
              #} else {
-             # cmd="java -jar"
+             #  cmd="java -jar"
              #}
              
              cmd="java -jar"
