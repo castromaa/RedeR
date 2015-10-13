@@ -1,0 +1,74 @@
+exportClasses (RedPort)
+
+exportMethods (
+
+  calld,
+  ping,
+  version,
+  updateGraph,
+  getGraph,
+  addGraph,
+  addSeries,
+  duplicateGraph,
+  addSubgraph,
+  addSubgraph.list,
+  addLegend.color,
+  addLegend.size,
+  addLegend.shape,
+  relax,
+
+  getNodes,
+  getNodeIDs,
+  addNodes,        
+  deleteNodes,     
+  nestNodes,     
+  nesthc,  
+                  
+  updateContainerSize,
+  mergeOutEdges,
+  getContainerComponets,
+  mergeNodes,      
+                  
+  getEdges,
+  getEdgeIDs,
+  getSourceEdgeIDs,
+  getTargetEdgeIDs,
+  setArrowDirection,  
+  addEdges,               
+  deleteEdges,     
+  addEdgeBetweenContainers,
+                  
+  selectEdges,
+  selectNodes,
+  selectAllEdges,
+  selectAllNodes,
+  selectGraph,
+
+  deSelectEdges,
+  deSelectNodes,
+  deSelectGraph,
+
+  deleteSelectedEdges,
+  deleteSelectedNodes,
+                  
+  isDynamicsActive,
+  exitd,
+  resetd
+
+  )
+
+export(
+  RedPort,
+  gtoy.rm,
+  att.setv,
+  att.sete,
+  att.mapv,
+  att.mape,
+  subg,
+  cea
+  )
+
+import(methods)
+import(igraph)
+importFrom(RCurl,postForm,getCurlHandle,dynCurlReader)
+importFrom(XML,newXMLNode,saveXML,xmlParse,xmlValue,xmlChildren,xmlName,xpathApply,newXMLCDataNode,xmlApply)
