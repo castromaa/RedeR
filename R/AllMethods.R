@@ -338,7 +338,7 @@ setMethod ('addSubgraph.list', 'RedPort',
                    } else {
                      g <- igraph::remove.vertex.attribute(g,"coordX")
                      g <- igraph::remove.vertex.attribute(g,"coordY")
-                     G(g,"isNest")=FALSE 	
+                     g$isNest=FALSE 	
                      att$update=update[1] 
                    }
                    if(!is.null(G(g,"gscale")))att$gscale=G(g,"gscale")
@@ -492,13 +492,13 @@ setMethod ('addSubgraph', 'RedPort',
              if(!is.null(nestSize))  sg$nestSize = nestSize
              if(!is.null(nestLineWidth)) sg$nestLineWidth = nestLineWidth
              if(!is.null(nestLineColor)) sg$nestLineColor = as.character(nestLineColor)
-             if(!is.null(nestLineType))G(sg,"nestLineType") = nestLineType
+             if(!is.null(nestLineType))sg$nestLineType= nestLineType
              if(!is.null(update)){
-               if(update=="all" || update=="partial")G(sg,"isUpdate")=TRUE
-               if(update=="partial")G(sg,"loadEdges")=FALSE
+               if(update=="all" || update=="partial")sg$isUpdate=TRUE
+               if(update=="partial")sg$loadEdges=FALSE
              }
              if(!is.null(isAssign) && isAssign==TRUE){
-               G(sg,"isAssign")=TRUE
+               sg$isAssign=TRUE
              }
              if(!is.null(update)){
                ref=addGraph(obj, sg, .callchecks=FALSE)

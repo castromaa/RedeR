@@ -2,7 +2,13 @@
 \title{RedeR News}
 \encoding{UTF-8}
 
-\section{Version 1.15.0}{
+\section{Version 1.18.0}{
+  \itemize{
+    \item Improved app reliability.
+  }
+}
+
+\section{Version 1.16.0}{
   \itemize{
     \item Improved app reliability.
     \item Implemented new compatibility checks for call-back functions.
