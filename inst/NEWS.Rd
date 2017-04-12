@@ -2,12 +2,6 @@
 \title{RedeR News}
 \encoding{UTF-8}
 
-\section{Version 1.26.0}{
-  \itemize{
-    \item Regular maintenance, stable release.
-  }
-}
-
 \section{Version 1.24.0}{
   \itemize{
     \item Regular maintenance, stable release.
