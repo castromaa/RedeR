@@ -39,7 +39,7 @@ Kerstin B Meyer and Florian Markowetz
 
 \section{Overview}
 
-\Rpackage{RedeR} is an R-based package combined with a Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, \Rpackage{RedeR} takes advantage of \emph{\textbf{R}} to run robust statistics, while the R-to-Java interface bridge the gap between network analysis and visualization.
+\Biocpkg{RedeR} is an R-based package combined with a Java application for dynamic network visualization and manipulation. It implements a callback engine by using a low-level R-to-Java interface to build and run common plugins. In this sense, \Rpackage{RedeR} takes advantage of \emph{\textbf{R}} to run robust statistics, while the R-to-Java interface bridge the gap between network analysis and visualization.
 
 RedeR is designed to deal with three key challenges in network analysis. Firstly, biological networks are modular and hierarchical, so network visualization needs to take advantage of such structural features. Secondly, network analysis relies on statistical methods, many of which are already available in resources like CRAN or Bioconductor. However, the missing link between advanced visualization and statistical computing makes it hard to take full advantage of R packages for network analysis. Thirdly, in larger networks user input is needed to focus the view of the network on the biologically relevant parts, rather than relying on an automatic layout function. RedeR is designed to address these challenges (additional information is available at Castro et al. \cite{Castro2012}).\\
 
@@ -224,60 +224,78 @@ This section provides a sequence of steps that illustrates how users might integ
 \begin{small}
 
 \item 1 - start the app (i.e. 'calld' method).
+\bigbreak
 
 \item 2 - get a dataframe and an interactome:
+
 <<label= Workflow 1: get a dataframe and an interactome, eval=TRUE>>=
 data(ER.limma)
 data(hs.inter)
 dt <- ER.limma
 gi <- hs.inter
 @
+\bigbreak
 
 \item 3 - extract a subgraph and set attributes to RedeR (i.e. logFC from t3-t0 contrast):
+
 <<label=Workflow 1: extract a subgraph and set attributes to RedeR, eval=TRUE>>=
 gt3  <- subg(g=gi, dat=dt[dt$degenes.t3!=0,], refcol=1)
 gt3  <- att.setv(g=gt3, from="Symbol", to="nodeAlias")
 gt3  <- att.setv(g=gt3, from="logFC.t3", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
+\bigbreak
 \emph{ps. some genes will not be found in the interactome!}
+\bigbreak
 
 \item 4 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t6-t0 contrast):
+
 <<label=Workflow 1: extract another subgraph and set attributes to RedeR, eval=TRUE>>=
 gt6  <- subg(g=gi, dat=dt[dt$degenes.t6!=0,], refcol=1)
 gt6  <- att.setv(g=gt6, from="Symbol", to="nodeAlias")
 gt6  <- att.setv(g=gt6, from="logFC.t6", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
+\bigbreak
 
 \item 5 - extract another subgraph and set attributes to RedeR  (i.e. logFC from t12-t0 contrast):
+
 <<label=Workflow 1: extract another subgraph and set attributes to RedeR, eval=TRUE>>=
 gt12 <- subg(g=gi, dat=dt[dt$degenes.t12!=0,], refcol=1)
 gt12 <- att.setv(g=gt12, from="Symbol", to="nodeAlias")
 gt12 <- att.setv(g=gt12, from="logFC.t12", to="nodeColor", breaks=seq(-2,2,0.4), pal=2)
 @
+\bigbreak
 
 \item 6 - add subgraphs to the app (Fig.\ref{fig6}):
+
 <<label=Workflow 1: add subgraphs to the app, eval=TRUE>>=
 addGraph(rdp, gt3, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
 addGraph(rdp, gt6, gcoord=c(20,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
 addGraph(rdp, gt12, gcoord=c(70,55), gscale=80, isNest=TRUE, theme='tm1', zoom=30)
 @
+\bigbreak
 
 \item 7 - nest subgraphs (i.e. overlap time-series):
+
 <<label=Workflow 1: nest subgraphs, eval=TRUE>>=
 nestNodes(rdp, nodes=V(gt3)$name, parent="N1", theme='tm2')
 nestNodes(rdp, nodes=V(gt6)$name, parent="N2", theme='tm2')
 nestNodes(rdp, nodes=V(gt3)$name, parent="N4", theme='tm3')
 @
+\bigbreak
 
 \item 8 - assign edges to containers
+
 <<label=Workflow 1: assign edges to containers, eval=TRUE>>=
 mergeOutEdges(rdp)
 @
+\bigbreak
 
 \item 9 - relax the network
+
 <<label=Workflow 1: relax the network, eval=TRUE>>=
 relax(rdp,50,400)
 @
+\bigbreak
 
 \item 10 - add a color legend (other types are available):\footnote{Legends are set only via command line in the current version.}
 
@@ -286,13 +304,17 @@ scl <- gt3$legNodeColor$scale
 leg <- gt3$legNodeColor$legend 
 addLegend.color(rdp, colvec=scl, labvec=leg, title="node color (logFC)")
 @
+\bigbreak
 
 \item 11 -  select a gene:
+
 <<label=Workflow 1: select a gene, eval=TRUE>>=
 selectNodes(rdp,"RET")
 @
+\bigbreak
 
 \item 12 - reset graph:
+
 <<label=Workflow 1: reset graph, eval=TRUE>>=
 resetd(rdp)
 @
@@ -326,50 +348,66 @@ Nested subnetworks. This graph shows genes differentially expressed in estrogen-
 \begin{small}
 
 \item 1 - get a dataframe and an igraph object:
+
 <<label=get a dataframe and an igraph object, eval=TRUE>>=
 data(ER.deg)
 dt <- ER.deg$dat
 sg <- ER.deg$ceg
 @
+\bigbreak
 
 \item 2 - map the dataframe to the graph:
+
 <<label=Workflow 2: map the dataframe to the graph, eval=TRUE>>=
 sg <- att.mapv(sg, dat=dt, refcol=1)
 @
+\bigbreak
 
 \item 3 - set attributes to RedeR (i.e. gene symbols and two available numeric data):
+
 <<label=Workflow 2: set attributes to RedeR , eval=TRUE>>=
 sg <- att.setv(sg, from="Symbol", to="nodeAlias")
 sg <- att.setv(sg, from="logFC.t3", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)	
 sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
 @
+\bigbreak
 
 \item 4 - add graph to the app (Fig.\ref{fig7}):
+
 <<label=Workflow 2: add graph to the app, eval=TRUE>>=
 addGraph(rdp,sg)
 @
+\bigbreak
 
 \item 5 - compute a hierarchical clustering using standard R functions:
+
 <<label=Workflow 2: compute a hierarchical clustering using standard R functions, eval=TRUE>>=
 hc <- hclust(dist(get.adjacency(sg, attr="weight")))
 @
+\bigbreak
 
 \item 6 - map the hclust object onto the network (pvclust objects are also compatible!):
+
 <<label=Workflow 2: map the hclust object onto the network, eval=TRUE>>=
 nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
 @
-
+\bigbreak
 \emph{...at this point nested objects from the network should also be mapped to a dendrogram!  different levels of the nested structure can be set by the nesthc method. Additionally, significant clusters can be computed by the pvclust package, which is already compatible with RedeR interface.}
+\bigbreak
 
 \item 7 - assign edges to containers:
+
 <<label=Workflow 2: assign edges to containers, eval=TRUE>>=
 mergeOutEdges(rdp,nlev=2)
 @
+\bigbreak
 
 \item 8 - relax the network:
+
 <<label=Workflow 2: relax the network, eval=TRUE>>=
 relax(rdp)
 @
+\bigbreak
 
 \item 9 - add color and size legends:\footnote{Legends are set only via command line in the current version.}
 
@@ -384,8 +422,10 @@ scl <- sg$legNodeSize$scale
 leg <- sg$legNodeSize$legend
 addLegend.size(rdp, sizevec=scl, labvec=leg, title="bd site distance (kb)")
 @
+\bigbreak
 
 \item 10 - reset graph:
+
 <<label=Workflow 2: reset graph, eval=TRUE>>=
 resetd(rdp)
 @
