@@ -40,10 +40,11 @@ Duplicates graphs in RedeR app.
 
 \examples{
 
-rdp <- RedPort('MyPort')
+library(igraph)
 
 \dontrun{
 
+rdp <- RedPort('MyPort')
 calld(rdp)
 
 ###

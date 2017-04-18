@@ -131,10 +131,11 @@ In this cases, source-target information is transferred to 'arrowDirection' attr
 
 \examples{
 
-rdp <- RedPort('MyPort')
+library(igraph)
 
 \dontrun{
 
+rdp <- RedPort('MyPort')
 calld(rdp)
 
 ###

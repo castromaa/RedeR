@@ -43,12 +43,12 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 
 \examples{
 
-rdp <- RedPort('MyPort') 
+library(igraph)
 el<-matrix(c("n1","n2","n1","n3","n1","n4","n2","n5","n2","n6","n2","n7"), ncol=2, byrow=TRUE)
-#g <- graph.edgelist(el)
+g <- graph.edgelist(el)
 
 \dontrun{
-
+  rdp <- RedPort('MyPort') 
   calld(rdp)
   addGraph( rdp, g, layout.kamada.kawai(g) )
   nestNodes( rdp, c("n1","n2") )

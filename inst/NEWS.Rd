@@ -4,7 +4,7 @@
 
 \section{Version 1.24.0}{
   \itemize{
-    \item Regular maintenance, stable release.
+    \item Implemented a new call-back method using R core infrastructure.
   }
 }
 

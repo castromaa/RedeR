@@ -10,8 +10,8 @@
   \describe{
     \item{\code{title}:}{The name of the XML-RPC port.}
     \item{\code{uri}:}{The uri to the XML-RPC server.}
-    \item{\code{port}:}{The port number to the XML-RPC server.} 
-    \item{\code{jclass}:}{The RedeR Java class that should wrap up R graphics.}    
+    \item{\code{host}:}{The host to the XML-RPC server.}  
+    \item{\code{port}:}{The port number to the XML-RPC server.}
   }
 }
 

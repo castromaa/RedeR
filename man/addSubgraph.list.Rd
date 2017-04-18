@@ -46,10 +46,11 @@ Extracts subgraphs from 'igraph' objects and sends the result to the RedeR app.
 
 \examples{
 
-rdp <- RedPort('MyPort')
+library(igraph)
 
 \dontrun{
 
+rdp <- RedPort('MyPort')
 calld(rdp)
 
 g <- graph.lattice(c(5,5,5))

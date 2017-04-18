@@ -1,18 +1,25 @@
 
 #-------------------------------------------------------------------------------
-setMethod ('ping', 'RedPort', 
+setMethod ('ping', 'RedPort',
            function (obj) { 
-             #Check if the port is not in use by the app------------------------
-             calltest=try(rederexpresspost(obj@uri,'RedHandler.ping'), TRUE) 
-             if(is.character(calltest) && length(calltest)==1){
-               if(calltest=="1"){
-                 return(1)
-               } else {
-                 return(0)
+             #Check if RedPort connection is available
+             rval <- 0L
+             calltest1 <- try(suppressWarnings(
+               socketConnection(host=obj@host, port=obj@port, blocking=TRUE)
+             ), silent = TRUE)
+             calltest1 <- !inherits(calltest1, "try-error")
+             if(calltest1){
+               calltest2 <- try(suppressWarnings(
+                 .rederexpresspost(obj,'RedHandler.ping')
+                 ),silent=TRUE)
+               if(is.character(calltest2) && length(calltest2)==1){
+                 if(calltest2=="1"){
+                   rval <- 1L
+                 }
                }
-             } else {
-               return(0)
+               try(suppressWarnings(closeAllConnections()), silent = TRUE)
              }
+             return(rval)
            }
 )
 
@@ -21,7 +28,7 @@ setMethod ('exitd', 'RedPort',
            function (obj) { 
              if(ping(obj)==0)return(invisible())
              Sys.sleep(0.5)
-             invisible(rederexpresspost(obj@uri, 'RedHandler.exit'))
+             invisible(.rederexpresspost(obj, 'RedHandler.exit'))
              Sys.sleep(0.5)
            }
 )
@@ -30,7 +37,7 @@ setMethod ('exitd', 'RedPort',
 setMethod ('resetd', 'RedPort', 
            function (obj) {
              if(ping(obj)==0)return(invisible())
-             invisible(rederexpresspost(obj@uri, 'RedHandler.reset'))
+             invisible(.rederexpresspost(obj, 'RedHandler.reset'))
            }
 )
 
@@ -38,7 +45,7 @@ setMethod ('resetd', 'RedPort',
 setMethod ('version', 'RedPort', 
            function (obj) { 
              if(ping(obj)==0)return(invisible())
-             return (rederexpresspost (obj@uri, 'RedHandler.version'))
+             return (.rederexpresspost(obj, 'RedHandler.version'))
            }
 )
 
@@ -117,7 +124,7 @@ setMethod ('calld', 'RedPort',
 setMethod ('updateGraph', 'RedPort', 
            function (obj) { 
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost (obj@uri, 'RedHandler.updateGraph'))
+             invisible (.rederexpresspost(obj, 'RedHandler.updateGraph'))
            }
 )
 
@@ -295,7 +302,7 @@ setMethod ('addSubgraph.list', 'RedPort',
              # 'update="default"' forces to keep old node coords and not to add new containers!
              if(!is.null(update) && !is.character(update))update=NULL
              # internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
-             invisible(rederexpresspost (obj@uri,'RedHandler.lockDragAndZoom'))
+             invisible(.rederexpresspost(obj,'RedHandler.lockDragAndZoom'))
              
              #send request to addSubgraph fuction
              for(i in 1:length(nodeList)){
@@ -363,7 +370,7 @@ setMethod ('addSubgraph.list', 'RedPort',
                }
              }  		
              #Internal function (unlocks DragAndZoon interactivity after sent subgraph list)
-             invisible(rederexpresspost (obj@uri,'RedHandler.unLockDragAndZoom'))
+             invisible(.rederexpresspost(obj,'RedHandler.unLockDragAndZoom'))
            }
 )
 
@@ -530,7 +537,7 @@ setMethod ('duplicateGraph', 'RedPort',
                } else {
                  nodes=as.character(nodes)
                  message("... duplicate subgraph")
-                 invisible( rederexpresspost(obj@uri, 'RedHandler.duplicateSubNetwork', arg1, arg2, nodes ) )
+                 invisible( .rederexpresspost(obj, 'RedHandler.duplicateSubNetwork', arg1, arg2, nodes ) )
                }
              } else {
                arg1="yes"
@@ -538,7 +545,7 @@ setMethod ('duplicateGraph', 'RedPort',
                if(!isToCopyEdges){arg1="no"}
                if(!isDefaultCopy){arg2="no"}
                message("... duplicate graph")
-               invisible( rederexpresspost(obj@uri, 'RedHandler.duplicateNetwork', arg1, arg2) )
+               invisible( .rederexpresspost(obj, 'RedHandler.duplicateNetwork', arg1, arg2) )
              }		
            }
 )
@@ -591,7 +598,7 @@ setMethod ('addSeries', 'RedPort',
              
              #send request to duplicate the original network in the main panel
              isDefaultCopy="no"
-             ref=try(rederexpresspost(obj@uri,'RedHandler.duplicateNetwork', isToCopyEdges, isDefaultCopy),TRUE)
+             ref=try(.rederexpresspost(obj,'RedHandler.duplicateNetwork', isToCopyEdges, isDefaultCopy),TRUE)
              if(!inherits(ref, "try-error")){
                print(paste("New container ID: ", ref, sep=""))
                #send graph to RedeR (it will update the reference network)
@@ -773,7 +780,7 @@ setMethod ('addGraph', 'RedPort',
                  warning("NOTE: invalid graph 'zoom' declaration: 'NA' found'!")
                } else {            
                  message("** ... graph 'zoom'") 
-                 invisible( rederexpresspost (obj@uri, 'RedHandler.setZoom', zoom) )
+                 invisible( .rederexpresspost(obj, 'RedHandler.setZoom', zoom) )
                }
              } else {
                zoom=100 # somente usado em 'themes'
@@ -800,7 +807,7 @@ setMethod ('addGraph', 'RedPort',
                    warning("NOTE: attribute 'gscale' is not set properly; must be <numeric> of length=1!")
                    gscale = 75
                  }
-                 pScale= rederexpresspost(obj@uri,'RedHandler.getPanelScale')
+                 pScale= .rederexpresspost(obj,'RedHandler.getPanelScale')
                  pScale=as.numeric(pScale)
                  if(is.numeric(pScale)){
                    pScale=pScale[1]*(gscale[1]/100)
@@ -832,7 +839,7 @@ setMethod ('addGraph', 'RedPort',
                } else {            
                  message("** ... graph background 'color'") 
                  if(nchar(bgColor)>7) bgColor=substr(bgColor,0,7)
-                 invisible( rederexpresspost (obj@uri, 'RedHandler.setBackground', bgColor) )
+                 invisible( .rederexpresspost(obj, 'RedHandler.setBackground', bgColor) )
                }      
              }  
              
@@ -856,7 +863,7 @@ setMethod ('addGraph', 'RedPort',
                    j=j+1
                  }
                  #internal function to load igraph edges! (..bit faster for dense graphs!)
-                 invisible(rederexpresspost(obj@uri,'RedHandler.addEdgesFastload',as.character(xedges) ) )
+                 invisible(.rederexpresspost(obj,'RedHandler.addEdgesFastload',as.character(xedges) ) )
                  return("Done!")
                }
              }
@@ -1298,7 +1305,7 @@ setMethod ('addGraph', 'RedPort',
              if(igraph::ecount(g)>0 && loadEdges){
                #update, isBrandNew   	
                #Main call to load nodes and edges
-               nestref=rederexpresspost(obj@uri, 'RedHandler.updateGraphMap', edges[,1],
+               nestref=.rederexpresspost(obj, 'RedHandler.updateGraphMap', edges[,1],
                                         edges[,2], arrowDirection, edgeWeight, edgeWidth, edgeColor, edgeType,
                                         arrowLength, arrowAngle, linkType, nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, 
                                         nodeColor, nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
@@ -1306,7 +1313,7 @@ setMethod ('addGraph', 'RedPort',
                                         parent, ntransform)      
              } else {
                #Main call to load only nodes
-               nestref=rederexpresspost(obj@uri, 'RedHandler.updateNodeMap', 
+               nestref=.rederexpresspost(obj, 'RedHandler.updateNodeMap', 
                                         nodes, coordX, coordY, nodeBend, nodeSize, nodeShape, nodeColor,
                                         nodeWeight, nodeLineWidth, nodeLineColor, nodeFontSize,
                                         nodeFontColor, nodeAlias, numsuppl, charsuppl, np1, np2, np3, np4, isnp, 
@@ -1334,7 +1341,7 @@ G<-function(g,att){
 setMethod ('getNodes', 'RedPort', 
            function (obj, status="selected", type="node") { 
              if(ping(obj)==0)return(NULL)
-             return (rederpost(obj@uri, 'RedHandler.getNodes', type, status))
+             return (.rederpost(obj, 'RedHandler.getNodes', type, status))
            }
 )
 
@@ -1342,7 +1349,7 @@ setMethod ('getNodes', 'RedPort',
 setMethod ('getNodeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             nodes<-rederpost (obj@uri, 'RedHandler.getNodeIDs', type, status)
+             nodes<-.rederpost (obj@uri, 'RedHandler.getNodeIDs', type, status)
              nodes<-nodes+1 #set index for R!
              return(nodes)
            }
@@ -1352,7 +1359,7 @@ setMethod ('getNodeIDs', 'RedPort',
 setMethod ('getEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             edges<-rederpost(obj@uri, 'RedHandler.getEdgeIDs', type, status)
+             edges<-.rederpost(obj, 'RedHandler.getEdgeIDs', type, status)
              edges<-edges+1 #set index for R!
              return(edges)
            }
@@ -1362,7 +1369,7 @@ setMethod ('getEdgeIDs', 'RedPort',
 setMethod ('getSourceEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)  
-             edges<-rederpost(obj@uri, 'RedHandler.getSourceEdgeIDs', type, status)
+             edges<-.rederpost(obj, 'RedHandler.getSourceEdgeIDs', type, status)
              edges<-edges+1 #set index for R!
              return(edges)
            }
@@ -1372,9 +1379,9 @@ setMethod ('getSourceEdgeIDs', 'RedPort',
 setMethod ('getTargetEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             edges<-rederpost(obj@uri, 'RedHandler.getTargetEdgeIDs', type, status)
+             edges<-.rederpost(obj, 'RedHandler.getTargetEdgeIDs', type, status)
              edges<-edges+1 #set index for R!
-             return (rederpost(edges))
+             return (.rederpost(edges))
            }
 )
 
@@ -1384,7 +1391,7 @@ setMethod ('addNodes', 'RedPort',
            function (obj, nodes) { 
              if(ping(obj)==0)return(invisible())
              nodes=as.character(nodes)
-             return (rederexpresspost(obj@uri, 'RedHandler.addNodes', nodes))
+             return (.rederexpresspost(obj, 'RedHandler.addNodes', nodes))
            }
 )
 
@@ -1393,7 +1400,7 @@ setMethod ('deleteNodes', 'RedPort',
            function (obj, nodes) { 
              if(ping(obj)==0)return(invisible())
              nodes=as.character(nodes)
-             return (rederexpresspost(obj@uri, 'RedHandler.deleteNodes', nodes))
+             return (.rederexpresspost(obj, 'RedHandler.deleteNodes', nodes))
            }
 )    
 
@@ -1418,7 +1425,7 @@ setMethod ('nestNodes', 'RedPort',
                if(getpack){
                  .zoom=100
                } else {
-                 .zoom=rederexpresspost(obj@uri,'RedHandler.getZoom')
+                 .zoom=.rederexpresspost(obj,'RedHandler.getZoom')
                  .zoom=as.numeric(.zoom)
                  if(is.nan(.zoom)){
                    .zoom=100
@@ -1695,7 +1702,7 @@ setMethod ('nestNodes', 'RedPort',
                              numericAtt=numericAtt, nestmap=length(nodes))
                return(nestpack)
              } else {
-               ref=rederexpresspost(obj@uri, 'RedHandler.nestexpress', nodes, c(status1,status2,status3), 
+               ref=.rederexpresspost(obj, 'RedHandler.nestexpress', nodes, c(status1,status2,status3), 
                                     charAtt, numericAtt )      
                invisible( updateGraph(obj) )
                return(ref)		
@@ -1708,7 +1715,7 @@ setMethod ('nestNodes', 'RedPort',
 setMethod ('updateContainerSize', 'RedPort', 
            function (obj) { 
              if(ping(obj)==0)return(invisible())
-             return (rederexpresspost(obj@uri, 'RedHandler.updateContainerSize'))
+             return (.rederexpresspost(obj, 'RedHandler.updateContainerSize'))
            }
 )
 
@@ -1732,7 +1739,7 @@ setMethod ('mergeOutEdges', 'RedPort',
                lb=max(lb,0)
                ub=max(ub,0)
              }
-             for(i in 1:nlev)res=rederexpresspost(obj@uri, 'RedHandler.mergeContainerOutEdges', rescale, lb, ub)
+             for(i in 1:nlev)res=.rederexpresspost(obj, 'RedHandler.mergeContainerOutEdges', rescale, lb, ub)
              res
            }
 )
@@ -1742,7 +1749,7 @@ setMethod ('getContainerComponets', 'RedPort',
            function (obj, container) { 
              if(ping(obj)==0)return(invisible())
              container=as.character(container)
-             return (rederpost(obj@uri, 'RedHandler.getContainerComponets', container))
+             return (.rederpost(obj, 'RedHandler.getContainerComponets', container))
            }
 )
 
@@ -1751,7 +1758,7 @@ setMethod ('mergeNodes', 'RedPort',
            function (obj, nodes) { 
              if(ping(obj)==0)return(invisible())
              node=as.character(nodes)
-             return (rederexpresspost(obj@uri, 'RedHandler.mergeNodes', nodes))
+             return (.rederexpresspost(obj, 'RedHandler.mergeNodes', nodes))
            }
 )
 
@@ -1760,7 +1767,7 @@ setMethod ('mergeNodes', 'RedPort',
 setMethod ('getEdges', 'RedPort', 
            function (obj, status="selected", type="node") { 
              if(ping(obj)==0)return(NULL)
-             return (rederpost(obj@uri, 'RedHandler.getEdges', type, status))
+             return (.rederpost(obj, 'RedHandler.getEdges', type, status))
            }
 )
 
@@ -1783,7 +1790,7 @@ setMethod ('setArrowDirection', 'RedPort',
              nodeA=as.character(nodeA)
              nodeB=as.character(nodeB)  
              direction=as.numeric(direction)  
-             return (rederexpresspost(obj@uri, 'RedHandler.setArrowDirection', 
+             return (.rederexpresspost(obj, 'RedHandler.setArrowDirection', 
                              nodeA, nodeB, direction))
            }
 )
@@ -1815,7 +1822,7 @@ setMethod ('addEdges', 'RedPort',
              if(!is.character(edges)){
                edges=as.character(edges)
              }     
-             return (rederexpresspost (obj@uri, 'RedHandler.addEdges', edges))
+             return (.rederexpresspost(obj, 'RedHandler.addEdges', edges))
            }
 )
 
@@ -1845,7 +1852,7 @@ setMethod ('deleteEdges', 'RedPort',
              if(!is.character(edges)){
                edges=as.character(edges)
              }     
-             return (rederexpresspost(obj@uri, 'RedHandler.deleteEdges', edges))
+             return (.rederexpresspost(obj, 'RedHandler.deleteEdges', edges))
            }
 )
 
@@ -1855,7 +1862,7 @@ setMethod ('addEdgeBetweenContainers', 'RedPort',
              if(ping(obj)==0)return(invisible())
              containerA=as.character(containerA)
              containerB=as.character(containerB)   
-             return (rederexpresspost(obj@uri, 'RedHandler.addEdgeBetweenContainers', 
+             return (.rederexpresspost(obj, 'RedHandler.addEdgeBetweenContainers', 
                               containerA, containerB))
            }
 )
@@ -1868,7 +1875,7 @@ setMethod ('selectEdges', 'RedPort',
              nodeA=as.character(nodeA)
              nodeB=as.character(nodeB)
              deSelectEdges(obj)  #deselect all edges previously to the call!    
-             invisible(rederexpresspost(obj@uri, 'RedHandler.selectEdges', nodeA, nodeB))
+             invisible(.rederexpresspost(obj, 'RedHandler.selectEdges', nodeA, nodeB))
            }
 )
 
@@ -1879,7 +1886,7 @@ setMethod ('selectNodes', 'RedPort',
              nodes=as.character(nodes)
              nt=ifelse(is.null(nt[1]),"",as.character(nt)[1])
              deSelectNodes(obj)#deselect all nodes previously to the call!
-             invisible (rederexpresspost(obj@uri, 'RedHandler.selectNodes', nodes, nt))
+             invisible (.rederexpresspost(obj, 'RedHandler.selectNodes', nodes, nt))
            }
 )
 
@@ -1887,7 +1894,7 @@ setMethod ('selectNodes', 'RedPort',
 setMethod ('selectAllEdges', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.selectAllEdges'))
+             invisible (.rederexpresspost(obj, 'RedHandler.selectAllEdges'))
            }
 )
 
@@ -1895,7 +1902,7 @@ setMethod ('selectAllEdges', 'RedPort',
 setMethod ('selectAllNodes', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.selectAllNodes'))
+             invisible (.rederexpresspost(obj, 'RedHandler.selectAllNodes'))
            }
 )
 
@@ -1903,7 +1910,7 @@ setMethod ('selectAllNodes', 'RedPort',
 setMethod ('selectGraph', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.selectGraph'))
+             invisible (.rederexpresspost(obj, 'RedHandler.selectGraph'))
            }
 )
 
@@ -1911,7 +1918,7 @@ setMethod ('selectGraph', 'RedPort',
 setMethod ('deSelectEdges', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.deSelectEdges'))
+             invisible (.rederexpresspost(obj, 'RedHandler.deSelectEdges'))
            }
 )
 
@@ -1919,7 +1926,7 @@ setMethod ('deSelectEdges', 'RedPort',
 setMethod ('deSelectNodes', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.deSelectNodes'))
+             invisible (.rederexpresspost(obj, 'RedHandler.deSelectNodes'))
            }
 )
 
@@ -1927,7 +1934,7 @@ setMethod ('deSelectNodes', 'RedPort',
 setMethod ('deSelectGraph', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.deSelectGraph'))
+             invisible (.rederexpresspost(obj, 'RedHandler.deSelectGraph'))
            }
 )
 
@@ -1935,7 +1942,7 @@ setMethod ('deSelectGraph', 'RedPort',
 setMethod ('deleteSelectedEdges', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.deleteSelectedEdges'))
+             invisible (.rederexpresspost(obj, 'RedHandler.deleteSelectedEdges'))
            }
 )
 
@@ -1943,7 +1950,7 @@ setMethod ('deleteSelectedEdges', 'RedPort',
 setMethod ('deleteSelectedNodes', 'RedPort', 
            function (obj) {
              if(ping(obj)==0)return(invisible())
-             invisible (rederexpresspost(obj@uri, 'RedHandler.deleteSelectedNodes'))
+             invisible (.rederexpresspost(obj, 'RedHandler.deleteSelectedNodes'))
            }
 )
 
@@ -1951,7 +1958,7 @@ setMethod ('deleteSelectedNodes', 'RedPort',
 setMethod ('isDynamicsActive', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             return (rederexpresspost(obj@uri, 'RedHandler.isDynamicsActive'))
+             return (.rederexpresspost(obj, 'RedHandler.isDynamicsActive'))
            }
 )
 
@@ -1969,7 +1976,7 @@ setMethod ('relax', 'RedPort',
              if(!is.numeric(p8) || length(p8)==0)p8=10;p8=p8[1]
              if(!is.logical(ps))ps=FALSE
              ps=ifelse(ps[1],1,0)
-             return (rederexpresspost(obj@uri, 'RedHandler.setDynamics',p1,p2,p3,p4,p5,p6,p7,p8,ps))
+             return (.rederexpresspost(obj, 'RedHandler.setDynamics',p1,p2,p3,p4,p5,p6,p7,p8,ps))
            }
 )
 
@@ -2131,8 +2138,8 @@ setMethod ('nesthc', 'RedPort',
              # ' update="default" ' forces keeping old node coords and not to add new containers!
              if(is.null(update) || !is.character(update))update=NULL
              # internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
-             invisible(rederexpresspost (obj@uri,'RedHandler.lockDragAndZoom'))
-             if(!is.null(zoom))invisible( rederexpresspost (obj@uri, 'RedHandler.setZoom',zoom) )
+             invisible(.rederexpresspost(obj,'RedHandler.lockDragAndZoom'))
+             if(!is.null(zoom))invisible( .rederexpresspost(obj, 'RedHandler.setZoom',zoom) )
              checknd=getGraph(obj, status="all", attribs="minimal")
              checknd=V(checknd)$name        
              
@@ -2220,12 +2227,12 @@ setMethod ('nesthc', 'RedPort',
                  }
                }
                message('*** Uploading nest hclust...')
-               rederexpresspost(obj@uri,'RedHandler.nestpackexpress', nodes, status, charAtt, numAtt, nestmap)
+               .rederexpresspost(obj,'RedHandler.nestpackexpress', nodes, status, charAtt, numAtt, nestmap)
                invisible( updateGraph(obj) )
              }
              
              #Internal function (unlocks DragAndZoon interactivity after send subgraph list)
-             invisible(rederexpresspost (obj@uri,'RedHandler.unLockDragAndZoom'))
+             invisible(.rederexpresspost(obj,'RedHandler.unLockDragAndZoom'))
              
              if(plothc){
                plot(x=hc, xlab=xlab, ylab=ylab, cex=cex, sub="", main=main, labels=labels, lwd=lwd,...)
@@ -2394,7 +2401,7 @@ setMethod ('addLegend.color', 'RedPort',
              # set logical
              vertical=ifelse(vertical,"true","false")
              
-             invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendColor', colvec, labvec, size, 
+             invisible( .rederexpresspost(obj, 'RedHandler.addLegendColor', colvec, labvec, size, 
                                          bend, ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type ) )
              
            }
@@ -2528,7 +2535,7 @@ setMethod ('addLegend.size', 'RedPort',
              # final logical setting
              vertical=ifelse(vertical,"true","false")
              
-             invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendSize', sizevec, labvec, col, intersp, 
+             invisible( .rederexpresspost(obj, 'RedHandler.addLegendSize', sizevec, labvec, col, intersp, 
                                          ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type, edgelen ) )
              
            }
@@ -2670,7 +2677,7 @@ setMethod ('addLegend.shape', 'RedPort',
              # final logical setting
              vertical=ifelse(vertical,"true","false")
              
-             invisible( rederexpresspost(obj@uri, 'RedHandler.addLegendShape', shapevec, labvec, col, size, 
+             invisible( .rederexpresspost(obj, 'RedHandler.addLegendShape', shapevec, labvec, col, size, 
                                          intersp, ftsize, title, dxtitle, position, dxborder, dyborder, vertical, type) )
              
            }
@@ -2682,70 +2689,70 @@ setMethod ('addLegend.shape', 'RedPort',
 
 #-------------------------------------------------------------------------------
 .getNodeAliases<-function (obj, status="all", type="node") { 
-  return ( rederpost(obj@uri, 'RedHandler.getNodeAliases', type, status) )
+  return ( .rederpost(obj, 'RedHandler.getNodeAliases', type, status) )
 }
 #-------------------------------------------------------------------------------
 .getNodeX<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeX', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeX', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeY<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeY', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeY', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeBend<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeBend', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeBend', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeSize<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeSize', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeSize', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeShape<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeShape', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeShape', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeColor<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeColor', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeColor', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeLineWidth<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeLineWidth', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeLineWidth', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeLineColor<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeLineColor', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeLineColor', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeFontSize<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeFontSize', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeFontSize', type, status))
 }
 #-------------------------------------------------------------------------------
 .getNodeFontColor<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeFontColor', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeFontColor', type, status))
 }
 #-------------------------------------------------------------------------------   
 .getNodeWeight<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getNodeWeight', type, status))
+  return (.rederpost(obj, 'RedHandler.getNodeWeight', type, status))
 }
 #-------------------------------------------------------------------------------
 .getArrowDirection<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getArrowDirection', type, status))
+  return (.rederpost(obj, 'RedHandler.getArrowDirection', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeWidth<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getEdgeWidth', type, status))
+  return (.rederpost(obj, 'RedHandler.getEdgeWidth', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeColor<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getEdgeColor', type, status))
+  return (.rederpost(obj, 'RedHandler.getEdgeColor', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeType<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getEdgeType', type, status))
+  return (.rederpost(obj, 'RedHandler.getEdgeType', type, status))
 }
 #-------------------------------------------------------------------------------
 .getEdgeWeight<-function(obj, status="all", type="node"){
-  return (rederpost(obj@uri, 'RedHandler.getEdgeWeight', type, status))
+  return (.rederpost(obj, 'RedHandler.getEdgeWeight', type, status))
 }
 

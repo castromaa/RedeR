@@ -40,10 +40,11 @@ Submits series of R graphs to RedeR app.
 
 \examples{
 
-rdp <- RedPort('MyPort')
+library(igraph)
 
 \dontrun{
 
+rdp <- RedPort('MyPort')
 calld(rdp)
 
 ###

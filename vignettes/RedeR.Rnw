@@ -89,6 +89,7 @@ calld(rdp)
 Within an active interface, then the method 'addGraph' can easily send R graphs to the application. For example, the following chunk adds an \Rpackage{igraph}\cite{igraph} object (Fig.\ref{fig2}):
 \begin{small}
 <<label= Add graph, eval= TRUE>>=
+library (igraph)
 g1 <- graph.lattice(c(5,5,5))
 addGraph( rdp, g1, layout.kamada.kawai(g1) )
 @
