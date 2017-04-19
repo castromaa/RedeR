@@ -118,7 +118,7 @@ resetd(rdp)
 The interface accepts additional graph attributes, as for example edge direction, edge width, edge weight, node shape, node size, node color etc. In \Rpackage{igraph} objects, vertex and edge attributes can be assigned as arbitrary R objects. In order to pass these extensible features to \Rpackage{RedeR} the attributes must be provided in a valid syntax.\footnote{See \Rfunction{getGraph} and \Rfunction{addGraph} specification for additional details.}
 
 
-Another strategy is to wrap graphs into containers and then send it to the Java app. Next, the subgraphs g3 and g4 are assigned to different nested structures (Fig.\ref{fig3}).
+Another strategy is to wrap graphs into containers and then send it to the Java application. Next, the subgraphs g3 and g4 are assigned to different nested structures (Fig.\ref{fig3}).
 \begin{small}
 <<label= Build subgraphs, eval= TRUE>>=
 g3 <- barabasi.game(10)
@@ -161,7 +161,7 @@ resetd(rdp)
 
 \subsection{Interactive work}
 
-The next chunk generates a scale-free graph according to the Barabasi-Albert model\cite{igraph} and sends the graph to RedeR without any layout information.
+The next chunk generates a scale-free graph according to the Barabasi-Albert model\cite{igraph} and sends the graph to \Rpackage{RedeR} without any layout information.
 \begin{small}
 <<label= Build scale-free graph and send to the app, eval=TRUE>>=
 g6 <- barabasi.game(500)
@@ -188,7 +188,7 @@ Scale-free graph according to the Barabasi-Albert model\cite{igraph}.
 }
 \end{figure}
 
-In Figure \ref{fig5a} the same graph is used to exemplify the community structure mapped by the edge-betweenness function available in RedeR. In Figure \ref{fig5b} these communities are nested to containers, which are objects of the same class of the nodes but with additional behaviors (Fig.\ref{fig5c}). You can build these containers either using \emph{R} or \emph{Java} functions (see options available in the \emph{clustering} main menu and in the shortcuts of the nested objects, i.e., right-click a container).
+In Figure \ref{fig5a} the same graph is used to exemplify the community structure mapped by the edge-betweenness function available in \Rpackage{RedeR}. In Figure \ref{fig5b} these communities are nested to containers, which are objects of the same class of the nodes but with additional behaviors (Fig.\ref{fig5c}). You can build these containers either using \emph{R} or \emph{Java} functions (see options available in the \emph{clustering} main menu and in the shortcuts of the nested objects, i.e., right-click a container).
 
 For the next example you will need to reproduce the graph from Figure \ref{fig5b} (or any graph with containers) in the \Rpackage{RedeR} app, then select one of the communities, and run the chunk below:  a simple degree distribution should be plotted in the R side.
 \begin{small}
@@ -393,7 +393,7 @@ hc <- hclust(dist(get.adjacency(sg, attr="weight")))
 nesthc(rdp,hc, cutlevel=3, nmemb=5, cex=0.3, labels=V(sg)$nodeAlias)
 @
 \bigbreak
-\emph{...at this point nested objects from the network should also be mapped to a dendrogram!  different levels of the nested structure can be set by the nesthc method. Additionally, significant clusters can be computed by the pvclust package, which is already compatible with RedeR interface.}
+\emph{...at this point nested objects from the network should appear mapped onto a dendrogram! different levels of the nested structure can be set by the \Rfunction{nesthc} method. Additionally, clustering stability can be assessed by the \Rpackage{pvclust} package, which is already compatible with RedeR interface.}
 \bigbreak
 
 \item 7 - assign edges to containers:

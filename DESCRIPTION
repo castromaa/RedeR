@@ -1,8 +1,8 @@
 Package: RedeR
 Type: Package
 Title: Interactive visualization and manipulation of nested networks
-Version: 1.23.4
-Date: 2017-04-18
+Version: 1.23.5
+Date: 2017-04-19
 Author: Mauro Castro, Xin Wang, Florian Markowetz
 Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
 Depends: R (>= 3.3.0), methods
