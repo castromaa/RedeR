@@ -35,11 +35,14 @@ Prior calling this method make sure that there is an active RedeR session.
 }
 
 \examples{
-rdp <- RedPort('MyPort') 
+# Initialize igraph
+library(igraph)
+
 edges<-c("n1","n2","n1","n3","n1","n4","n1","n5","n1","n6","n1","n7")
 
 \dontrun{
 
+  rdp <- RedPort() 
   calld(rdp)
   addEdges(rdp, edges)  
   updateGraph(rdp)

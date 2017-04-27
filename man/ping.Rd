@@ -31,17 +31,12 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 }
 
 \examples{
-
 rdp <- RedPort('MyPort') 
 
 \dontrun{
 
 calld(rdp)
-
 ping (rdp)
-
-    # "R interface is ready to use!"  
-
 }  
  
 }

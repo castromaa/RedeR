@@ -43,9 +43,7 @@ An adjacency matrix with significant correlation values.
 \code{\link[stats:p.adjust]{p.adjust}}
 }
 
-
 \examples{
-
 data(ER.deg)
 #--- a gene expression matrix
 exp <- ER.deg$exp

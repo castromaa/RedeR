@@ -32,12 +32,14 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 }
 
 \examples{
+# Initialize igraph
+library(igraph)
 
-rdp <- RedPort('MyPort') 
 edges<-c("n1","n2","n1","n3","n1","n4","n1","n5","n1","n6","n1","n7")
 
 \dontrun{
 
+  rdp <- RedPort() 
   calld(rdp)
   addEdges(rdp, edges)
   deleteNodes(rdp, c("n1","n3") )

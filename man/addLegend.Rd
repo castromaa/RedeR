@@ -62,13 +62,13 @@ Send legend objects to RedeR app.
 \code{\link[RedeR:att.sete]{att.sete}}
 }
 
-
 \examples{
-
-rdp <- RedPort('MyPort')
+# Initialize igraph
+library(igraph)
 
 \dontrun{
 
+rdp <- RedPort()
 calld(rdp)
 
 cols<-colorRampPalette(colors=c('red','blue'))(14)	
@@ -86,8 +86,6 @@ addLegend.shape(rdp,shape)
 
 shape<-c('SOLID','DOTTED','DOTTED_SHORT','LONG_DASH')
 addLegend.shape(rdp,shape,type="edge")
-
-
 }
 }
 

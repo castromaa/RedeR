@@ -38,7 +38,6 @@ Systems call to open RedeR application and XML-RPC server.
 }
 
 \examples{
-
 rdp <- RedPort('MyPort')
 
 \dontrun{

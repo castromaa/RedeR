@@ -39,19 +39,18 @@ Fruchterman TMJ, Reingold EM. Graph drawing by force-directed placement. Softwar
 
 \author{Mauro Castro}
 
-
 \examples{
-
+# Initialize igraph
 library(igraph)
+
 g <- graph.lattice(c(5,5,5))
 
 \dontrun{
 
-  rdp <- RedPort('MyPort')
+  rdp <- RedPort()
   calld(rdp)
   addGraph( rdp, g, layout.random(g) )
   relax(rdp)
-
 } 
 
 

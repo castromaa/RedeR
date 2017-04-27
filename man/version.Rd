@@ -37,7 +37,6 @@ rdp <- RedPort('MyPort')
 
   calld(rdp) 
   version(rdp)
-    # "RedeR v1.0" 
 }
 }
 
