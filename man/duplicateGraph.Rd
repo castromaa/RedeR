@@ -39,12 +39,12 @@ Duplicates graphs in RedeR app.
 
 
 \examples{
-
+# Initialize igraph
 library(igraph)
 
 \dontrun{
 
-rdp <- RedPort('MyPort')
+rdp <- RedPort() 
 calld(rdp)
 
 ###

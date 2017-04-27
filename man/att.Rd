@@ -70,7 +70,6 @@ sg <- att.setv(sg, from="logFC.t3", to="nodeColor", breaks=seq(-1,1,0.2), pal=2)
 # sets numerical value to nodeSize attribute
 sg <- att.setv(sg, from="ERbdist", to="nodeSize", nquant=10, isrev=TRUE, xlim=c(5,40,1))
 
-
 }
 
 \keyword{attributes}

@@ -33,7 +33,6 @@ rdp <- RedPort('MyPort')
 
   calld(rdp)
   resetd(rdp)
-
 }  
 }
 

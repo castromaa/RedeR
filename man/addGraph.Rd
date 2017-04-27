@@ -126,16 +126,13 @@ In this cases, source-target information is transferred to 'arrowDirection' attr
 \code{\link[RedeR:att]{att}}
 }
 
-
-
-
 \examples{
-
+# Initialize igraph
 library(igraph)
 
 \dontrun{
 
-rdp <- RedPort('MyPort')
+rdp <- RedPort()
 calld(rdp)
 
 ###
@@ -168,8 +165,6 @@ resetd(rdp)
 
 data(hs.inter)
 system.time( addGraph(rdp, hs.inter, layout=NULL) )
-
-
 }
 }
 

@@ -1408,8 +1408,10 @@ treemap<-function(hc){
   hcEdges<-data.frame(hcEdges,stringsAsFactors=FALSE)
   hcEdges$parentHeight<-obj$height[hcEdges$parentNode]
   #---get unified nodes
-  hcl<-data.frame(node=hc$labels,mergeId=-c(1:nn),hcId=c(1:nn), type="leaf",stringsAsFactors=FALSE)
-  hcn<-data.frame(node=paste("N",c(1:N),sep=""),mergeId=c(1:N),hcId=c(1:N),type="nest",stringsAsFactors=FALSE)
+  hcl<-data.frame(node=hc$labels,mergeId=-c(1:nn),hcId=c(1:nn), type="leaf",
+                  stringsAsFactors=FALSE)
+  hcn<-data.frame(node=paste("N",c(1:N),sep=""),mergeId=c(1:N),hcId=c(1:N),
+                  type="nest",stringsAsFactors=FALSE)
   hcNodes<-rbind(hcl,hcn)
   hcEdges$parentNode<-hcNodes$node[match(hcEdges$parentNode,hcNodes$mergeId)]
   hcEdges$childNode<-hcNodes$node[match(hcEdges$childNode,hcNodes$mergeId)]
@@ -1418,63 +1420,53 @@ treemap<-function(hc){
   return(obj)
 }
 
-#-------------------------------------------------------------
-# simplified remote calls for RedeR!
-# designed for internal handler, only for simple calls!
-.rederpost<-function(obj, RedHandler, ..., .args=list(...)){
-  aXML<-function(method, .args){
-    node<-newXMLNode("methodCall", newXMLNode("methodName", method))
-    params<-newXMLNode("params", parent=node)
-    nattrs<-function(x)newXMLNode("value",newXMLNode("string",newXMLCDataNode(x)))
-    sapply(.args,function(x)newXMLNode("param",nattrs(x),parent=params))
-    node
+#-------------------------------------------------------------------
+#-------------------------------------------------------------------
+# simplified remote calls for RedeR, designed for internal handler
+#-------------------------------------------------------------------
+#-------------------------------------------------------------------
+
+#-------------------------------------------------------------------
+.rederpost<-function(obj, method, ..., gdata=list(...)){
+  aXML<-function(method, x){
+    method <- paste(c("<methodName>",method,"</methodName>"), 
+                    collapse = "",sep="")
+    x <- lapply(x,function(arg){
+      paste(c("<string><![CDATA[",arg,"]]></string>"), collapse="", 
+            sep="")
+    })
+    x <- lapply(x,function(arg){
+      paste(c("<value>",arg,"</value>"), collapse="", sep="")
+    })
+    x <- lapply(x,function(arg){
+      paste(c("<param>",arg,"</param>"), collapse="", sep="")
+    })
+    x <- paste(unlist(x),collapse="", sep="")
+    x <- paste("<params>",x,"</params>",collapse="", sep="")
+    doc <- paste(c("<methodCall>",method,x,"</methodCall>"), 
+                 collapse="", sep="")
+    return(doc)
   }
-  bXML<-function(node){
-    if(is.null(node))return(node)
-    if(xmlName(node)=="value")node<-node[[1]]
-    if(is(node, "XMLInternalTextNode"))return(xmlValue(node))
-    type<-xmlName(node)
-    if(type=='array'){
-      node<-xmlApply(node[["data"]], function(x) bXML(x[[1]]))
-      bl<-!is.list(node[[1]]) && all(sapply(node, typeof)==typeof(node[[1]]))
-      if(bl) node<-structure(unlist(node),names=NULL)
-    } else {
-      node<-xmlValue(node)
-    }
-    if(type=="i4"||type=="int")node<-as.integer(node)
-    if(type=="double")node<-as.numeric(node)
-    node
-  }
-  #---VERSION1 - WITH 'RCurl'
-  # cXML<-dynCurlReader(.curl, baseURL=obj@uri)
-  # dXML<-list(httpheader=c('Content-Type'="text/xml"),
-  #            followlocation=TRUE, useragent="R-XMLRPC",
-  #            postfields=saveXML(aXML(RedHandler,.args)),
-  #            headerfunction=cXML$update)
-  # postForm(obj@uri,.opts=dXML,style="POST")
-  # rdcall<-cXML$value()
-  #---VERSION2 - WITH 'utils'
-  rdcall <- .simplePost(host=obj@host, port=obj@port, 
-                        datatosend = saveXML(aXML(RedHandler,.args)) )
-  #---
-  rdcall <- xmlParse(rdcall,asText=TRUE)
-  rdcall <- xpathApply(rdcall, "//param/value", bXML)
-  if(length(rdcall)==1)rdcall <- rdcall[[1]]
-  rdcall
+  rdcall <- .simplePost(host=obj@host, port=obj@port,
+                        datatosend=aXML(method,gdata) )
+  rdcall <- .postParser(rdcall)
+  return(rdcall)
 }
-#-------------------------------------------------------------
+
+#-------------------------------------------------------------------
 # express post: direct calls to RedeR 
-# improve loading performance for large/sequential objects!
-# designed for internal handler, only for large and complex calls!
+# improve loading performance for large/sequential objects,
+# designed for internal handler
 .rederexpresspost<-function(obj, method, ..., gdata=list(...)){	
-  getminimumxml<-function(x, method){
+  bXML<-function(method, x){
     getserial<-function(x){
       if(is.character(x)){
         x<-gsub("&","&amp;",x)
         x<-gsub("<","&lt;",x)
         x<-gsub(">","&gt;",x)
       }
-      type<-c("integer"="double", "double"="double", "character"="string")[typeof(x)]
+      type<-c("integer"="double", "double"="double", 
+              "character"="string")[typeof(x)]
       head<-paste("<value><",type,">",sep="",collapse="")
       tail<-paste("</",type,"></value>",sep="",collapse="")
       doc<-paste(head,x,tail,sep="",collapse="")
@@ -1490,27 +1482,26 @@ treemap<-function(hc){
     doc<-paste("<params>",doc,"</params>",sep="", collapse="")	
     mt<-paste("<methodName>",method,"</methodName>", sep="", collapse="")
     doc<-paste("<methodCall>",mt,doc,"</methodCall>",sep="", collapse="")
-    list(httpheader=c('Content-Type'="text/xml"),postfields=doc)	
-  }	
-  doc<-getminimumxml(gdata, method)
-  #---VERSION1 - WITH 'RCurl'
-  # p<-postForm(uri=obj@uri, .opts=doc, style="POST")
-  #---VERSION2 - WITH 'utils'
-  p <- .simplePost(host=obj@host, port=obj@port, datatosend = doc$postfields )
-  #---
-  p<-xmlParse(p, asText = TRUE)
-  xmlValue(xmlChildren(p)[[1]])	
+    return(doc)	
+  }
+  rdcall <- .simplePost(host=obj@host, port=obj@port, 
+                        datatosend=bXML(method,gdata))
+  rdcall <- .postParser(rdcall)
+  return(rdcall)	
 }
-#-------------------------------------------------------------
-.simplePost<-function (host, port=9091, contenttype="text/xml", datatosend) {
+
+#-------------------------------------------------------------------
+.simplePost<-function (host, port, datatosend, contenttype="text/xml"){
   lengthdatatosend <- length(charToRaw(datatosend))
   header <- character(0)
   header <- c(header, "POST / HTTP/1.1\n")
-  header <- c(header, paste("Content-Type: ", contenttype, "\n", sep = ""))
-  header <- c(header, paste("Content-Length: ", lengthdatatosend, "\n", sep = ""))
+  header <- c(header, paste("Content-Type: ", contenttype, "\n", 
+                            sep = ""))
+  header <- c(header, paste("Content-Length: ", 
+                            lengthdatatosend, "\n", sep = ""))
   header <- c(header, "Connection: Keep-Alive\n\n")
   header <- paste(c(header, datatosend, "\n"), collapse = "")
-  fp <- make.socket(host = host, port = port, server = FALSE)
+  fp <- make.socket(host=host, port=port, server=FALSE)
   write.socket(fp, header)
   output <- character(0)
   repeat{
@@ -1523,5 +1514,22 @@ treemap<-function(hc){
   output <- gsub("<methodResponse.*?>", "<methodResponse>", output) 
   output <- gsub("\\s", "", output)
   return(output)
+}
+
+#-------------------------------------------------------------------
+.postParser <- function(rdcall){
+  type <- c("i4|int","double","array")
+  type <- sapply(type,function(tp){grepl(tp, x=rdcall)})
+  if(type[3]){
+    rdcall <- unlist(strsplit(rdcall, "<.?data>", perl=TRUE))[2]
+  } else {
+    rdcall <- unlist(strsplit(rdcall, "<.?param>", perl=TRUE))[2]
+  }
+  rdcall <- gsub(pattern = "<value>", "", rdcall)
+  rdcall <- unlist(strsplit(rdcall, "</value>"))
+  rdcall <- gsub("<.*?>", "", rdcall)
+  if(type[1])rdcall <- as.integer(rdcall)
+  if(type[2])rdcall <- as.numeric(rdcall)
+  return(rdcall)
 }
 

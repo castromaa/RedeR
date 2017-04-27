@@ -28,7 +28,7 @@ Exit software.
 
 \examples{
 
-rdp <- RedPort('MyPort') 
+rdp <- RedPort()
 
 \dontrun{
 

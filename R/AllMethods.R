@@ -10,10 +10,10 @@ setMethod ('ping', 'RedPort',
              calltest1 <- !inherits(calltest1, "try-error")
              if(calltest1){
                calltest2 <- try(suppressWarnings(
-                 .rederexpresspost(obj,'RedHandler.ping')
+                 .rederpost(obj,'RedHandler.ping')
                  ),silent=TRUE)
-               if(is.character(calltest2) && length(calltest2)==1){
-                 if(calltest2=="1"){
+               if(is.numeric(calltest2) && length(calltest2)==1){
+                 if(calltest2==1){
                    rval <- 1L
                  }
                }
@@ -28,7 +28,7 @@ setMethod ('exitd', 'RedPort',
            function (obj) { 
              if(ping(obj)==0)return(invisible())
              Sys.sleep(0.5)
-             invisible(.rederexpresspost(obj, 'RedHandler.exit'))
+             invisible(.rederpost(obj, 'RedHandler.exit'))
              Sys.sleep(0.5)
            }
 )
@@ -37,15 +37,17 @@ setMethod ('exitd', 'RedPort',
 setMethod ('resetd', 'RedPort', 
            function (obj) {
              if(ping(obj)==0)return(invisible())
-             invisible(.rederexpresspost(obj, 'RedHandler.reset'))
+             invisible(.rederpost(obj, 'RedHandler.reset'))
            }
 )
 
 #-------------------------------------------------------------------------------
 setMethod ('version', 'RedPort', 
            function (obj) { 
-             if(ping(obj)==0)return(invisible())
-             return (.rederexpresspost(obj, 'RedHandler.version'))
+             if(ping(obj)==0){
+               return("RedeR/Java interface has not yet been initialized!")
+             }
+             return (.rederpost(obj, 'RedHandler.version'))
            }
 )
 
@@ -86,7 +88,7 @@ setMethod ('calld', 'RedPort',
                }
              } else {
                #(3)Execute 'calld' and update app settings in RedeR preferences:-----               
-               command = paste(cmd,      shQuote(filepath), sep=' ')
+               command = paste(cmd, shQuote(filepath), sep=' ')
                system(command, ignore.stdout = !checkcalls, ignore.stderr = !checkcalls, wait=FALSE) 
              }
 
@@ -113,7 +115,6 @@ setMethod ('calld', 'RedPort',
                  message("\nThe Java interface is not responding to initialization!")
                  message("Please, check whether Java is already installed in your machine (JRE version>=6).")
                  message("For a general diagnosis, re-run the 'calld' function with 'checkcalls=TRUE', for example: \n> calld(rdp, checkcalls=TRUE)")
-                 message("Please report any eventual error message to us <mauro.a.castro at gmail.com>")
                }
              }
              if(!checkcalls)testInterface(obj=obj,maxlag=maxlag)
@@ -124,7 +125,7 @@ setMethod ('calld', 'RedPort',
 setMethod ('updateGraph', 'RedPort', 
            function (obj) { 
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.updateGraph'))
+             invisible (.rederpost(obj, 'RedHandler.updateGraph'))
            }
 )
 
@@ -167,18 +168,18 @@ setMethod ('getGraph', 'RedPort',
                g         = igraph::set.vertex.attribute(g, "coordY", value=nodeY)
                return(g)
              } else if(attribs=="all"){
-               nodeAlias      = .getNodeAliases (obj, status, type ) 
-               nodeBend       = .getNodeBend (obj, status, type )     
-               nodeX          = .getNodeX (obj, status, type )
-               nodeY          = .getNodeY (obj, status, type )
-               nodeSize       = .getNodeSize (obj, status, type )
-               nodeShape      = .getNodeShape (obj, status, type )
-               nodeColor      = .getNodeColor (obj, status, type )
-               nodeWeight     = .getNodeWeight (obj, status, type )
-               nodeLineWidth  = .getNodeLineWidth (obj, status, type )
-               nodeLineColor  = .getNodeLineColor (obj, status, type ) 
-               nodeFontSize   = .getNodeFontSize (obj, status, type )
-               nodeFontColor  = .getNodeFontColor (obj, status, type )        
+               nodeAlias      = .getNodeAliases(obj, status, type ) 
+               nodeBend       = .getNodeBend(obj, status, type )     
+               nodeX          = .getNodeX(obj, status, type )
+               nodeY          = .getNodeY(obj, status, type )
+               nodeSize       = .getNodeSize(obj, status, type )
+               nodeShape      = .getNodeShape(obj, status, type )
+               nodeColor      = .getNodeColor(obj, status, type )
+               nodeWeight     = .getNodeWeight(obj, status, type )
+               nodeLineWidth  = .getNodeLineWidth(obj, status, type )
+               nodeLineColor  = .getNodeLineColor(obj, status, type ) 
+               nodeFontSize   = .getNodeFontSize(obj, status, type )
+               nodeFontColor  = .getNodeFontColor(obj, status, type )        
                g     = igraph::set.vertex.attribute(g, "nodeAlias",  value=nodeAlias)
                g     = igraph::set.vertex.attribute(g, "nodeBend",   value=nodeBend)
                g     = igraph::set.vertex.attribute(g, "coordX",   value=nodeX)
@@ -302,7 +303,7 @@ setMethod ('addSubgraph.list', 'RedPort',
              # 'update="default"' forces to keep old node coords and not to add new containers!
              if(!is.null(update) && !is.character(update))update=NULL
              # internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
-             invisible(.rederexpresspost(obj,'RedHandler.lockDragAndZoom'))
+             invisible(.rederpost(obj,'RedHandler.lockDragAndZoom'))
              
              #send request to addSubgraph fuction
              for(i in 1:length(nodeList)){
@@ -322,8 +323,9 @@ setMethod ('addSubgraph.list', 'RedPort',
                        att$zoom=50
                      }
                    } else {
-                     g <- igraph::remove.vertex.attribute(g,"coordX")
-                     g <- igraph::remove.vertex.attribute(g,"coordY")
+                     vattrbs <- igraph::vertex_attr_names(g)
+                     if("coordX"%in%vattrbs) g <- igraph::delete_vertex_attr(g,"coordX")
+                     if("coordY"%in%vattrbs) g <- igraph::delete_vertex_attr(g,"coordY")
                      att$isNest=FALSE
                      att$update=update[1]
                    }
@@ -343,8 +345,9 @@ setMethod ('addSubgraph.list', 'RedPort',
                        att$zoom=G(g,"zoom")
                      }
                    } else {
-                     g <- igraph::remove.vertex.attribute(g,"coordX")
-                     g <- igraph::remove.vertex.attribute(g,"coordY")
+                     vattrbs <- igraph::vertex_attr_names(g)
+                     if("coordX"%in%vattrbs) g <- igraph::delete_vertex_attr(g,"coordX")
+                     if("coordY"%in%vattrbs) g <- igraph::delete_vertex_attr(g,"coordY")
                      g$isNest=FALSE 	
                      att$update=update[1] 
                    }
@@ -370,7 +373,7 @@ setMethod ('addSubgraph.list', 'RedPort',
                }
              }  		
              #Internal function (unlocks DragAndZoon interactivity after sent subgraph list)
-             invisible(.rederexpresspost(obj,'RedHandler.unLockDragAndZoom'))
+             invisible(.rederpost(obj,'RedHandler.unLockDragAndZoom'))
            }
 )
 
@@ -546,7 +549,8 @@ setMethod ('duplicateGraph', 'RedPort',
                if(!isDefaultCopy){arg2="no"}
                message("... duplicate graph")
                invisible( .rederexpresspost(obj, 'RedHandler.duplicateNetwork', arg1, arg2) )
-             }		
+             }
+             invisible( .rederpost(obj, 'RedHandler.fitToWindow') )
            }
 )
 
@@ -567,32 +571,22 @@ setMethod ('addSeries', 'RedPort',
                stop("Empty graph!")
              }
              #Remove attributes no longer needed!
-             g <- igraph::remove.vertex.attribute(g,"coordX")
-             g <- igraph::remove.vertex.attribute(g,"coordY")      
-             if(!setnodes){  
-               g <- igraph::remove.vertex.attribute(g,"nodeAlias")
-               g <- igraph::remove.vertex.attribute(g,"nodeBend")
-               g <- igraph::remove.vertex.attribute(g,"nodeSize")
-               g <- igraph::remove.vertex.attribute(g,"nodeShape")
-               g <- igraph::remove.vertex.attribute(g,"nodeColor")
-               g <- igraph::remove.vertex.attribute(g,"nodeWeight")
-               g <- igraph::remove.vertex.attribute(g,"nodeLineWidth")
-               g <- igraph::remove.vertex.attribute(g,"nodeLineColor")
-               g <- igraph::remove.vertex.attribute(g,"nodeFontSize")
-               g <- igraph::remove.vertex.attribute(g,"nodeFontColor")
+             vattrbs <- igraph::vertex_attr_names(g)
+             if(setnodes){ 
+               if("coordX"%in%vattrbs) g <- igraph::delete_vertex_attr(g,"coordX")
+               if("coordY"%in%vattrbs) g <- igraph::delete_vertex_attr(g,"coordY") 
+             } else {
+               for(i in vattrbs){
+                 g <- delete_vertex_attr(g,i)
+               }
              }
-             isToCopyEdges="no"
-             if(!setedges){
+             if(setedges){
+               isToCopyEdges="no"
+             } else {
                isToCopyEdges="yes"
-               g <- remove.edge.attribute(g,"arrowDirection")
-               g <- remove.edge.attribute(g,"arrowLength")
-               g <- remove.edge.attribute(g,"arrowAngle") 
-               g <- remove.edge.attribute(g,"linkType")     	
-               g <- remove.edge.attribute(g,"edgeWeight")
-               g <- remove.edge.attribute(g,"weight")
-               g <- remove.edge.attribute(g,"edgeWidth")
-               g <- remove.edge.attribute(g,"edgeColor")
-               g <- remove.edge.attribute(g,"edgeType")
+               for(i in edge_attr_names(g)){
+                 g <- delete_edge_attr(g,i)
+               }
                g <- igraph::delete.edges(g,E(g))
              }
              
@@ -600,9 +594,10 @@ setMethod ('addSeries', 'RedPort',
              isDefaultCopy="no"
              ref=try(.rederexpresspost(obj,'RedHandler.duplicateNetwork', isToCopyEdges, isDefaultCopy),TRUE)
              if(!inherits(ref, "try-error")){
-               print(paste("New container ID: ", ref, sep=""))
                #send graph to RedeR (it will update the reference network)
-               addGraph(obj,g)    	
+               addGraph(obj,g, layout=NULL)
+               invisible( .rederpost(obj, 'RedHandler.fitToWindow') )
+               print(paste("New container ID: ", ref, sep=""))
              } else {
                warning("Unable to complete the request!")
              }
@@ -807,7 +802,7 @@ setMethod ('addGraph', 'RedPort',
                    warning("NOTE: attribute 'gscale' is not set properly; must be <numeric> of length=1!")
                    gscale = 75
                  }
-                 pScale= .rederexpresspost(obj,'RedHandler.getPanelScale')
+                 pScale= .rederpost(obj,'RedHandler.getPanelScale')
                  pScale=as.numeric(pScale)
                  if(is.numeric(pScale)){
                    pScale=pScale[1]*(gscale[1]/100)
@@ -1349,8 +1344,8 @@ setMethod ('getNodes', 'RedPort',
 setMethod ('getNodeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             nodes<-.rederpost (obj@uri, 'RedHandler.getNodeIDs', type, status)
-             nodes<-nodes+1 #set index for R!
+             nodes <- .rederpost(obj, 'RedHandler.getNodeIDs', type, status)
+             nodes <- nodes+1 #set index for R!
              return(nodes)
            }
 )
@@ -1359,8 +1354,8 @@ setMethod ('getNodeIDs', 'RedPort',
 setMethod ('getEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             edges<-.rederpost(obj, 'RedHandler.getEdgeIDs', type, status)
-             edges<-edges+1 #set index for R!
+             edges <- .rederpost(obj, 'RedHandler.getEdgeIDs', type, status)
+             edges <- edges+1 #set index for R!
              return(edges)
            }
 )
@@ -1369,8 +1364,8 @@ setMethod ('getEdgeIDs', 'RedPort',
 setMethod ('getSourceEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)  
-             edges<-.rederpost(obj, 'RedHandler.getSourceEdgeIDs', type, status)
-             edges<-edges+1 #set index for R!
+             edges <- .rederpost(obj, 'RedHandler.getSourceEdgeIDs', type, status)
+             edges <- edges+1 #set index for R!
              return(edges)
            }
 )
@@ -1379,9 +1374,9 @@ setMethod ('getSourceEdgeIDs', 'RedPort',
 setMethod ('getTargetEdgeIDs', 'RedPort', 
            function (obj, status="all", type="node") {
              if(ping(obj)==0)return(NULL)
-             edges<-.rederpost(obj, 'RedHandler.getTargetEdgeIDs', type, status)
-             edges<-edges+1 #set index for R!
-             return (.rederpost(edges))
+             edges <- .rederpost(obj, 'RedHandler.getTargetEdgeIDs', type, status)
+             edges <- edges+1 #set index for R!
+             return(edges)
            }
 )
 
@@ -1390,8 +1385,8 @@ setMethod ('getTargetEdgeIDs', 'RedPort',
 setMethod ('addNodes', 'RedPort', 
            function (obj, nodes) { 
              if(ping(obj)==0)return(invisible())
-             nodes=as.character(nodes)
-             return (.rederexpresspost(obj, 'RedHandler.addNodes', nodes))
+             nodes <- as.character(nodes)
+             return ( .rederexpresspost(obj, 'RedHandler.addNodes', nodes) )
            }
 )
 
@@ -1425,8 +1420,8 @@ setMethod ('nestNodes', 'RedPort',
                if(getpack){
                  .zoom=100
                } else {
-                 .zoom=.rederexpresspost(obj,'RedHandler.getZoom')
-                 .zoom=as.numeric(.zoom)
+                 .zoom <- .rederpost(obj,'RedHandler.getZoom')
+                 .zoom <- as.numeric(.zoom)
                  if(is.nan(.zoom)){
                    .zoom=100
                  } else if(.zoom>100){
@@ -1715,7 +1710,7 @@ setMethod ('nestNodes', 'RedPort',
 setMethod ('updateContainerSize', 'RedPort', 
            function (obj) { 
              if(ping(obj)==0)return(invisible())
-             return (.rederexpresspost(obj, 'RedHandler.updateContainerSize'))
+             return (.rederpost(obj, 'RedHandler.updateContainerSize'))
            }
 )
 
@@ -1749,7 +1744,7 @@ setMethod ('getContainerComponets', 'RedPort',
            function (obj, container) { 
              if(ping(obj)==0)return(invisible())
              container=as.character(container)
-             return (.rederpost(obj, 'RedHandler.getContainerComponets', container))
+             return (.rederexpresspost(obj, 'RedHandler.getContainerComponets', container))
            }
 )
 
@@ -1894,7 +1889,7 @@ setMethod ('selectNodes', 'RedPort',
 setMethod ('selectAllEdges', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.selectAllEdges'))
+             invisible (.rederpost(obj, 'RedHandler.selectAllEdges'))
            }
 )
 
@@ -1902,7 +1897,7 @@ setMethod ('selectAllEdges', 'RedPort',
 setMethod ('selectAllNodes', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.selectAllNodes'))
+             invisible (.rederpost(obj, 'RedHandler.selectAllNodes'))
            }
 )
 
@@ -1910,7 +1905,7 @@ setMethod ('selectAllNodes', 'RedPort',
 setMethod ('selectGraph', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.selectGraph'))
+             invisible (.rederpost(obj, 'RedHandler.selectGraph'))
            }
 )
 
@@ -1918,7 +1913,7 @@ setMethod ('selectGraph', 'RedPort',
 setMethod ('deSelectEdges', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.deSelectEdges'))
+             invisible (.rederpost(obj, 'RedHandler.deSelectEdges'))
            }
 )
 
@@ -1926,7 +1921,7 @@ setMethod ('deSelectEdges', 'RedPort',
 setMethod ('deSelectNodes', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.deSelectNodes'))
+             invisible (.rederpost(obj, 'RedHandler.deSelectNodes'))
            }
 )
 
@@ -1934,7 +1929,7 @@ setMethod ('deSelectNodes', 'RedPort',
 setMethod ('deSelectGraph', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.deSelectGraph'))
+             invisible (.rederpost(obj, 'RedHandler.deSelectGraph'))
            }
 )
 
@@ -1942,7 +1937,7 @@ setMethod ('deSelectGraph', 'RedPort',
 setMethod ('deleteSelectedEdges', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.deleteSelectedEdges'))
+             invisible (.rederpost(obj, 'RedHandler.deleteSelectedEdges'))
            }
 )
 
@@ -1950,7 +1945,7 @@ setMethod ('deleteSelectedEdges', 'RedPort',
 setMethod ('deleteSelectedNodes', 'RedPort', 
            function (obj) {
              if(ping(obj)==0)return(invisible())
-             invisible (.rederexpresspost(obj, 'RedHandler.deleteSelectedNodes'))
+             invisible (.rederpost(obj, 'RedHandler.deleteSelectedNodes'))
            }
 )
 
@@ -1958,7 +1953,7 @@ setMethod ('deleteSelectedNodes', 'RedPort',
 setMethod ('isDynamicsActive', 'RedPort', 
            function (obj) {   
              if(ping(obj)==0)return(invisible())
-             return (.rederexpresspost(obj, 'RedHandler.isDynamicsActive'))
+             return (.rederpost(obj, 'RedHandler.isDynamicsActive'))
            }
 )
 
@@ -1976,17 +1971,20 @@ setMethod ('relax', 'RedPort',
              if(!is.numeric(p8) || length(p8)==0)p8=10;p8=p8[1]
              if(!is.logical(ps))ps=FALSE
              ps=ifelse(ps[1],1,0)
-             return (.rederexpresspost(obj, 'RedHandler.setDynamics',p1,p2,p3,p4,p5,p6,p7,p8,ps))
+             return (.rederexpresspost(obj, 'RedHandler.setDynamics',
+                                       p1,p2,p3,p4,p5,p6,p7,p8,ps))
            }
 )
 
 #Map hclust to RedeR app
 #-------------------------------------------------------------------------------
 setMethod ('nesthc', 'RedPort', 
-           function(obj, hc, cutlevel=2, metric=c("rootdist","leafdist","height"), nmemb=2, nlev=2, grid=c(2,3),
-                    gridScale=75, gscale=c(30,75,45), isAssign=FALSE, isAnchor=TRUE, theme='tm6', nlinewidth=10, nfontsz=60,
-                    col=NULL, plothc=TRUE, plotbox=TRUE, cex=0.6, xlab="Nodes", ylab="Height", main="Hierarchical Network",
-                    alpha = 0.95, pv = "au", type = "geq", max.only = TRUE, labels=NULL, lwd=1,...){
+           function(obj, hc, cutlevel=2, metric=c("rootdist","leafdist","height"), 
+                    nmemb=2, nlev=2, grid=c(2,3), gridScale=75, gscale=c(30,75,45), 
+                    isAssign=FALSE, isAnchor=TRUE, theme='tm6', nlinewidth=10, 
+                    nfontsz=60, col=NULL, plothc=TRUE, plotbox=TRUE, cex=0.6, 
+                    xlab="Nodes", ylab="Height", main="Hierarchical Network",
+                    labels=NULL, lwd=1,...){
              
              if(ping(obj)==0)return(invisible())
              
@@ -1994,12 +1992,7 @@ setMethod ('nesthc', 'RedPort',
              igraph.check()
              
              #check hclust object-----------------------------------------------
-             hctype="hclust"
-             if(class(hc)=="pvclust"){
-               pvedges=pvpick(x=hc, alpha=alpha, pv=pv, type=type, max.only=max.only)$edges
-               hc=hc$hclust
-               hctype="pvclust"
-             } else if(class(hc)!="hclust"){
+             if(class(hc)!="hclust"){
                stop("Not a hclust object!")
              }
              hc$height=hc$height/max(hc$height)
@@ -2047,44 +2040,24 @@ setMethod ('nesthc', 'RedPort',
              nn=length(tm$nest)
              
              #compute dist to root and select nested series	
-             if(hctype=="pvclust"){
-               selec=rep(0, nn)
-               selec[pvedges]=1
-               tp=tm$parent
-               td=selec[tp]
-               td[is.na(td)]=0
-               nrtdist=td
-               while(sum(td)>0){
-                 tp=tm$parent[tp]
-                 td=selec[tp]
-                 td[is.na(td)]=0
-                 nrtdist=nrtdist+td
-               }
-               selec=nrtdist+selec
-               tp=rep(0, nn)
-               tp[pvedges]=1
-               selec[tp==0]=0
-               selec[selec>nlev]=0
+             val=tm[[metric]]
+             if(metric=="rootdist"){
+               selec=as.numeric(val>=cutlevel)
              } else {
-               val=tm[[metric]]
-               if(metric=="rootdist"){
-                 selec=as.numeric(val>=cutlevel)
-               } else {
-                 selec=as.numeric(val<=cutlevel)
-               }
-               tp=tm$parent
+               selec=as.numeric(val<=cutlevel)
+             }
+             tp=tm$parent
+             td=selec[tp]
+             td[is.na(td)]=0
+             nrtdist=td
+             while(sum(td)>0){
+               tp=tm$parent[tp]
                td=selec[tp]
                td[is.na(td)]=0
-               nrtdist=td
-               while(sum(td)>0){
-                 tp=tm$parent[tp]
-                 td=selec[tp]
-                 td[is.na(td)]=0
-                 nrtdist=nrtdist+td
-               }
-               selec=nrtdist+selec	
-               selec[selec>nlev]=0		
+               nrtdist=nrtdist+td
              }
+             selec=nrtdist+selec	
+             selec[selec>nlev]=0
              tedges=c(1:length(selec))[selec!=0]
              # remap parents (e.g. after removing tree nodes via pvclust)
              tp=tm$parent
@@ -2138,7 +2111,7 @@ setMethod ('nesthc', 'RedPort',
              # ' update="default" ' forces keeping old node coords and not to add new containers!
              if(is.null(update) || !is.character(update))update=NULL
              # internal function (locks DragAndZoon interactivity while sending the subgraph list to the data bank)
-             invisible(.rederexpresspost(obj,'RedHandler.lockDragAndZoom'))
+             invisible(.rederpost(obj,'RedHandler.lockDragAndZoom'))
              if(!is.null(zoom))invisible( .rederexpresspost(obj, 'RedHandler.setZoom',zoom) )
              checknd=getGraph(obj, status="all", attribs="minimal")
              checknd=V(checknd)$name        
@@ -2232,7 +2205,7 @@ setMethod ('nesthc', 'RedPort',
              }
              
              #Internal function (unlocks DragAndZoon interactivity after send subgraph list)
-             invisible(.rederexpresspost(obj,'RedHandler.unLockDragAndZoom'))
+             invisible(.rederpost(obj,'RedHandler.unLockDragAndZoom'))
              
              if(plothc){
                plot(x=hc, xlab=xlab, ylab=ylab, cex=cex, sub="", main=main, labels=labels, lwd=lwd,...)

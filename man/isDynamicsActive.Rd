@@ -31,12 +31,12 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 }
 
 \examples{
-rdp <- RedPort('MyPort') 
+rdp <- RedPort() 
 
 \dontrun{
 
   calld(rdp)
-  isDynamicsActive (rdp)
+  isDynamicsActive(rdp)
     # 1 or 0
 }  
 }

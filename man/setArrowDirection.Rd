@@ -34,11 +34,14 @@ The direction is set according to the edge order in the app (i.e. the edge list 
 }
 
 \examples{
-rdp <- RedPort('MyPort') 
+# Initialize igraph
+library(igraph)
+
 edges<-c("n1","n2","n1","n3","n1","n4","n1","n5","n1","n6","n1","n7")
 
 \dontrun{
 
+  rdp <- RedPort() 
   calld(rdp)
   addEdges(rdp, edges)
   setArrowDirection(rdp, "n1", "n2", 2)

@@ -41,14 +41,13 @@ Extracts subgraphs from 'igraph' objects and sends the result to the RedeR app.
 \code{\link[RedeR:addSubgraph.list]{addSubgraph.list}}
 }
 
-
 \examples{
-
+# Initialize igraph
 library(igraph)
 
 \dontrun{
 
-rdp <- RedPort('MyPort')
+rdp <- RedPort()
 calld(rdp)
 
 g <- graph.lattice(c(5,5,5))

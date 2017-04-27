@@ -38,12 +38,14 @@ Returns igraph objects.
 }
 
 \examples{
-
-rdp <- RedPort('MyPort')
+# Initialize igraph
+library(igraph)
 
 \dontrun{
 
+rdp <- RedPort()
 calld(rdp) 
+
 #ps. first add a graph (e.g. see samples in RedeR or 'addGraph' method)!
 g <- getGraph(rdp)
 }

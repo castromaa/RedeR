@@ -58,19 +58,20 @@ Prior calling this method invoke RedeR application via XML-RPC server (i.e. 'cal
 }
 
 \examples{
+# Initialize igraph
+library(igraph)
 
-#g <- gtoy.rm()
-#hc<-hclust(dist(get.adjacency(g)))
+g <- gtoy.rm()
+hc<-hclust(dist(get.adjacency(g)))
+
 #plot(hc)
-
-#rdp <- RedPort('MyPort') 
 
 \dontrun{
 
+  rdp <- RedPort() 
   calld(rdp)
   addGraph(rdp,g)
   nesthc(rdp, hc)
-
 }  
 }
 

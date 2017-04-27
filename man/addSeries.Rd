@@ -37,14 +37,13 @@ Submits series of R graphs to RedeR app.
 \code{\link[RedeR:addGraph]{addGraph}}
 }
 
-
 \examples{
-
+# Initialize igraph
 library(igraph)
 
 \dontrun{
 
-rdp <- RedPort('MyPort')
+rdp <- RedPort()
 calld(rdp)
 
 ###

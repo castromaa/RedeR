@@ -69,10 +69,10 @@ export(
   )
 
 import(methods)
-importFrom(igraph,is.mutual,delete.edges,remove.edge.attribute,V, E,'V<-','E<-')
-importFrom(XML,newXMLNode,saveXML,xmlParse,xmlValue,xmlChildren,xmlName,xpathApply,newXMLCDataNode,xmlApply)
-importFrom(pvclust, pvpick)
-importFrom(utils, setTxtProgressBar, txtProgressBar, close.socket, make.socket, read.socket, write.socket)
+importFrom(igraph,is.mutual,delete_vertex_attr,vertex_attr_names,delete.edges,
+           delete_edge_attr,edge_attr_names, V, E,'V<-','E<-')
+importFrom(utils, setTxtProgressBar, txtProgressBar, close.socket, make.socket, 
+           read.socket, write.socket)
 importFrom(graphics, hist, legend, lines, par, plot, polygon, rect, text)
 importFrom(grDevices, colorRampPalette, grey, terrain.colors)
 importFrom(stats, cor, density, p.adjust, quantile, runif)
